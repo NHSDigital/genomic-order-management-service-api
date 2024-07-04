@@ -2524,7 +2524,7 @@ paths:
         - $ref: '#/components/parameters/Id'
       responses:
         '200':
-          $ref: '#/components/responses/200-goms-bundle-patient-get'
+          $ref: '#/components/responses/200-goms-bundle-patient-get-logical-id'
         4XX:
           $ref: '#/components/responses/4XX-goms-error'
   /FHIR/R4/PractitionerRole:
@@ -2573,7 +2573,8 @@ paths:
         - $ref: '#/components/parameters/Id'
       responses:
         '200':
-          $ref: '#/components/responses/200-goms-bundle-practitionerrole-get'
+          $ref: >-
+            #/components/responses/200-goms-bundle-practitionerrole-get-logical-id
         4XX:
           $ref: '#/components/responses/4XX-goms-error'
 components:
@@ -3745,9 +3746,7 @@ components:
               - type
               - entry
             description: >-
-              A FHIR
-              [bundle](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-Bundle?version=0.3.0)
-              containing a single [FHIR
+              A single [FHIR
               ServiceRequest](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-ServiceRequest?version=0.3.0)
           examples:
             single-item:
@@ -3755,63 +3754,60 @@ components:
                 A successful response to a service request get, contains a
                 single item.
               value:
-                resourceType: Bundle
-                type: searchset
-                entry:
-                  - resourceType: ServiceRequest
-                    id: ServiceRequest-NonWGSTestOrderForm-Example
-                    extension:
-                      - url: >-
-                          https://fhir.hl7.org.uk/StructureDefinition/Extension-UKCore-Coverage
-                        valueCodeableConcept:
-                          coding:
-                            - system: >-
-                                https://fhir.hl7.org.uk/CodeSystem/UKCore-FundingCategory
-                              code: nhs
-                              display: NHS
-                    status: active
-                    intent: order
-                    category:
-                      - coding:
-                          - system: >-
-                              https://fhir.hl7.org.uk/CodeSystem/UKCore-GenomeSequencingCategory
-                            code: rare-disease-non-wgs
-                            display: Rare Disease - Non-WGS
-                    priority: routine
-                    code:
+                resourceType: ServiceRequest
+                id: ServiceRequest-NonWGSTestOrderForm-Example
+                extension:
+                  - url: >-
+                      https://fhir.hl7.org.uk/StructureDefinition/Extension-UKCore-Coverage
+                    valueCodeableConcept:
                       coding:
                         - system: >-
-                            https://fhir.nhs.uk/CodeSystem/England-GenomicTestDirectory
-                          code: R67.2
-                          display: Monogenic hearing loss
-                    subject:
-                      reference: Patient/Patient-MeirLieberman-Example
-                      identifier:
-                        system: https://fhir.nhs.uk/Id/nhs-number
-                        value: '9449307873'
-                    authoredOn: '2023-08-05'
-                    requester:
-                      reference: PractitionerRole/PractitionerRole-GeneSmithENT-Example
-                    reasonCode:
-                      - coding:
-                          - system: http://snomed.info/sct
-                            code: '103693007'
-                            display: Diagnostic procedure
-                    supportingInfo:
-                      - reference: Observation/Observation-DiseaseStatus-Example
-                      - reference: Observation/Observation-GenomicEthnicity-Example
-                      - reference: Observation/Observation-NoPregnancy-Example
-                      - reference: >-
-                          FamilyMemberHistory/FamilyMemberHistory-NonConsanguinousUnion-Example
-                      - reference: Observation/Observation-NoTransplant-Example
-                      - reference: Observation/Observation-NoTransfusion-Example
-                      - reference: Condition/Condition-HearingLoss-Example
-                    note:
-                      - text: No family history of genomic testing
-                      - text: >-
-                          Free text for diagnosis/reason for referral, relevant
-                          information including family history, phenotypic
-                          details/ HPO Terms/Patient in need of test...example
+                            https://fhir.hl7.org.uk/CodeSystem/UKCore-FundingCategory
+                          code: nhs
+                          display: NHS
+                status: active
+                intent: order
+                category:
+                  - coding:
+                      - system: >-
+                          https://fhir.hl7.org.uk/CodeSystem/UKCore-GenomeSequencingCategory
+                        code: rare-disease-non-wgs
+                        display: Rare Disease - Non-WGS
+                priority: routine
+                code:
+                  coding:
+                    - system: >-
+                        https://fhir.nhs.uk/CodeSystem/England-GenomicTestDirectory
+                      code: R67.2
+                      display: Monogenic hearing loss
+                subject:
+                  reference: Patient/Patient-MeirLieberman-Example
+                  identifier:
+                    system: https://fhir.nhs.uk/Id/nhs-number
+                    value: '9449307873'
+                authoredOn: '2023-08-05'
+                requester:
+                  reference: PractitionerRole/PractitionerRole-GeneSmithENT-Example
+                reasonCode:
+                  - coding:
+                      - system: http://snomed.info/sct
+                        code: '103693007'
+                        display: Diagnostic procedure
+                supportingInfo:
+                  - reference: Observation/Observation-DiseaseStatus-Example
+                  - reference: Observation/Observation-GenomicEthnicity-Example
+                  - reference: Observation/Observation-NoPregnancy-Example
+                  - reference: >-
+                      FamilyMemberHistory/FamilyMemberHistory-NonConsanguinousUnion-Example
+                  - reference: Observation/Observation-NoTransplant-Example
+                  - reference: Observation/Observation-NoTransfusion-Example
+                  - reference: Condition/Condition-HearingLoss-Example
+                note:
+                  - text: No family history of genomic testing
+                  - text: >-
+                      Free text for diagnosis/reason for referral, relevant
+                      information including family history, phenotypic details/
+                      HPO Terms/Patient in need of test...example
     200-goms-bundle-diagnostic-report-read:
       description: |
         Read diagnostic report operation successful
@@ -3825,9 +3821,7 @@ components:
               - type
               - entry
             description: >-
-              A FHIR
-              [bundle](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-Bundle?version=0.3.0)
-              containing a single [FHIR
+              A single [FHIR
               DiagnosticReport](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-DiagnosticReport?version=0.3.0)
           examples:
             single-item:
@@ -3835,49 +3829,45 @@ components:
                 A successful response to a diagnostic report get, contains a
                 single item.
               value:
-                resourceType: Bundle
-                type: searchset
-                entry:
-                  - resourceType: DiagnosticReport
-                    id: DiagnosticReport-AnitaLamberts-Example
-                    identifier:
-                      - system: https://www.guysandstthomas.nhs.uk/SEGLH/lims
-                        value: FHGenomicReport
-                        assigner:
-                          identifier:
-                            system: https://fhir.nhs.uk/Id/ods-organization-code
-                            value: RJ1
-                    basedOn:
-                      - reference: >-
-                          ServiceRequest/ServiceRequest-NonWGSTestOrderForm-NewFollowupTest-Example
-                    status: final
-                    category:
-                      - coding:
-                          - system: http://terminology.hl7.org/CodeSystem/v2-0074
-                            code: GE
-                            display: Genetics
-                    code:
-                      coding:
-                        - system: http://snomed.info/sct
-                          code: '1054161000000101'
-                          display: Genetic report
-                    subject:
-                      reference: Patient/Patient-AnitaLamberts-Example
-                    issued: '2023-11-24T09:45:00Z'
-                    performer:
-                      - identifier:
-                          system: https://fhir.nhs.uk/Id/ods-organization-code
-                          value: RJ1
-                    specimen:
-                      - reference: Specimen/Specimen-BloodEDTA-Example
-                    presentedForm:
-                      - contentType: application/pdf
-                        language: en-GB
-                        url: >-
-                          https://o719on.axshare.com/?id=8aol33&p=introduction&g=1
-                        size: 43272
-                        title: Genomic Report for Anita Lamberts
-                        creation: '2023-11-24'
+                resourceType: DiagnosticReport
+                id: DiagnosticReport-AnitaLamberts-Example
+                identifier:
+                  - system: https://www.guysandstthomas.nhs.uk/SEGLH/lims
+                    value: FHGenomicReport
+                    assigner:
+                      identifier:
+                        system: https://fhir.nhs.uk/Id/ods-organization-code
+                        value: RJ1
+                basedOn:
+                  - reference: >-
+                      ServiceRequest/ServiceRequest-NonWGSTestOrderForm-NewFollowupTest-Example
+                status: final
+                category:
+                  - coding:
+                      - system: http://terminology.hl7.org/CodeSystem/v2-0074
+                        code: GE
+                        display: Genetics
+                code:
+                  coding:
+                    - system: http://snomed.info/sct
+                      code: '1054161000000101'
+                      display: Genetic report
+                subject:
+                  reference: Patient/Patient-AnitaLamberts-Example
+                issued: '2023-11-24T09:45:00Z'
+                performer:
+                  - identifier:
+                      system: https://fhir.nhs.uk/Id/ods-organization-code
+                      value: RJ1
+                specimen:
+                  - reference: Specimen/Specimen-BloodEDTA-Example
+                presentedForm:
+                  - contentType: application/pdf
+                    language: en-GB
+                    url: https://o719on.axshare.com/?id=8aol33&p=introduction&g=1
+                    size: 43272
+                    title: Genomic Report for Anita Lamberts
+                    creation: '2023-11-24'
     200-goms-bundle-task-read:
       description: |
         Read Task operation successful
@@ -3891,37 +3881,32 @@ components:
               - type
               - entry
             description: >-
-              A FHIR
-              [bundle](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-Bundle?version=0.3.0)
-              containing a single [FHIR
+              A single [FHIR
               Task](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-Task?version=0.3.0)
           examples:
             single-item:
               description: A successful response to a task get, contains a single item.
               value:
-                resourceType: Bundle
-                type: searchset
-                entry:
-                  - resourceType: Task
-                    id: Task-NonWGSRareDiseaseTestOrder-Example
-                    status: requested
-                    intent: order
-                    priority: routine
-                    code:
-                      coding:
-                        - system: https://fhir.nhs.uk/CodeSystem/task-code-genomics
-                          code: ProcessGenomicTestRequest
-                          display: Process Genomic Test Request
-                    focus:
-                      reference: ServiceRequest/ServiceRequest-SavedTestOrder-Example
-                    for:
-                      reference: Patient/Patient-MeirLieberman-Example
-                      identifier:
-                        system: https://fhir.nhs.uk/Id/nhs-number
-                        value: '9449307873'
-                    authoredOn: '2023-08-05'
-                    requester:
-                      reference: PractitionerRole/PractitionerRole-GeneSmithENT-Example
+                resourceType: Task
+                id: Task-NonWGSRareDiseaseTestOrder-Example
+                status: requested
+                intent: order
+                priority: routine
+                code:
+                  coding:
+                    - system: https://fhir.nhs.uk/CodeSystem/task-code-genomics
+                      code: ProcessGenomicTestRequest
+                      display: Process Genomic Test Request
+                focus:
+                  reference: ServiceRequest/ServiceRequest-SavedTestOrder-Example
+                for:
+                  reference: Patient/Patient-MeirLieberman-Example
+                  identifier:
+                    system: https://fhir.nhs.uk/Id/nhs-number
+                    value: '9449307873'
+                authoredOn: '2023-08-05'
+                requester:
+                  reference: PractitionerRole/PractitionerRole-GeneSmithENT-Example
     20X-goms-bundle-specimen-create-update:
       description: A response from the /FHIR/R4/Specimen create update action.
       content:
@@ -3979,43 +3964,92 @@ components:
               - type
               - entry
             description: >-
-              A FHIR
-              [bundle](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-Bundle?version=0.3.0)
-              containing a single [FHIR
+              A single [FHIR
               Specimen](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-Specimen?version=0.3.0)
           examples:
             single-item:
               description: A successful response to a specimen get, contains a single item.
               value:
-                resourceType: Bundle
-                type: searchset
-                entry:
-                  - resourceType: Specimen
-                    id: Specimen-PheobeSmitham-Example
+                resourceType: Specimen
+                id: Specimen-PheobeSmitham-Example
+                identifier:
+                  - system: https://fhir.leedssth.nhs.uk//Id/specimenId
+                    value: RGD-69050-P-RR12764
+                status: available
+                type:
+                  coding:
+                    - system: http://snomed.info/sct
+                      code: '445295009'
+                      display: Blood specimen with EDTA
+                subject:
+                  reference: Patient/Patient-PheobeSmitham-Example
+                  identifier:
+                    system: https://fhir.nhs.uk/Id/nhs-number
+                    value: '9449307539'
+                collection:
+                  collector:
                     identifier:
-                      - system: https://fhir.leedssth.nhs.uk//Id/specimenId
-                        value: RGD-69050-P-RR12764
-                    status: available
-                    type:
-                      coding:
-                        - system: http://snomed.info/sct
-                          code: '445295009'
-                          display: Blood specimen with EDTA
-                    subject:
-                      reference: Patient/Patient-PheobeSmitham-Example
-                      identifier:
-                        system: https://fhir.nhs.uk/Id/nhs-number
-                        value: '9449307539'
-                    collection:
-                      collector:
-                        identifier:
-                          system: https://fhir.nhs.uk/Id/sds-user-id
-                          value: '9999999998'
-                        display: Phletobomist-Lois Lane
-                      collectedDateTime: '2023-09-17'
-                    request:
-                      - reference: >-
-                          ServiceRequest/ServiceRequest-WGSTestOrderForm-TrioTestingProband-Example
+                      system: https://fhir.nhs.uk/Id/sds-user-id
+                      value: '9999999998'
+                    display: Phletobomist-Lois Lane
+                  collectedDateTime: '2023-09-17'
+                request:
+                  - reference: >-
+                      ServiceRequest/ServiceRequest-WGSTestOrderForm-TrioTestingProband-Example
+    200-goms-bundle-practitionerrole-get-logical-id:
+      description: |
+        Read patient operation successful
+      content:
+        application/fhir+json:
+          schema:
+            type: object
+            required:
+              - resourceType
+              - identifier
+              - type
+              - entry
+            description: >-
+              A single [FHIR
+              Patient](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-Patient?version=0.3.0)
+          examples:
+            single-item:
+              description: A successful response to a patient get, contains a single item.
+              value:
+                resourceType: PractitionerRole
+                id: PractitionerRole-EugeneSmith-Example
+                practitioner:
+                  identifier:
+                    system: https://fhir.nhs.uk/Id/sds-user-id
+                    value: '9999999998'
+                  display: Dr. Eugene Smith
+                organization:
+                  identifier:
+                    system: https://fhir.nhs.uk/Id/ods-organization-code
+                    value: RPA02
+                  display: MEDWAY MARITIME HOSPITAL
+                specialty:
+                  - coding:
+                      - system: >-
+                          https://fhir.hl7.org.uk/CodeSystem/UKCore-PracticeSettingCode
+                        code: '820'
+                        display: General Pathology
+                telecom:
+                  - system: phone
+                    value: '01634976477'
+                  - system: email
+                    value: medwaypath@nhs.net
+                  - system: email
+                    value: clinicalgeneticsmedway@nhs.net
+                    extension:
+                      - url: >-
+                          http://hl7.org/fhir/StructureDefinition/contactpoint-comment
+                        valueString: reporting
+                  - system: email
+                    value: asmithgppracticeg@nhs.net
+                    extension:
+                      - url: >-
+                          http://hl7.org/fhir/StructureDefinition/contactpoint-comment
+                        valueString: reporting
     200-goms-bundle-practitionerrole-get:
       description: |
         Read patient operation successful
@@ -4075,6 +4109,93 @@ components:
                           - url: >-
                               http://hl7.org/fhir/StructureDefinition/contactpoint-comment
                             valueString: reporting
+    200-goms-bundle-patient-get-logical-id:
+      description: |
+        Read patient operation successful
+      content:
+        application/fhir+json:
+          schema:
+            type: object
+            required:
+              - resourceType
+              - identifier
+              - type
+              - entry
+            description: >-
+              A single [FHIR
+              Patient](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-Patient?version=0.3.0)
+          examples:
+            single-item:
+              description: A successful response to a patient get, contains a single item.
+              value:
+                resourceType: Patient
+                id: Patient-MeirLieberman-Example
+                extension:
+                  - url: >-
+                      https://fhir.hl7.org.uk/StructureDefinition/Extension-UKCore-BirthSex
+                    valueCodeableConcept:
+                      coding:
+                        - system: >-
+                            http://terminology.hl7.org/CodeSystem/v3-AdministrativeGender
+                          code: M
+                          display: Male
+                  - url: >-
+                      https://fhir.hl7.org.uk/StructureDefinition/Extension-UKCore-EthnicCategory
+                    valueCodeableConcept:
+                      coding:
+                        - system: >-
+                            https://fhir.hl7.org.uk/CodeSystem/UKCore-EthnicCategoryEngland
+                          code: A
+                          display: White - British
+                identifier:
+                  - system: https://fhir.nhs.uk/Id/nhs-number
+                    value: '9449307873'
+                    extension:
+                      - url: >-
+                          https://fhir.hl7.org.uk/StructureDefinition/Extension-UKCore-NHSNumberVerificationStatus
+                        valueCodeableConcept:
+                          coding:
+                            - system: >-
+                                https://fhir.hl7.org.uk/CodeSystem/UKCore-NHSNumberVerificationStatusEngland
+                              version: 2.2.0
+                              code: '01'
+                              display: Number present and verified
+                  - system: urn:oid:2.16.840.1.113883.2.1.3.2.4.18.24
+                    value: RGT012423
+                    assigner:
+                      identifier:
+                        system: https://fhir.nhs.uk/Id/ods-organization-code
+                        value: RGT01
+                  - system: https://fhir.nhs.uk/Id/genomics-pedigree-number
+                    value: P12345
+                name:
+                  - given:
+                      - Meir
+                      - Anah
+                    family: Lieberman
+                gender: male
+                birthDate: '2005-12-19'
+                deceasedBoolean: false
+                address:
+                  - line:
+                      - 1 Spinney Close
+                      - Worcester Park
+                    city: Surrey
+                    postalCode: KT4 7BS
+                generalPractitioner:
+                  - identifier:
+                      system: https://fhir.hl7.org.uk/Id/gmp-number
+                      value: G9999999
+                    display: Dr. Aero Smith
+                  - identifier:
+                      system: https://fhir.hl7.org.uk/Id/ODS-code
+                      value: TP123
+                    display: 123 Test Practice
+                link:
+                  - other:
+                      reference: >-
+                        https://api.service.nhs.uk/personal-demographics/FHIR/R4/Patient/9449307873
+                    type: seealso
     200-goms-bundle-patient-get:
       description: |
         Read patient operation successful
