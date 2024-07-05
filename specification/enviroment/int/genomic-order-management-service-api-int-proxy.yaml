@@ -2498,6 +2498,10 @@ paths:
         - $ref: '#/components/parameters/RequestID'
         - $ref: '#/components/parameters/CorrelationID'
         - $ref: '#/components/parameters/PatientIdentifier'
+        - $ref: '#/components/parameters/GivenName'
+        - $ref: '#/components/parameters/FamilyName'
+        - $ref: '#/components/parameters/DateOfBirth'
+        - $ref: '#/components/parameters/Gender'
       responses:
         '200':
           $ref: '#/components/responses/200-goms-bundle-patient-get'
@@ -2546,7 +2550,8 @@ paths:
         - $ref: '#/components/parameters/NHSDSessionURID'
         - $ref: '#/components/parameters/RequestID'
         - $ref: '#/components/parameters/CorrelationID'
-        - $ref: '#/components/parameters/Identifier'
+        - $ref: '#/components/parameters/PractitionerIdentifier'
+        - $ref: '#/components/parameters/Organisation'
       responses:
         '200':
           $ref: '#/components/responses/200-goms-bundle-practitionerrole-get'
@@ -4342,6 +4347,15 @@ components:
       schema:
         type: string
         example: https://example.org.system|ABCD1234
+    PractitionerIdentifier:
+      in: query
+      name: practitioner.identifier
+      description: |
+        The practitioner.identifier for the PractitionerRole.
+        Expressed as `<system>|<value>`
+      schema:
+        type: string
+        example: https://example.org.system|ABCD1234
     DateFrom:
       in: query
       name: '-date.from'
@@ -4449,6 +4463,42 @@ components:
       in: query
       name: status
       description: Parameter to search based on Status of a Resource
+      schema:
+        type: string
+        default: null
+    Organisation:
+      in: query
+      name: organisation
+      description: Parameter to search based on organisation code
+      schema:
+        type: string
+        default: null
+    GivenName:
+      in: query
+      name: given
+      description: Parameter to search based on GivenName of a Patient
+      schema:
+        type: string
+        default: null
+    FamilyName:
+      in: query
+      name: family
+      description: Parameter to search based on FamilyName of a Patient
+      schema:
+        type: string
+        default: null
+    DateOfBirth:
+      in: query
+      name: birthdate
+      description: Parameter to search based on DateOfBirth of a Patient
+      schema:
+        type: string
+        format: date
+        default: '9999-12-31'
+    Gender:
+      in: query
+      name: gender
+      description: Parameter to search based on Gender of a Patient
       schema:
         type: string
         default: null
