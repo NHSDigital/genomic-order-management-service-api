@@ -522,7 +522,8 @@
 									},
 									"response": []
 								}
-							]
+							],
+							"description": "This collection test the following scenario\n\n1. Send a test request for Rare Disease R132.1 using requestor org \"699W0\" to /FHIR/R4 endpoint using transaction message. Capture the logical Id for Patient and Service Request.\n    \n2. A generic /ServiceRequest GET using \"699W0\" as requester.\n    \n3. A ServiceRequest/LOGICAL_ID GET can confirming is the ID's match"
 						},
 						{
 							"name": "Singleton - RARE - NONWGS - Performer Selected",
@@ -770,7 +771,8 @@
 									},
 									"response": []
 								}
-							]
+							],
+							"description": "This collection test the following scenario\n\n1. Send a test request for Rare Disease R132.1 using requestor org \"699N0\" to /FHIR/R4 endpoint using transaction message. Capture the logical Id for Patient and Service Request.\n    \n2. A generic /ServiceRequest GET using \"699W0\" as requester.\n    \n3. A ServiceRequest/LOGICAL_ID GET can confirming is the ID's match and check the performer is \"699N0\""
 						},
 						{
 							"name": "Singleton - RARE - WGS",
@@ -953,8 +955,67 @@
 										}
 									},
 									"response": []
+								},
+								{
+									"name": "Get Service Request - Logical Id",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"const responseJson = pm.response.json();\r",
+													"\r",
+													"pm.test(\"HTTP Status code is 200\", function () {\r",
+													"  pm.response.to.have.status(200);\r",
+													"});\r",
+													"\r",
+													"pm.test(\"Content-Type header is present\", () => {\r",
+													"  pm.response.to.have.header(\"Content-Type\");\r",
+													"});\r",
+													"\r",
+													"pm.test(\"resourceType type = 'ServiceRequest'\", () => {\r",
+													"  pm.expect(responseJson.resourceType).to.eql(\"ServiceRequest\");\r",
+													"});\r",
+													"\r",
+													"const Response_Service_Request_Logical_Id = responseJson.id\r",
+													"pm.test(\"Logical id of the resource matches\", () => {\r",
+													"  pm.expect(Response_Service_Request_Logical_Id).to.eql(pm.environment.get('Service_Request_Logical_Id'));\r",
+													"})"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{url}}FHIR/R4/ServiceRequest/{{Service_Request_Logical_Id}}",
+											"host": [
+												"{{url}}FHIR"
+											],
+											"path": [
+												"R4",
+												"ServiceRequest",
+												"{{Service_Request_Logical_Id}}"
+											]
+										}
+									},
+									"response": []
 								}
-							]
+							],
+							"description": "This collection test the following scenario\n\n1. Send a test request for Rare Disease R135.2 WGS using requestor org \"699W0\" to /FHIR/R4 endpoint using transaction message. Capture the logical Id for Patient and Service Request.\n    \n2. A generic /ServiceRequest GET using \"699W0\" as requester.\n    \n3. A ServiceRequest/LOGICAL_ID GET can confirming is the ID's match"
 						},
 						{
 							"name": "Singleton - RARE - ROD",
@@ -1137,6 +1198,64 @@
 									"response": []
 								},
 								{
+									"name": "Get Service Request - Logical Id",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"const responseJson = pm.response.json();\r",
+													"\r",
+													"pm.test(\"HTTP Status code is 200\", function () {\r",
+													"  pm.response.to.have.status(200);\r",
+													"});\r",
+													"\r",
+													"pm.test(\"Content-Type header is present\", () => {\r",
+													"  pm.response.to.have.header(\"Content-Type\");\r",
+													"});\r",
+													"\r",
+													"pm.test(\"resourceType type = 'ServiceRequest'\", () => {\r",
+													"  pm.expect(responseJson.resourceType).to.eql(\"ServiceRequest\");\r",
+													"});\r",
+													"\r",
+													"const Response_Service_Request_Logical_Id = responseJson.id\r",
+													"pm.test(\"Logical id of the resource matches\", () => {\r",
+													"  pm.expect(Response_Service_Request_Logical_Id).to.eql(pm.environment.get('Service_Request_Logical_Id'));\r",
+													"})"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{url}}FHIR/R4/ServiceRequest/{{Service_Request_Logical_Id}}",
+											"host": [
+												"{{url}}FHIR"
+											],
+											"path": [
+												"R4",
+												"ServiceRequest",
+												"{{Service_Request_Logical_Id}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
 									"name": "Consent To Follow",
 									"event": [
 										{
@@ -1288,7 +1407,8 @@
 									},
 									"response": []
 								}
-							]
+							],
+							"description": "This collection test the following scenario\n\n1. Send a test request for Rare Disease R132.1 using requestor org \"699W0\" to /FHIR/R4 endpoint using transaction message. Capture the logical Id for Patient and Service Request.\n    \n2. A generic /ServiceRequest GET using \"699W0\" as requester.\n    \n3. A ServiceRequest/LOGICAL_ID GET can confirming is the ID's match\n    \n4. ROD to follow using Consent resource with \"status\":\"proposed\", capture logical Id of the resource\n    \n5. Attach ROD to the Consent"
 						},
 						{
 							"name": "Singleton - RARE - NONWGS Add & Update Sample",
@@ -1466,6 +1586,64 @@
 													"key": "requester",
 													"value": "699W0"
 												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Get Service Request - Logical Id",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"const responseJson = pm.response.json();\r",
+													"\r",
+													"pm.test(\"HTTP Status code is 200\", function () {\r",
+													"  pm.response.to.have.status(200);\r",
+													"});\r",
+													"\r",
+													"pm.test(\"Content-Type header is present\", () => {\r",
+													"  pm.response.to.have.header(\"Content-Type\");\r",
+													"});\r",
+													"\r",
+													"pm.test(\"resourceType type = 'ServiceRequest'\", () => {\r",
+													"  pm.expect(responseJson.resourceType).to.eql(\"ServiceRequest\");\r",
+													"});\r",
+													"\r",
+													"const Response_Service_Request_Logical_Id = responseJson.id\r",
+													"pm.test(\"Logical id of the resource matches\", () => {\r",
+													"  pm.expect(Response_Service_Request_Logical_Id).to.eql(pm.environment.get('Service_Request_Logical_Id'));\r",
+													"})"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{url}}FHIR/R4/ServiceRequest/{{Service_Request_Logical_Id}}",
+											"host": [
+												"{{url}}FHIR"
+											],
+											"path": [
+												"R4",
+												"ServiceRequest",
+												"{{Service_Request_Logical_Id}}"
 											]
 										}
 									},
@@ -1839,11 +2017,11 @@
 													"  pm.response.to.have.header(\"Content-Type\");\r",
 													"});\r",
 													"\r",
-													"pm.test(\"Response type = 'searchset'\", () => {\r",
-													"  pm.expect(responseJson.type).to.eql(\"searchset\");\r",
+													"pm.test(\"resourceType type = 'DiagnosticReport'\", () => {\r",
+													"  pm.expect(responseJson.resourceType).to.eql(\"DiagnosticReport\");\r",
 													"});\r",
 													"\r",
-													"const Response_DiagnosticReport_Logical_Id = responseJson.entry[0].resource.id\r",
+													"const Response_DiagnosticReport_Logical_Id = responseJson.id\r",
 													"pm.test(\"Logical id of the resource matches\", () => {\r",
 													"  pm.expect(Response_DiagnosticReport_Logical_Id).to.eql(pm.environment.get('Report_Logical_Id'));\r",
 													"})\r",
@@ -1862,25 +2040,21 @@
 										"method": "GET",
 										"header": [],
 										"url": {
-											"raw": "{{url}}FHIR/R4/DiagnosticReport?id={{Report_Logical_Id}}",
+											"raw": "{{url}}FHIR/R4/DiagnosticReport/{{Report_Logical_Id}}",
 											"host": [
 												"{{url}}FHIR"
 											],
 											"path": [
 												"R4",
-												"DiagnosticReport"
-											],
-											"query": [
-												{
-													"key": "id",
-													"value": "{{Report_Logical_Id}}"
-												}
+												"DiagnosticReport",
+												"{{Report_Logical_Id}}"
 											]
 										}
 									},
 									"response": []
 								}
-							]
+							],
+							"description": "This collection test the following scenario\n\n1. Send a test request for Rare Disease R132.1 using requestor org \"699W0\" to /FHIR/R4 endpoint using transaction message. Capture the logical Id for Patient and Service Request. There is no specimen in the initial request\n    \n2. A generic /ServiceRequest GET using \"699W0\" as requester.\n    \n3. A ServiceRequest/LOGICAL_ID GET can confirming is the ID's match\n    \n4. Attach a specimen to the test request\n    \n5. Get the specimen and check Id\n    \n6. Update the specimen\n    \n7. Get the specimen and check Id\n    \n8. Attach a report to the specimen\n    \n9. Get report and check Id of the report"
 						}
 					]
 				},
@@ -1896,7 +2070,7 @@
 		"apikey": [
 			{
 				"key": "value",
-				"value": "pk21d72jqrFsjPtmCQjhTA39FB58p30W",
+				"value": "",
 				"type": "string"
 			},
 			{
