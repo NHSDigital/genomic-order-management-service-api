@@ -4554,7 +4554,7 @@ x-nhsd-apim:
   target:
     type: external
     healthcheck: /_status
-    url: https://f4kotn5nra.execute-api.eu-west-2.amazonaws.com/dev
+    url: https://mgq002nolc.execute-api.eu-west-2.amazonaws.com/stag
     security:
       type: apikey
       header: X-Api-Key
