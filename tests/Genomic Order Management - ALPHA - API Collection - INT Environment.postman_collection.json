@@ -446,9 +446,9 @@
 										"method": "GET",
 										"header": [],
 										"url": {
-											"raw": "{{url}}FHIR/R4/ServiceRequest?requester=699W0",
+											"raw": "{{int.api.url}}FHIR/R4/ServiceRequest?requester=699W0",
 											"host": [
-												"{{url}}FHIR"
+												"{{int.api.url}}FHIR"
 											],
 											"path": [
 												"R4",
@@ -458,6 +458,11 @@
 												{
 													"key": "requester",
 													"value": "699W0"
+												},
+												{
+													"key": "category",
+													"value": "cancer-wgs",
+													"disabled": true
 												}
 											]
 										}
@@ -509,9 +514,9 @@
 										"method": "GET",
 										"header": [],
 										"url": {
-											"raw": "{{url}}FHIR/R4/ServiceRequest/{{Service_Request_Logical_Id}}",
+											"raw": "{{int.api.url}}FHIR/R4/ServiceRequest/{{Service_Request_Logical_Id}}",
 											"host": [
-												"{{url}}FHIR"
+												"{{int.api.url}}FHIR"
 											],
 											"path": [
 												"R4",
@@ -691,9 +696,9 @@
 										"method": "GET",
 										"header": [],
 										"url": {
-											"raw": "{{url}}FHIR/R4/ServiceRequest?requester=699W0",
+											"raw": "{{int.api.url}}FHIR/R4/ServiceRequest?requester=699W0",
 											"host": [
-												"{{url}}FHIR"
+												"{{int.api.url}}FHIR"
 											],
 											"path": [
 												"R4",
@@ -758,9 +763,9 @@
 										"method": "GET",
 										"header": [],
 										"url": {
-											"raw": "{{url}}FHIR/R4/ServiceRequest/{{Service_Request_Logical_Id}}",
+											"raw": "{{int.api.url}}FHIR/R4/ServiceRequest/{{Service_Request_Logical_Id}}",
 											"host": [
-												"{{url}}FHIR"
+												"{{int.api.url}}FHIR"
 											],
 											"path": [
 												"R4",
@@ -938,9 +943,9 @@
 										"method": "GET",
 										"header": [],
 										"url": {
-											"raw": "{{url}}FHIR/R4/ServiceRequest?requester=699W0",
+											"raw": "{{int.api.url}}FHIR/R4/ServiceRequest?requester=699W0",
 											"host": [
-												"{{url}}FHIR"
+												"{{int.api.url}}FHIR"
 											],
 											"path": [
 												"R4",
@@ -1001,9 +1006,9 @@
 										"method": "GET",
 										"header": [],
 										"url": {
-											"raw": "{{url}}FHIR/R4/ServiceRequest/{{Service_Request_Logical_Id}}",
+											"raw": "{{int.api.url}}FHIR/R4/ServiceRequest/{{Service_Request_Logical_Id}}",
 											"host": [
-												"{{url}}FHIR"
+												"{{int.api.url}}FHIR"
 											],
 											"path": [
 												"R4",
@@ -1179,9 +1184,9 @@
 										"method": "GET",
 										"header": [],
 										"url": {
-											"raw": "{{url}}FHIR/R4/ServiceRequest?requester=699W0",
+											"raw": "{{int.api.url}}FHIR/R4/ServiceRequest?requester=699W0",
 											"host": [
-												"{{url}}FHIR"
+												"{{int.api.url}}FHIR"
 											],
 											"path": [
 												"R4",
@@ -1242,9 +1247,9 @@
 										"method": "GET",
 										"header": [],
 										"url": {
-											"raw": "{{url}}FHIR/R4/ServiceRequest/{{Service_Request_Logical_Id}}",
+											"raw": "{{int.api.url}}FHIR/R4/ServiceRequest/{{Service_Request_Logical_Id}}",
 											"host": [
-												"{{url}}FHIR"
+												"{{int.api.url}}FHIR"
 											],
 											"path": [
 												"R4",
@@ -1573,9 +1578,9 @@
 										"method": "GET",
 										"header": [],
 										"url": {
-											"raw": "{{url}}FHIR/R4/ServiceRequest?requester=699W0",
+											"raw": "{{int.api.url}}FHIR/R4/ServiceRequest?requester=699W0",
 											"host": [
-												"{{url}}FHIR"
+												"{{int.api.url}}FHIR"
 											],
 											"path": [
 												"R4",
@@ -1636,9 +1641,9 @@
 										"method": "GET",
 										"header": [],
 										"url": {
-											"raw": "{{url}}FHIR/R4/ServiceRequest/{{Service_Request_Logical_Id}}",
+											"raw": "{{int.api.url}}FHIR/R4/ServiceRequest/{{Service_Request_Logical_Id}}",
 											"host": [
-												"{{url}}FHIR"
+												"{{int.api.url}}FHIR"
 											],
 											"path": [
 												"R4",
@@ -1771,9 +1776,9 @@
 										"method": "GET",
 										"header": [],
 										"url": {
-											"raw": "{{url}}FHIR/R4/Specimen/{{Specimen_Logical_Id}}",
+											"raw": "{{int.api.url}}FHIR/R4/Specimen/{{Specimen_Logical_Id}}",
 											"host": [
-												"{{url}}FHIR"
+												"{{int.api.url}}FHIR"
 											],
 											"path": [
 												"R4",
@@ -1905,9 +1910,9 @@
 										"method": "GET",
 										"header": [],
 										"url": {
-											"raw": "{{url}}FHIR/R4/Specimen/{{Specimen_Logical_Id}}",
+											"raw": "{{int.api.url}}FHIR/R4/Specimen/{{Specimen_Logical_Id}}",
 											"host": [
-												"{{url}}FHIR"
+												"{{int.api.url}}FHIR"
 											],
 											"path": [
 												"R4",
@@ -2040,9 +2045,9 @@
 										"method": "GET",
 										"header": [],
 										"url": {
-											"raw": "{{url}}FHIR/R4/DiagnosticReport/{{Report_Logical_Id}}",
+											"raw": "{{int.api.url}}FHIR/R4/DiagnosticReport/{{Report_Logical_Id}}",
 											"host": [
-												"{{url}}FHIR"
+												"{{int.api.url}}FHIR"
 											],
 											"path": [
 												"R4",
@@ -2055,12 +2060,165 @@
 								}
 							],
 							"description": "This collection test the following scenario\n\n1. Send a test request for Rare Disease R132.1 using requestor org \"699W0\" to /FHIR/R4 endpoint using transaction message. Capture the logical Id for Patient and Service Request. There is no specimen in the initial request\n    \n2. A generic /ServiceRequest GET using \"699W0\" as requester.\n    \n3. A ServiceRequest/LOGICAL_ID GET can confirming is the ID's match\n    \n4. Attach a specimen to the test request\n    \n5. Get the specimen and check Id\n    \n6. Update the specimen\n    \n7. Get the specimen and check Id\n    \n8. Attach a report to the specimen\n    \n9. Get report and check Id of the report"
+						},
+						{
+							"name": "GLH",
+							"item": [
+								{
+									"name": "Get Task",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{int.api.url}}FHIR/R4/Task?owner=699N0",
+											"host": [
+												"{{int.api.url}}FHIR"
+											],
+											"path": [
+												"R4",
+												"Task"
+											],
+											"query": [
+												{
+													"key": "owner",
+													"value": "699N0"
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Get Task - Logical Id",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"const responseJson = pm.response.json();\r",
+													"\r",
+													"pm.test(\"HTTP Status code is 200\", function () {\r",
+													"  pm.response.to.have.status(200);\r",
+													"});\r",
+													"\r",
+													"pm.test(\"Content-Type header is present\", () => {\r",
+													"  pm.response.to.have.header(\"Content-Type\");\r",
+													"});\r",
+													"\r",
+													"pm.test(\"resourceType type = 'Task'\", () => {\r",
+													"  pm.expect(responseJson.resourceType).to.eql(\"Task\");\r",
+													"});"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{int.api.url}}FHIR/R4/Task/2028ba37-a707-493b-afe7-f2e6b58f8914",
+											"host": [
+												"{{int.api.url}}FHIR"
+											],
+											"path": [
+												"R4",
+												"Task",
+												"2028ba37-a707-493b-afe7-f2e6b58f8914"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Update Task",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													"const bundle_id = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"pm.environment.set(\"bundle_id\",bundle_id);\r",
+													"\r",
+													"//const specimen_id = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"//pm.environment.set(\"specimen_id\",specimen_id);\r",
+													"\r",
+													"//const test_specimen_id = pm.variables.replaceIn(\"{{$randomBankAccount}}\");\r",
+													"//pm.environment.set(\"test_specimen_id\",test_specimen_id);\r",
+													"\r",
+													"//const specimen_collection_time=pm.variables.replaceIn(\"{{$isoTimestamp}}\");\r",
+													"//pm.environment.set(\"specimen_collection_time\",specimen_collection_time);"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"resourceType\": \"Bundle\",\r\n    \"id\": \"{{bundle_id}}\",\r\n    \"type\": \"transaction\",\r\n    \"entry\": [{\r\n            \"fullUrl\": \"Task/2028ba37-a707-493b-afe7-f2e6b58f8914\",\r\n            \"resource\": {\r\n                \"resourceType\": \"Task\",\r\n                \"id\": \"2028ba37-a707-493b-afe7-f2e6b58f8914\",\r\n                \"status\": \"accepted\",\r\n                \"intent\": \"order\",\r\n                \"priority\": \"routine\",\r\n                \"code\": {\r\n                    \"coding\": [{\r\n                            \"system\": \"https://fhir.nhs.uk/CodeSystem/task-code-genomics\",\r\n                            \"code\": \"GenomicMDT\",\r\n                            \"display\": \"Genomic MDT\"\r\n                        }\r\n                    ]\r\n                },\r\n                \"focus\": {\r\n                    \"reference\": \"ServiceRequest/147b3d52-2d40-4d81-a4a8-c3f2ec972e72\",\r\n                    \"identifier\": {\r\n                        \"system\": \"http://terminology.hl7.org/NamingSystem/uri\",\r\n                        \"value\": \"147b3d52-2d40-4d81-a4a8-c3f2ec972e72\"\r\n                    }\r\n                },\r\n                \"for\": {\r\n                    \"reference\": \"Patient/994fb30b-7832-485e-b222-7de54a99a971\",\r\n                    \"type\": \"Patient\",\r\n                    \"identifier\": {\r\n                        \"system\": \"https://fhir.nhs.uk/Id/nhs-number\",\r\n                        \"value\": \"9449307946\"\r\n                    }\r\n                },\r\n                \"authoredOn\": \"2024-07-05T10:10:30.7880182+00:00\",\r\n                \"requester\": {\r\n                    \"reference\": \"PractitionerRole/8d3d2efe-9a94-420b-a421-ec9573a5e51e\",\r\n                    \"type\": \"PractitionerRole\",\r\n                    \"identifier\": {\r\n                        \"system\": \"https://fhir.nhs.uk/Id/ods-organization-code\",\r\n                        \"value\": \"699W0\"\r\n                    }\r\n                },\r\n                \"owner\": {\r\n                    \"identifier\": {\r\n                        \"system\": \"https://fhir.nhs.uk/Id/ods-organization-code\",\r\n                        \"value\": \"699N0\"\r\n                    }\r\n                }\r\n            },\r\n            \"request\": {\r\n                \"method\": \"PUT\",\r\n                \"url\": \"Task\"\r\n            }\r\n        }\r\n    ]\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{int.api.url}}FHIR/R4",
+											"host": [
+												"{{int.api.url}}FHIR"
+											],
+											"path": [
+												"R4"
+											]
+										}
+									},
+									"response": []
+								}
+							]
 						}
 					]
 				},
 				{
 					"name": "Cancer",
 					"item": []
+				},
+				{
+					"name": "Core Resources",
+					"item": [
+						{
+							"name": "Get Patient",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{int.api.url}}FHIR/R4/Patient",
+									"host": [
+										"{{int.api.url}}FHIR"
+									],
+									"path": [
+										"R4",
+										"Patient"
+									]
+								}
+							},
+							"response": []
+						}
+					]
 				}
 			]
 		}
