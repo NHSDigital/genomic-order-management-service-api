@@ -353,6 +353,7 @@ info:
     | Integration         
     |`https://int.api.service.nhs.uk/genomic-order-management-service`|
 
+     Postman collection to test against [INT](https://github.com/NHSDigital/genomic-order-management-service-api/tree/main/tests).
 
     ### Sandbox testing
 

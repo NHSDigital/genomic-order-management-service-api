@@ -2,6 +2,7 @@
 	"info": {
 		"_postman_id": "92813abe-5580-4aa0-8fad-01db085b67a1",
 		"name": "Genomic Order Management - ALPHA - API Collection - INT Environment",
+		"description": "This is the postman collection for the following\n\n1\\. Test directory API -\n\n2\\. Routing API\n\n3\\. Order Management API - INT Enviroment\n\nConfiguration Steps\n\na) Import the collection into postman\n\nb) At the collection level in Authorisation add your application apikey value. To get apikey follow steps in [https://digital.nhs.uk/developer/getting-started](https://digital.nhs.uk/developer/getting-started) by creating an account and registering an application for integration.",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "13103948"
 	},
