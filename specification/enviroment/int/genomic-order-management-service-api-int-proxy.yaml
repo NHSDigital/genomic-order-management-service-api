@@ -2498,7 +2498,7 @@ paths:
         - $ref: '#/components/parameters/NHSDSessionURID'
         - $ref: '#/components/parameters/RequestID'
         - $ref: '#/components/parameters/CorrelationID'
-        - $ref: '#/components/parameters/PatientIdentifier'
+        - $ref: '#/components/parameters/Identifier'
         - $ref: '#/components/parameters/GivenName'
         - $ref: '#/components/parameters/FamilyName'
         - $ref: '#/components/parameters/DateOfBirth'
@@ -4329,7 +4329,7 @@ components:
         example: 60E0B220-8136-4CA5-AE46-1D97EF59D068
     PatientIdentifier:
       in: query
-      name: patient.identifier
+      name: patient:identifier
       description: >
         The patient's NHS number.
 
