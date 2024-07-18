@@ -4350,9 +4350,9 @@ components:
         example: https://example.org.system|ABCD1234
     PractitionerIdentifier:
       in: query
-      name: practitioner.identifier
+      name: practitioner:identifier
       description: |
-        The practitioner.identifier for the PractitionerRole.
+        The practitioner identifier within PractitionerRole.practitioner reference object.
         Expressed as `<system>|<value>`
       schema:
         type: string
