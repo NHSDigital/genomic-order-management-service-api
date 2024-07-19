@@ -1759,9 +1759,9 @@ paths:
         - $ref: '#/components/parameters/RequestID'
         - $ref: '#/components/parameters/CorrelationID'
         - $ref: '#/components/parameters/PatientIdentifier'
+        - $ref: '#/components/parameters/LogicalIdentifier'
         - $ref: '#/components/parameters/Identifier'
-        - $ref: '#/components/parameters/DateFrom'
-        - $ref: '#/components/parameters/DateTo'
+        - $ref: '#/components/parameters/Authored'
         - $ref: '#/components/parameters/Requestor'
         - $ref: '#/components/parameters/Performer'
         - $ref: '#/components/parameters/Status'
@@ -1986,8 +1986,8 @@ paths:
         - $ref: '#/components/parameters/RequestID'
         - $ref: '#/components/parameters/CorrelationID'
         - $ref: '#/components/parameters/PatientIdentifier'
-        - $ref: '#/components/parameters/DateFrom'
-        - $ref: '#/components/parameters/DateTo'
+        - $ref: '#/components/parameters/LogicalIdentifier'
+        - $ref: '#/components/parameters/TaskAuthored'
         - $ref: '#/components/parameters/Requestor'
         - $ref: '#/components/parameters/Owner'
         - $ref: '#/components/parameters/Status'
@@ -2226,9 +2226,9 @@ paths:
         - $ref: '#/components/parameters/RequestID'
         - $ref: '#/components/parameters/CorrelationID'
         - $ref: '#/components/parameters/PatientIdentifier'
+        - $ref: '#/components/parameters/LogicalIdentifier'
         - $ref: '#/components/parameters/Identifier'
-        - $ref: '#/components/parameters/DateFrom'
-        - $ref: '#/components/parameters/DateTo'
+        - $ref: '#/components/parameters/ReportIssued'
         - $ref: '#/components/parameters/Performer'
         - $ref: '#/components/parameters/ResultsInterpreter'
         - $ref: '#/components/parameters/Status'
@@ -2425,9 +2425,10 @@ paths:
         - $ref: '#/components/parameters/RequestID'
         - $ref: '#/components/parameters/CorrelationID'
         - $ref: '#/components/parameters/PatientIdentifier'
+        - $ref: '#/components/parameters/LogicalIdentifier'
         - $ref: '#/components/parameters/Identifier'
-        - $ref: '#/components/parameters/DateFrom'
-        - $ref: '#/components/parameters/DateTo'
+        - $ref: '#/components/parameters/SpecimenCollected'
+        - $ref: '#/components/parameters/ContainerIdentifier'
         - $ref: '#/components/parameters/Status'
         - $ref: '#/components/parameters/SpecimenInclude'
       responses:
@@ -2498,6 +2499,7 @@ paths:
         - $ref: '#/components/parameters/NHSDSessionURID'
         - $ref: '#/components/parameters/RequestID'
         - $ref: '#/components/parameters/CorrelationID'
+        - $ref: '#/components/parameters/LogicalIdentifier'
         - $ref: '#/components/parameters/Identifier'
         - $ref: '#/components/parameters/GivenName'
         - $ref: '#/components/parameters/FamilyName'
@@ -2551,6 +2553,7 @@ paths:
         - $ref: '#/components/parameters/NHSDSessionURID'
         - $ref: '#/components/parameters/RequestID'
         - $ref: '#/components/parameters/CorrelationID'
+        - $ref: '#/components/parameters/LogicalIdentifier'
         - $ref: '#/components/parameters/PractitionerIdentifier'
         - $ref: '#/components/parameters/Organisation'
       responses:
@@ -4351,8 +4354,10 @@ components:
     PractitionerIdentifier:
       in: query
       name: practitioner:identifier
-      description: |
-        The practitioner identifier within PractitionerRole.practitioner reference object.
+      description: >
+        The practitioner identifier within PractitionerRole.practitioner
+        reference object.
+
         Expressed as `<system>|<value>`
       schema:
         type: string
@@ -4373,6 +4378,54 @@ components:
         type: string
         format: date
         default: '9999-12-31'
+    Authored:
+      in: query
+      name: authored
+      description: Search by date request signed - ServiceRequest.authoredOn
+      schema:
+        type: string
+        format: date
+        default: '1900-01-01'
+    TaskAuthored:
+      in: query
+      name: authored-on
+      description: Search by creation date - Task.authoredOn
+      schema:
+        type: string
+        format: date
+        default: '1900-01-01'
+    ReportIssued:
+      in: query
+      name: issued
+      description: When the report was issued - DiagnosticReport.issued
+      schema:
+        type: string
+        format: date
+        default: '1900-01-01'
+    SpecimenCollected:
+      in: query
+      name: collected
+      description: The date the specimen was collected  Specimen.collection.collected
+      schema:
+        type: string
+        format: date
+        default: '1900-01-01'
+    ContainerIdentifier:
+      in: query
+      name: container-id
+      description: >-
+        Search based on the unique identifier associated with the specimen
+        container - Specimen.container.identifier
+      schema:
+        type: string
+        example: b4dccd9f-1f49-45aa-8566-3a517fc98d3d
+    LogicalIdentifier:
+      in: query
+      name: _id
+      description: The logical identifier of the resource
+      schema:
+        type: string
+        example: b4dccd9f-1f49-45aa-8566-3a517fc98d3d
     Include:
       in: query
       name: _include
@@ -4448,7 +4501,7 @@ components:
         default: null
     ResultsInterpreter:
       in: query
-      name: resultsInterpreter
+      name: results-interpreter
       description: Parameter to search based on ResultsInterpreter Organisation
       schema:
         type: string
@@ -4469,7 +4522,7 @@ components:
         default: null
     Organisation:
       in: query
-      name: organisation
+      name: organization:identifier
       description: Parameter to search based on organisation code
       schema:
         type: string
@@ -4505,7 +4558,7 @@ components:
         default: null
     TestID:
       in: query
-      name: testId
+      name: code
       description: >-
         Parameter to search Service Request based on [test directory
         code](https://www.england.nhs.uk/publication/national-genomic-test-directories/)
@@ -4523,7 +4576,7 @@ components:
         default: null
     BusinessStatus:
       in: query
-      name: businessStatus
+      name: business-status
       description: >-
         Parameter to search based on
         [BusinessStatus](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/ValueSets?version=0.3.0#Genomic-Business-Status)
@@ -4533,7 +4586,7 @@ components:
         default: null
     TaskCode:
       in: query
-      name: taskCode
+      name: code
       description: >-
         Parameter to search based on
         [TaskCode](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/CodeSystems?version=0.3.0#Genomic-Task-Code)
