@@ -1816,6 +1816,49 @@ paths:
           $ref: '#/components/responses/200-goms-bundle-service-request-read'
         4XX:
           $ref: '#/components/responses/4XX-goms-error'
+  /FHIR/R4/ServiceRequest/{id}/_history:
+    get:
+      summary: Retrieve a ServiceRequest history by its unique identifier
+      operationId: readServiceRequestHistory
+      description: >
+        ## Overview
+
+        This endpoint allows you to retrieve the record of a single
+        ServiceRequest history by its identifier.
+
+
+        ## Sandbox testing
+
+        You can test the following scenarios in our sandbox environment:
+
+
+        | Scenario                                |
+        Request                                                                                                                                                        
+        |
+        Response                                                               
+        |
+
+        | ----------------------------------------|
+        ----------------------------------------------------------------------------------------------------------------------------------------------------------------|
+        ------------------------------------------------------------------------|
+
+        |                                        
+        |                                                                                                                                                                
+        |                                                                        
+        |
+      tags:
+        - order
+      parameters:
+        - $ref: '#/components/parameters/apikey'
+        - $ref: '#/components/parameters/NHSDSessionURID'
+        - $ref: '#/components/parameters/RequestID'
+        - $ref: '#/components/parameters/CorrelationID'
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          $ref: '#/components/responses/200-goms-bundle-service-request-history'
+        4XX:
+          $ref: '#/components/responses/4XX-goms-error'
   /FHIR/R4/Task:
     post:
       operationId: addtask
@@ -3779,6 +3822,149 @@ components:
                       Free text for diagnosis/reason for referral, relevant
                       information including family history, phenotypic details/
                       HPO Terms/Patient in need of test...example
+    200-goms-bundle-service-request-history:
+      description: |
+        Read Service Request history operation successful
+      content:
+        application/fhir+json:
+          schema:
+            type: object
+            required:
+              - resourceType
+              - identifier
+              - type
+              - entry
+            description: >-
+              A Bundle containing [FHIR ServiceRequest] history
+              (https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-ServiceRequest?version=0.3.0)
+          examples:
+            multiple-items:
+              description: >-
+                A successful response to a service request get, contains a
+                multiple items.
+              value:
+                resourceType: Bundle
+                type: history
+                entry:
+                  - resourceType: ServiceRequest
+                    id: ServiceRequest-NonWGSTestOrderForm-Example
+                    extension:
+                      - url: >-
+                          https://fhir.hl7.org.uk/StructureDefinition/Extension-UKCore-Coverage
+                        valueCodeableConcept:
+                          coding:
+                            - system: >-
+                                https://fhir.hl7.org.uk/CodeSystem/UKCore-FundingCategory
+                              code: nhs
+                              display: NHS
+                    status: active
+                    intent: order
+                    category:
+                      - coding:
+                          - system: >-
+                              https://fhir.hl7.org.uk/CodeSystem/UKCore-GenomeSequencingCategory
+                            code: rare-disease-non-wgs
+                            display: Rare Disease - Non-WGS
+                    priority: routine
+                    code:
+                      coding:
+                        - system: >-
+                            https://fhir.nhs.uk/CodeSystem/England-GenomicTestDirectory
+                          code: R67.2
+                          display: Monogenic hearing loss
+                    subject:
+                      reference: Patient/Patient-MeirLieberman-Example
+                      identifier:
+                        system: https://fhir.nhs.uk/Id/nhs-number
+                        value: '9449307873'
+                    authoredOn: '2023-08-05'
+                    requester:
+                      reference: PractitionerRole/PractitionerRole-GeneSmithENT-Example
+                    reasonCode:
+                      - coding:
+                          - system: http://snomed.info/sct
+                            code: '103693007'
+                            display: Diagnostic procedure
+                    supportingInfo:
+                      - reference: Observation/Observation-DiseaseStatus-Example
+                      - reference: Observation/Observation-GenomicEthnicity-Example
+                      - reference: Observation/Observation-NoPregnancy-Example
+                      - reference: >-
+                          FamilyMemberHistory/FamilyMemberHistory-NonConsanguinousUnion-Example
+                      - reference: Observation/Observation-NoTransplant-Example
+                      - reference: Observation/Observation-NoTransfusion-Example
+                      - reference: Condition/Condition-HearingLoss-Example
+                    note:
+                      - text: No family history of genomic testing
+                      - text: >-
+                          Free text for diagnosis/reason for referral, relevant
+                          information including family history, phenotypic
+                          details/ HPO Terms/Patient in need of test...example
+                  - resourceType: ServiceRequest
+                    id: ServiceRequest-NonWGSTestOrderForm-FetalScenario-Example
+                    extension:
+                      - url: >-
+                          https://fhir.hl7.org.uk/StructureDefinition/Extension-UKCore-Coverage
+                        valueCodeableConcept:
+                          coding:
+                            - system: >-
+                                https://fhir.hl7.org.uk/CodeSystem/UKCore-FundingCategory
+                              code: nhs
+                              display: NHS
+                    status: active
+                    intent: order
+                    category:
+                      - coding:
+                          - system: >-
+                              https://fhir.hl7.org.uk/CodeSystem/UKCore-GenomeSequencingCategory
+                            code: rare-disease-non-wgs
+                            display: Rare Disease - Non-WGS
+                    priority: urgent
+                    code:
+                      coding:
+                        - system: >-
+                            https://fhir.nhs.uk/CodeSystem/England-GenomicTestDirectory
+                          code: R21
+                          display: Fetal anomalies with a likely genetic cause
+                    subject:
+                      reference: Patient/Patient-FoetusOfRyanneBoulder-Example
+                      identifier:
+                        - system: urn:oid:2.16.840.1.113883.2.1.3.2.4.18.24
+                          value: FT-RWT13521
+                          assigner:
+                            identifier:
+                              system: https://fhir.nhs.uk/Id/ods-organization-code
+                              value: RAX
+                    authoredOn: '2023-09-25'
+                    requester:
+                      reference: >-
+                        PractitionerRole/PractitionerRole-LoisLaneKingstonClinicalGenetics-Example
+                    reasonCode:
+                      - coding:
+                          - system: http://snomed.info/sct
+                            code: '243787009'
+                            display: Antenatal screening
+                    supportingInfo:
+                      - reference: Observation/Observation-HistoryOfFetalLoss-Example
+                      - reference: Observation/Observation-NonConsanguinousUnion-Example
+                      - reference: >-
+                          FamilyMemberHistory/FamilyMemberHistory-NonConsanguinousUnionRyanneBoulder-Example
+                      - reference: Observation/Observation-GenomicEthnicity-Example
+                      - reference: Observation/Observation-PregnancyConfirmation-Example
+                      - reference: Observation/Observation-NoTransplant-Example
+                      - reference: >-
+                          Observation/Observation-NoFirstTrimesterFetalAnomalies-Example
+                      - reference: >-
+                          Observation/Observation-NoSecondTrimesterFetalAnomalies-Example
+                      - reference: Procedure/Procedure-InVitroFertilisation-Example
+                    note:
+                      - text: Samples are to be provided at a later date
+                      - text: No family history of relevant testing
+                      - text: >-
+                          Free text for diagnosis/reason for referral, relevant
+                          information including family history, phenotypic
+                          details/ HPO Terms/ E.g. large echogenic kidneys with
+                          normal bladder
     200-goms-bundle-diagnostic-report-read:
       description: |
         Read diagnostic report operation successful
