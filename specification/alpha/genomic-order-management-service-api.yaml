@@ -1768,6 +1768,7 @@ paths:
         - $ref: '#/components/parameters/TestID'
         - $ref: '#/components/parameters/Include'
         - $ref: '#/components/parameters/RevInclude'
+        - $ref: '#/components/parameters/SupportingInfo'
       responses:
         '200':
           $ref: '#/components/responses/200-goms-bundle-servicerequests-get'
@@ -4719,6 +4720,14 @@ components:
       description: >-
         Parameter to search Service Request based on
         [category](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/ValueSets?version=0.3.0#Genomic-Test-Types)
+      schema:
+        type: string
+        default: null
+    SupportingInfo:
+      in: query
+      name: supporting-info
+      description: >-
+        Parameter to search Service Request based on supporting info in the test
       schema:
         type: string
         default: null
