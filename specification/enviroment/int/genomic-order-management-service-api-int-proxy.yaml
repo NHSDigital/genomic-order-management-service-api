@@ -1822,15 +1822,15 @@ paths:
           $ref: '#/components/responses/4XX-goms-error'
   /FHIR/R4/ServiceRequest/{id}/_history:
     get:
-      summary: Retrieve a ServiceRequest history by its unique identifier
+      summary: Retrieve ServiceRequest history by its unique identifier
       operationId: readServiceRequestHistory
       security:
         - app-level0: []
       description: >
         ## Overview
 
-        This endpoint allows you to retrieve the record of a single
-        ServiceRequest history by its identifier.
+        This endpoint allows you to retrieve the history of a single
+        ServiceRequest by its identifier.
 
 
         ## Sandbox testing
@@ -1860,6 +1860,52 @@ paths:
         - $ref: '#/components/parameters/RequestID'
         - $ref: '#/components/parameters/CorrelationID'
         - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          $ref: '#/components/responses/200-goms-bundle-service-request-history'
+        4XX:
+          $ref: '#/components/responses/4XX-goms-error'
+  /FHIR/R4/ServiceRequest/{id}/_history/{versionId}:
+    get:
+      summary: Retrieve ServiceRequest version by its unique identifier
+      operationId: readServiceRequestHistoryVersion
+      security:
+        - app-level0: []
+      description: >
+        ## Overview
+
+        This endpoint allows you to retrieve a single ServiceRequest version by
+        its logical identifier.
+
+
+        ## Sandbox testing
+
+        You can test the following scenarios in our sandbox environment:
+
+
+        | Scenario                                |
+        Request                                                                                                                                                        
+        |
+        Response                                                               
+        |
+
+        | ----------------------------------------|
+        ----------------------------------------------------------------------------------------------------------------------------------------------------------------|
+        ------------------------------------------------------------------------|
+
+        |                                        
+        |                                                                                                                                                                
+        |                                                                        
+        |
+      tags:
+        - order
+      parameters:
+        - $ref: '#/components/parameters/apikey'
+        - $ref: '#/components/parameters/NHSDSessionURID'
+        - $ref: '#/components/parameters/RequestID'
+        - $ref: '#/components/parameters/CorrelationID'
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/VersionId'
       responses:
         '200':
           $ref: '#/components/responses/200-goms-bundle-service-request-history'
@@ -4766,8 +4812,7 @@ components:
     SupportingInfo:
       in: query
       name: supporting-info
-      description: >-
-        Parameter to search Service Request based on supporting info in the test
+      description: Parameter to search Service Request based on supporting info in the test
       schema:
         type: string
         default: null
@@ -4841,6 +4886,16 @@ components:
       schema:
         type: string
         example: 29dc4e84-7e72-11ee-b962-0242ac120002
+    VersionId:
+      in: path
+      name: versionId
+      required: true
+      description: >-
+        The specific version Id which you can use to identify an unique resource
+        object with its logical Id.
+      schema:
+        type: string
+        example: '1'
   schemas: {}
   requestBodies: {}
   headers:
