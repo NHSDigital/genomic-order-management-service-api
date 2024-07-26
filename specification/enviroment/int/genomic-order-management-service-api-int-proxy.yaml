@@ -1824,6 +1824,8 @@ paths:
     get:
       summary: Retrieve a ServiceRequest history by its unique identifier
       operationId: readServiceRequestHistory
+      security:
+        - app-level0: []
       description: >
         ## Overview
 
