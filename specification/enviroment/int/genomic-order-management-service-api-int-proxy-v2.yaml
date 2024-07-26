@@ -449,6 +449,7 @@ tags:
   - name: specimen
   - name: patient
   - name: practitionerrole
+  - name: history
 paths:
   /FHIR/R4:
     post:
@@ -1775,142 +1776,6 @@ paths:
           $ref: '#/components/responses/200-goms-bundle-servicerequests-get'
         4XX:
           $ref: '#/components/responses/4XX-goms-error'
-  /FHIR/R4/ServiceRequest/{id}:
-    get:
-      summary: Retrieve a ServiceRequest by its unique identifier
-      operationId: readServiceRequest
-      security:
-        - app-level0: []
-      description: >
-        ## Overview
-
-        This endpoint allows you to retrieve the record of a single
-        ServiceRequest by its identifier.
-
-
-        ## Sandbox testing
-
-        You can test the following scenarios in our sandbox environment:
-
-
-        | Scenario                                |
-        Request                                                                                                                                                        
-        |
-        Response                                                               
-        |
-
-        | ----------------------------------------|
-        ----------------------------------------------------------------------------------------------------------------------------------------------------------------|
-        ------------------------------------------------------------------------|
-
-        |                                        
-        |                                                                                                                                                                
-        |                                                                        
-        |
-      tags:
-        - order
-      parameters:
-        - $ref: '#/components/parameters/apikey'
-        - $ref: '#/components/parameters/NHSDSessionURID'
-        - $ref: '#/components/parameters/RequestID'
-        - $ref: '#/components/parameters/CorrelationID'
-        - $ref: '#/components/parameters/Id'
-      responses:
-        '200':
-          $ref: '#/components/responses/200-goms-bundle-service-request-read'
-        4XX:
-          $ref: '#/components/responses/4XX-goms-error'
-  /FHIR/R4/ServiceRequest/{id}/_history:
-    get:
-      summary: Retrieve ServiceRequest history by its unique identifier
-      operationId: readServiceRequestHistory
-      security:
-        - app-level0: []
-      description: >
-        ## Overview
-
-        This endpoint allows you to retrieve the history of a single
-        ServiceRequest by its identifier.
-
-
-        ## Sandbox testing
-
-        You can test the following scenarios in our sandbox environment:
-
-
-        | Scenario                                |
-        Request                                                                                                                                                        
-        |
-        Response                                                               
-        |
-
-        | ----------------------------------------|
-        ----------------------------------------------------------------------------------------------------------------------------------------------------------------|
-        ------------------------------------------------------------------------|
-
-        |                                        
-        |                                                                                                                                                                
-        |                                                                        
-        |
-      tags:
-        - order
-      parameters:
-        - $ref: '#/components/parameters/apikey'
-        - $ref: '#/components/parameters/NHSDSessionURID'
-        - $ref: '#/components/parameters/RequestID'
-        - $ref: '#/components/parameters/CorrelationID'
-        - $ref: '#/components/parameters/Id'
-      responses:
-        '200':
-          $ref: '#/components/responses/200-goms-bundle-service-request-history'
-        4XX:
-          $ref: '#/components/responses/4XX-goms-error'
-  /FHIR/R4/ServiceRequest/{id}/_history/{versionId}:
-    get:
-      summary: Retrieve ServiceRequest version by its unique identifier
-      operationId: readServiceRequestHistoryVersion
-      security:
-        - app-level0: []
-      description: >
-        ## Overview
-
-        This endpoint allows you to retrieve a single ServiceRequest version by
-        its logical identifier.
-
-
-        ## Sandbox testing
-
-        You can test the following scenarios in our sandbox environment:
-
-
-        | Scenario                                |
-        Request                                                                                                                                                        
-        |
-        Response                                                               
-        |
-
-        | ----------------------------------------|
-        ----------------------------------------------------------------------------------------------------------------------------------------------------------------|
-        ------------------------------------------------------------------------|
-
-        |                                        
-        |                                                                                                                                                                
-        |                                                                        
-        |
-      tags:
-        - order
-      parameters:
-        - $ref: '#/components/parameters/apikey'
-        - $ref: '#/components/parameters/NHSDSessionURID'
-        - $ref: '#/components/parameters/RequestID'
-        - $ref: '#/components/parameters/CorrelationID'
-        - $ref: '#/components/parameters/Id'
-        - $ref: '#/components/parameters/VersionId'
-      responses:
-        '200':
-          $ref: '#/components/responses/200-goms-bundle-service-request-history'
-        4XX:
-          $ref: '#/components/responses/4XX-goms-error'
   /FHIR/R4/Task:
     post:
       operationId: addtask
@@ -2089,142 +1954,6 @@ paths:
       responses:
         '200':
           $ref: '#/components/responses/200-goms-bundle-tasks-get'
-        4XX:
-          $ref: '#/components/responses/4XX-goms-error'
-  /FHIR/R4/Task/{id}:
-    get:
-      summary: Retrieve a Task by its unique identifier
-      operationId: readTask
-      security:
-        - app-level0: []
-      description: >
-        ## Overview
-
-        This endpoint allows you to retrieve the record of a single Task by its
-        identifier.
-
-
-        ## Sandbox testing
-
-        You can test the following scenarios in our sandbox environment:
-
-
-        | Scenario                                |
-        Request                                                                                                                                                        
-        |
-        Response                                                               
-        |
-
-        | ----------------------------------------|
-        ----------------------------------------------------------------------------------------------------------------------------------------------------------------|
-        ------------------------------------------------------------------------|
-
-        |                                        
-        |                                                                                                                                                                
-        |                                                                        
-        |
-      tags:
-        - task
-      parameters:
-        - $ref: '#/components/parameters/apikey'
-        - $ref: '#/components/parameters/NHSDSessionURID'
-        - $ref: '#/components/parameters/RequestID'
-        - $ref: '#/components/parameters/CorrelationID'
-        - $ref: '#/components/parameters/Id'
-      responses:
-        '200':
-          $ref: '#/components/responses/200-goms-bundle-task-read'
-        4XX:
-          $ref: '#/components/responses/4XX-goms-error'
-  /FHIR/R4/Task/{id}/_history:
-    get:
-      summary: Retrieve Task history by its unique identifier
-      operationId: readTaskHistory
-      security:
-        - app-level0: []
-      description: >
-        ## Overview
-
-        This endpoint allows you to retrieve the history of a single
-        Task by its identifier.
-
-
-        ## Sandbox testing
-
-        You can test the following scenarios in our sandbox environment:
-
-
-        | Scenario                                |
-        Request                                                                                                                                                        
-        |
-        Response                                                               
-        |
-
-        | ----------------------------------------|
-        ----------------------------------------------------------------------------------------------------------------------------------------------------------------|
-        ------------------------------------------------------------------------|
-
-        |                                        
-        |                                                                                                                                                                
-        |                                                                        
-        |
-      tags:
-        - task
-      parameters:
-        - $ref: '#/components/parameters/apikey'
-        - $ref: '#/components/parameters/NHSDSessionURID'
-        - $ref: '#/components/parameters/RequestID'
-        - $ref: '#/components/parameters/CorrelationID'
-        - $ref: '#/components/parameters/Id'
-      responses:
-        '200':
-          $ref: '#/components/responses/200-goms-bundle-service-request-history'
-        4XX:
-          $ref: '#/components/responses/4XX-goms-error'
-  /FHIR/R4/Task/{id}/_history/{versionId}:
-    get:
-      summary: Retrieve Task version by its unique identifier
-      operationId: readTaskHistoryVersion
-      security:
-        - app-level0: []
-      description: >
-        ## Overview
-
-        This endpoint allows you to retrieve a single Task version by
-        its logical identifier.
-
-
-        ## Sandbox testing
-
-        You can test the following scenarios in our sandbox environment:
-
-
-        | Scenario                                |
-        Request                                                                                                                                                        
-        |
-        Response                                                               
-        |
-
-        | ----------------------------------------|
-        ----------------------------------------------------------------------------------------------------------------------------------------------------------------|
-        ------------------------------------------------------------------------|
-
-        |                                        
-        |                                                                                                                                                                
-        |                                                                        
-        |
-      tags:
-        - task
-      parameters:
-        - $ref: '#/components/parameters/apikey'
-        - $ref: '#/components/parameters/NHSDSessionURID'
-        - $ref: '#/components/parameters/RequestID'
-        - $ref: '#/components/parameters/CorrelationID'
-        - $ref: '#/components/parameters/Id'
-        - $ref: '#/components/parameters/VersionId'
-      responses:
-        '200':
-          $ref: '#/components/responses/200-goms-bundle-service-request-history'
         4XX:
           $ref: '#/components/responses/4XX-goms-error'
   /FHIR/R4/DiagnosticReport:
@@ -2421,142 +2150,6 @@ paths:
           $ref: '#/components/responses/200-goms-bundle-diagnosticreports-get'
         4XX:
           $ref: '#/components/responses/4XX-goms-error'
-  /FHIR/R4/DiagnosticReport/{id}:
-    get:
-      summary: Retrieve a DiagnosticReport by its unique identifier
-      operationId: readDiagnosticReport
-      security:
-        - app-level0: []
-      description: >
-        ## Overview
-
-        This endpoint allows you to retrieve the record of a single
-        DiagnosticReport by its identifier.
-
-
-        ## Sandbox testing
-
-        You can test the following scenarios in our sandbox environment:
-
-
-        | Scenario                                |
-        Request                                                                                                                                                        
-        |
-        Response                                                               
-        |
-
-        | ----------------------------------------|
-        ----------------------------------------------------------------------------------------------------------------------------------------------------------------|
-        ------------------------------------------------------------------------|
-
-        |                                        
-        |                                                                                                                                                                
-        |                                                                        
-        |
-      tags:
-        - report
-      parameters:
-        - $ref: '#/components/parameters/apikey'
-        - $ref: '#/components/parameters/NHSDSessionURID'
-        - $ref: '#/components/parameters/RequestID'
-        - $ref: '#/components/parameters/CorrelationID'
-        - $ref: '#/components/parameters/Id'
-      responses:
-        '200':
-          $ref: '#/components/responses/200-goms-bundle-diagnostic-report-read'
-        4XX:
-          $ref: '#/components/responses/4XX-goms-error'
-  /FHIR/R4/DiagnosticReport/{id}/_history:
-    get:
-      summary: Retrieve DiagnosticReport history by its unique identifier
-      operationId: readDiagnosticReportHistory
-      security:
-        - app-level0: []
-      description: >
-        ## Overview
-
-        This endpoint allows you to retrieve the history of a single
-        DiagnosticReport by its identifier.
-
-
-        ## Sandbox testing
-
-        You can test the following scenarios in our sandbox environment:
-
-
-        | Scenario                                |
-        Request                                                                                                                                                        
-        |
-        Response                                                               
-        |
-
-        | ----------------------------------------|
-        ----------------------------------------------------------------------------------------------------------------------------------------------------------------|
-        ------------------------------------------------------------------------|
-
-        |                                        
-        |                                                                                                                                                                
-        |                                                                        
-        |
-      tags:
-        - report
-      parameters:
-        - $ref: '#/components/parameters/apikey'
-        - $ref: '#/components/parameters/NHSDSessionURID'
-        - $ref: '#/components/parameters/RequestID'
-        - $ref: '#/components/parameters/CorrelationID'
-        - $ref: '#/components/parameters/Id'
-      responses:
-        '200':
-          $ref: '#/components/responses/200-goms-bundle-service-request-history'
-        4XX:
-          $ref: '#/components/responses/4XX-goms-error'
-  /FHIR/R4/DiagnosticReport/{id}/_history/{versionId}:
-    get:
-      summary: Retrieve DiagnosticReport version by its unique identifier
-      operationId: readDiagnosticReportHistoryVersion
-      security:
-        - app-level0: []
-      description: >
-        ## Overview
-
-        This endpoint allows you to retrieve a single DiagnosticReport version by
-        its logical identifier.
-
-
-        ## Sandbox testing
-
-        You can test the following scenarios in our sandbox environment:
-
-
-        | Scenario                                |
-        Request                                                                                                                                                        
-        |
-        Response                                                               
-        |
-
-        | ----------------------------------------|
-        ----------------------------------------------------------------------------------------------------------------------------------------------------------------|
-        ------------------------------------------------------------------------|
-
-        |                                        
-        |                                                                                                                                                                
-        |                                                                        
-        |
-      tags:
-        - report
-      parameters:
-        - $ref: '#/components/parameters/apikey'
-        - $ref: '#/components/parameters/NHSDSessionURID'
-        - $ref: '#/components/parameters/RequestID'
-        - $ref: '#/components/parameters/CorrelationID'
-        - $ref: '#/components/parameters/Id'
-        - $ref: '#/components/parameters/VersionId'
-      responses:
-        '200':
-          $ref: '#/components/responses/200-goms-bundle-service-request-history'
-        4XX:
-          $ref: '#/components/responses/4XX-goms-error'
   /FHIR/R4/Specimen:
     post:
       operationId: addSpecimen
@@ -2710,142 +2303,6 @@ paths:
           $ref: '#/components/responses/200-goms-bundle-specimens-get'
         4XX:
           $ref: '#/components/responses/4XX-goms-error'
-  /FHIR/R4/Specimen/{id}:
-    get:
-      summary: Retrieve a Specimen by its unique identifier
-      operationId: readSpecimen
-      security:
-        - app-level0: []
-      description: >
-        ## Overview
-
-        This endpoint allows you to retrieve the record of a single Specimen by
-        its identifier.
-
-
-        ## Sandbox testing
-
-        You can test the following scenarios in our sandbox environment:
-
-
-        | Scenario                                |
-        Request                                                                                                                                                        
-        |
-        Response                                                               
-        |
-
-        | ----------------------------------------|
-        ----------------------------------------------------------------------------------------------------------------------------------------------------------------|
-        ------------------------------------------------------------------------|
-
-        |                                        
-        |                                                                                                                                                                
-        |                                                                        
-        |
-      tags:
-        - specimen
-      parameters:
-        - $ref: '#/components/parameters/apikey'
-        - $ref: '#/components/parameters/NHSDSessionURID'
-        - $ref: '#/components/parameters/RequestID'
-        - $ref: '#/components/parameters/CorrelationID'
-        - $ref: '#/components/parameters/Id'
-      responses:
-        '200':
-          $ref: '#/components/responses/200-goms-bundle-specimen-read'
-        4XX:
-          $ref: '#/components/responses/4XX-goms-error'
-  /FHIR/R4/Specimen/{id}/_history:
-    get:
-      summary: Retrieve Specimen history by its unique identifier
-      operationId: readSpecimenHistory
-      security:
-        - app-level0: []
-      description: >
-        ## Overview
-
-        This endpoint allows you to retrieve the history of a single
-        Specimen by its identifier.
-
-
-        ## Sandbox testing
-
-        You can test the following scenarios in our sandbox environment:
-
-
-        | Scenario                                |
-        Request                                                                                                                                                        
-        |
-        Response                                                               
-        |
-
-        | ----------------------------------------|
-        ----------------------------------------------------------------------------------------------------------------------------------------------------------------|
-        ------------------------------------------------------------------------|
-
-        |                                        
-        |                                                                                                                                                                
-        |                                                                        
-        |
-      tags:
-        - specimen
-      parameters:
-        - $ref: '#/components/parameters/apikey'
-        - $ref: '#/components/parameters/NHSDSessionURID'
-        - $ref: '#/components/parameters/RequestID'
-        - $ref: '#/components/parameters/CorrelationID'
-        - $ref: '#/components/parameters/Id'
-      responses:
-        '200':
-          $ref: '#/components/responses/200-goms-bundle-service-request-history'
-        4XX:
-          $ref: '#/components/responses/4XX-goms-error'
-  /FHIR/R4/Specimen/{id}/_history/{versionId}:
-    get:
-      summary: Retrieve Specimen version by its unique identifier
-      operationId: readSpecimenHistoryVersion
-      security:
-        - app-level0: []
-      description: >
-        ## Overview
-
-        This endpoint allows you to retrieve a single Specimen version by
-        its logical identifier.
-
-
-        ## Sandbox testing
-
-        You can test the following scenarios in our sandbox environment:
-
-
-        | Scenario                                |
-        Request                                                                                                                                                        
-        |
-        Response                                                               
-        |
-
-        | ----------------------------------------|
-        ----------------------------------------------------------------------------------------------------------------------------------------------------------------|
-        ------------------------------------------------------------------------|
-
-        |                                        
-        |                                                                                                                                                                
-        |                                                                        
-        |
-      tags:
-        - specimen
-      parameters:
-        - $ref: '#/components/parameters/apikey'
-        - $ref: '#/components/parameters/NHSDSessionURID'
-        - $ref: '#/components/parameters/RequestID'
-        - $ref: '#/components/parameters/CorrelationID'
-        - $ref: '#/components/parameters/Id'
-        - $ref: '#/components/parameters/VersionId'
-      responses:
-        '200':
-          $ref: '#/components/responses/200-goms-bundle-service-request-history'
-        4XX:
-          $ref: '#/components/responses/4XX-goms-error'
   /FHIR/R4/Patient:
     get:
       operationId: getPatient
@@ -2875,121 +2332,6 @@ paths:
           $ref: '#/components/responses/200-goms-bundle-patient-get'
         4XX:
           $ref: '#/components/responses/4XX-goms-error'
-  /FHIR/R4/Patient/{id}:
-    get:
-      operationId: readPatient
-      security:
-        - app-level0: []
-      summary: Search for Patient by their unique identifier
-      description: >
-        ## Overview
-
-        This endpoint allows you to retrieve the record of a single patient by
-        its identifier.
-      tags:
-        - patient
-      parameters:
-        - $ref: '#/components/parameters/apikey'
-        - $ref: '#/components/parameters/NHSDSessionURID'
-        - $ref: '#/components/parameters/RequestID'
-        - $ref: '#/components/parameters/CorrelationID'
-        - $ref: '#/components/parameters/Id'
-      responses:
-        '200':
-          $ref: '#/components/responses/200-goms-bundle-patient-get-logical-id'
-        4XX:
-          $ref: '#/components/responses/4XX-goms-error'
-  /FHIR/R4/Patient/{id}/_history:
-    get:
-      summary: Retrieve Patient history by its unique identifier
-      operationId: readPatientHistory
-      security:
-        - app-level0: []
-      description: >
-        ## Overview
-
-        This endpoint allows you to retrieve the history of a single
-        Patient by its identifier.
-
-
-        ## Sandbox testing
-
-        You can test the following scenarios in our sandbox environment:
-
-
-        | Scenario                                |
-        Request                                                                                                                                                        
-        |
-        Response                                                               
-        |
-
-        | ----------------------------------------|
-        ----------------------------------------------------------------------------------------------------------------------------------------------------------------|
-        ------------------------------------------------------------------------|
-
-        |                                        
-        |                                                                                                                                                                
-        |                                                                        
-        |
-      tags:
-        - patient
-      parameters:
-        - $ref: '#/components/parameters/apikey'
-        - $ref: '#/components/parameters/NHSDSessionURID'
-        - $ref: '#/components/parameters/RequestID'
-        - $ref: '#/components/parameters/CorrelationID'
-        - $ref: '#/components/parameters/Id'
-      responses:
-        '200':
-          $ref: '#/components/responses/200-goms-bundle-service-request-history'
-        4XX:
-          $ref: '#/components/responses/4XX-goms-error'
-  /FHIR/R4/Patient/{id}/_history/{versionId}:
-    get:
-      summary: Retrieve Patient version by its unique identifier
-      operationId: readPatientHistoryVersion
-      security:
-        - app-level0: []
-      description: >
-        ## Overview
-
-        This endpoint allows you to retrieve a single Patient version by
-        its logical identifier.
-
-
-        ## Sandbox testing
-
-        You can test the following scenarios in our sandbox environment:
-
-
-        | Scenario                                |
-        Request                                                                                                                                                        
-        |
-        Response                                                               
-        |
-
-        | ----------------------------------------|
-        ----------------------------------------------------------------------------------------------------------------------------------------------------------------|
-        ------------------------------------------------------------------------|
-
-        |                                        
-        |                                                                                                                                                                
-        |                                                                        
-        |
-      tags:
-        - patient
-      parameters:
-        - $ref: '#/components/parameters/apikey'
-        - $ref: '#/components/parameters/NHSDSessionURID'
-        - $ref: '#/components/parameters/RequestID'
-        - $ref: '#/components/parameters/CorrelationID'
-        - $ref: '#/components/parameters/Id'
-        - $ref: '#/components/parameters/VersionId'
-      responses:
-        '200':
-          $ref: '#/components/responses/200-goms-bundle-service-request-history'
-        4XX:
-          $ref: '#/components/responses/4XX-goms-error'
   /FHIR/R4/PractitionerRole:
     get:
       operationId: getPractitionerRole
@@ -3017,24 +2359,25 @@ paths:
           $ref: '#/components/responses/200-goms-bundle-practitionerrole-get'
         4XX:
           $ref: '#/components/responses/4XX-goms-error'
-  /FHIR/R4/PractitionerRole/{id}:
+  /FHIR/R4/{resourceName}/{id}:
     get:
-      operationId: readPractitionerRole
+      operationId: readResource
       security:
         - app-level0: []
-      summary: Search for PractitionerRole by their unique identifier
+      summary: Search for resource by its logical id
       description: >
         ## Overview
 
         This endpoint allows you to retrieve the record of a single
-        PractitionerRole by its identifier.
+        FHIR resource latest version by its logical id.
       tags:
-        - practitionerrole
+        - history
       parameters:
         - $ref: '#/components/parameters/apikey'
         - $ref: '#/components/parameters/NHSDSessionURID'
         - $ref: '#/components/parameters/RequestID'
         - $ref: '#/components/parameters/CorrelationID'
+        - $ref: '#/components/parameters/ResourceName'
         - $ref: '#/components/parameters/Id'
       responses:
         '200':
@@ -3042,17 +2385,17 @@ paths:
             #/components/responses/200-goms-bundle-practitionerrole-get-logical-id
         4XX:
           $ref: '#/components/responses/4XX-goms-error'
-  /FHIR/R4/PractitionerRole/{id}/_history:
+  /FHIR/R4/{resourceName}/{id}/_history:
     get:
-      summary: Retrieve PractitionerRole history by its unique identifier
-      operationId: readPractitionerRoleHistory
+      summary: Retrieve resource history by its logical id
+      operationId: readResourceHistory
       security:
         - app-level0: []
       description: >
         ## Overview
 
-        This endpoint allows you to retrieve the history of a single
-        PractitionerRole by its identifier.
+        This endpoint allows you to retrieve the full history of a single
+        FHIR resource by its logical id.
 
 
         ## Sandbox testing
@@ -3075,29 +2418,30 @@ paths:
         |                                                                        
         |
       tags:
-        - practitionerrole
+        - history
       parameters:
         - $ref: '#/components/parameters/apikey'
         - $ref: '#/components/parameters/NHSDSessionURID'
         - $ref: '#/components/parameters/RequestID'
         - $ref: '#/components/parameters/CorrelationID'
+        - $ref: '#/components/parameters/ResourceName'
         - $ref: '#/components/parameters/Id'
       responses:
         '200':
           $ref: '#/components/responses/200-goms-bundle-service-request-history'
         4XX:
           $ref: '#/components/responses/4XX-goms-error'
-  /FHIR/R4/PractitionerRole/{id}/_history/{versionId}:
+  /FHIR/R4/{resourceName}/{id}/_history/{versionId}:
     get:
-      summary: Retrieve PractitionerRole version by its unique identifier
-      operationId: readPractitionerRoleHistoryVersion
+      summary: Retrieve Resource version by its logical id
+      operationId: readResourceHistoryVersion
       security:
         - app-level0: []
       description: >
         ## Overview
 
-        This endpoint allows you to retrieve a single PractitionerRole version by
-        its logical identifier.
+        This endpoint allows you to retrieve a single resource specified version by
+        its logical id.
 
 
         ## Sandbox testing
@@ -3120,17 +2464,18 @@ paths:
         |                                                                        
         |
       tags:
-        - practitionerrole
+        - history
       parameters:
         - $ref: '#/components/parameters/apikey'
         - $ref: '#/components/parameters/NHSDSessionURID'
         - $ref: '#/components/parameters/RequestID'
         - $ref: '#/components/parameters/CorrelationID'
+        - $ref: '#/components/parameters/ResourceName'
         - $ref: '#/components/parameters/Id'
         - $ref: '#/components/parameters/VersionId'
       responses:
         '200':
-          $ref: '#/components/responses/200-goms-bundle-service-request-history'
+          $ref: '#/components/responses/200-goms-bundle-service-request-read'
         4XX:
           $ref: '#/components/responses/4XX-goms-error'
 components:
@@ -5351,6 +4696,16 @@ components:
       schema:
         type: string
         example: '1'
+    ResourceName:
+      in: path
+      name: resourceName
+      required: true
+      description: >-
+        The specific resource type
+      schema:
+        type: string
+        enum: [ServiceRequest, Specimen, DiagnosticReport, Task, PractitionerRole, Patient]
+        example: 'ServiceRequest'
   schemas: {}
   requestBodies: {}
   headers:
