@@ -1,0 +1,4265 @@
+openapi: 3.0.3
+info:
+  title: Genomic Order Management Service (FHIR) API
+  version: v0.3.0beta
+  description: >
+
+    ## Overview
+
+    The [NHS Genomic Medicine Service](https://www.england.nhs.uk/genomics/)
+    enables the NHS to harness the power of genomic technology and science to
+    improve the health of our population and deliver on the commitments in the
+    [NHS Long Term Plan](https://www.longtermplan.nhs.uk/) including:
+
+    * to be the first national health care system to offer whole genome
+    sequencing as part of routine care, including for all children with cancer
+    or children who are seriously ill with a likely genetic disorder
+
+    * increased access to molecular diagnostics and offer genomic testing
+    routinely to all people with cancer
+     
+    * improve early detection and treatment of high-risk conditions including
+    expanding genomic testing for familial hypocholesterolaemia
+
+    * linking and correlating genomic data to help provide new treatments,
+    diagnostic approaches and help patients make informed decisions about their
+    care
+
+
+    A
+    [strategy](https://www.england.nhs.uk/long-read/accelerating-genomic-medicine-in-the-nhs/)
+    for embedding genomics in the NHS over the next 5 years was published in
+    October 2022 outlined four priority areas:
+
+    1. embedding genomics across the NHS, through a world leading innovative
+    service model from primary and community care through to specialist and
+    tertiary care
+
+
+    2. delivering equitable genomic testing for improved outcomes in cancer,
+    rare, inherited and common diseases and in enabling precision medicine and
+    reducing adverse drug reactions
+
+
+    3. enabling genomics to be at the forefront of the data and digital
+    revolution, ensuring genomic data can be interpreted and informed by other
+    diagnostic and clinical data
+
+
+    4. evolving the service through cutting-edge science, research and
+    innovation to ensure that patients can benefit from rapid implementation of
+    advances
+
+
+
+    The Genomic Order Management service forms part of the core digital service
+    in enabling to accelerate services into clinical settings. The scope of this
+    service is the digitisation of **genomics test ordering and reporting**
+    within the whole of NHSE, focusing solely on test order management (Whole
+    Genome Sequencing (WGS) and Non-WGS Test Requests) and the management of
+    test results and reports. Key points in scope:
+
+    * it is a central national capability, which will standardise the data
+    associated with each genomic test request and communication standards
+
+    * it is focusing on the relevant data flows between organisational
+    boundaries
+
+
+    * with the end strategic goal being that a significant proportion of
+    requesting locations have their systems (e.g., EHRs, Portals, LIMS, Order
+    Comms) and receiving locations (e.g., Lab LIMS) integrated to central
+    national capability
+
+
+    Clinical users in NHS will be able to:
+
+    * create requests for genomics tests
+
+
+    * track status updates to tests
+
+
+    * retrieve interpretation reports
+
+
+    Users in NHS Genomics Laboratories will be able to:
+
+    * access genomic tests
+
+
+    * manage send aways
+
+
+    * update genomic tests
+
+
+    * create, Manage and Reassign tasks
+
+
+    * provide status updates on test progress
+
+
+    * upload interpretation reports
+
+
+    ## Who can use this API
+      This API can only be used where there is a legal basis to do so. Make sure you have a valid use case before you go too far with your development.
+
+    ## Related APIs
+       
+    ### Services
+
+    These services must be used alongside genomic order management service to
+    create a genetic test request, status tracking, updates and report access:
+
+    * [Care Identity Service
+    2](https://digital.nhs.uk/services/identity-and-access-management/national-care-identity-service)
+    [(CIS2)](https://digital.nhs.uk/services/care-identity-service/applications-and-services#cis2-authentication)
+    - use this to authenticate clinical users with their smartcard. See Security
+    and Authorisation
+    [section](https://digital.nhs.uk/developer/api-catalogue/genomic-order-management-service-fhir#overview--security-and-authorisation)
+    for more details.
+
+    * [Organisation Data Service
+    (ODS)](https://digital.nhs.uk/developer/api-catalogue/organisation-data-service-fhir)
+    - use this to access ODS codes for NHS organisations using the genomics
+    services.
+
+    * [Personal Demographics Service
+    (PDS)](https://digital.nhs.uk/developer/api-catalogue/personal-demographics-service-fhir)
+    - use PDS to synchronise a patient's demographic details including their
+    name, date of birth and address.
+
+    * [Role-Based Access Controls
+    (RBAC)](https://digital.nhs.uk/developer/guides-and-documentation/security-and-authorisation/national-rbac-for-developers)
+    - RBAC rules are stored in the National RBAC Database (NRD) and are used to
+    limit what clinical users can and cannot do.
+
+
+    ### Documentation
+
+    This documentation provides important context:
+
+    * [Genomic Test
+    Diretory](https://www.england.nhs.uk/publication/national-genomic-test-directories/)
+    - The national genomic test directory specifies which genomic tests are
+    commissioned by the NHS in England, the technology by which they are
+    available, and the patients who will be eligible to access to a test.
+
+    * [Genomic Laboratory
+    Hubs](https://www.england.nhs.uk/genomics/genomic-laboratory-hubs/) -
+    Genomic testing in the NHS is being provided through a national testing
+    network, consolidating and enhancing the existing laboratory provision.
+
+
+    ### Guidance for developers and product owners
+
+    Documentation and guidance for technical audiences:
+
+    * [Implementation guide for Genomics FHIR
+    standard](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/Design/Interactions?version=0.3.0)
+    - the implementation guide contains detailed information, example, error
+    codes and processes. This is for technical audiences like developers.
+
+
+    * [FHIR UK Core R4](https://simplifier.net/hl7fhirukcorer4) - Core FHIR
+    standard mandated for adoption and implementation in UK and our [Genomics
+    IG]((https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/Design/Interactions?version=0.3.0)
+    is based on this standard.
+
+
+    ## API status and roadmap
+
+    The data and digital framework established as part of the [genomics
+    strategy](https://www.england.nhs.uk/long-read/accelerating-genomic-medicine-in-the-nhs/)
+    outlined 3 major deliverables to accelerate the digital adoption and improve
+    services.
+
+    * genomic order management service
+
+
+    * test directory
+
+
+    * unified genomic record
+
+
+    The immediate priority of Genomics Order Management development is to
+    support the rollout of the next-gen FHIR APIs for primary care and secondary
+    care settings for genetics ordering and GLH's in provding the  testing
+    services.
+
+
+    This API is [in
+    development](https://digital.nhs.uk/developer/guides-and-documentation/reference-guide#statuses),
+    meaning:
+
+    * it is available for testing in the integration environment
+
+
+    * we expect to make breaking changes based on developer feedback
+
+
+    To see our roadmap, or to suggest, comment or vote on features for this API,
+    see our [interactive product
+    backlog](https://nhs-digital-api-management.featureupvote.com/?tag=genomics-diag-order-management).
+
+
+    If you have any other queries, please [contact
+    us](https://digital.nhs.uk/developer/help-and-support).
+
+
+    ## Service level
+
+    This API is a platinum service, meaning it is operational and supported 24
+    hours a day, 365 days a year.
+
+
+    For more details, see [service
+    levels](https://digital.nhs.uk/developer/guides-and-documentation/reference-guide#service-levels).
+
+
+    ## Technology
+
+    This API is
+    [RESTful](https://digital.nhs.uk/developer/guides-and-documentation/our-api-technologies#basic-rest).
+
+
+    It conforms to the
+    [FHIR](https://digital.nhs.uk/developer/guides-and-documentation/our-api-technologies#fhir)
+    global standard for health care data exchange, specifically to [FHIR R4
+    (v4.0.1)](https://hl7.org/fhir/r4/), except that it does not support the
+    [capabilities](http://hl7.org/fhir/R4/http.html#capabilities) interaction. 
+
+    Refer to [Genomics FHIR
+    IG](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home?version=0.3.0)
+    for more details to the implementation requirements. This specification is
+    based on UK Core Ballot2 and conforms to the same.
+
+
+    You do not need to know much about FHIR to use this API - FHIR APIs are just
+    RESTful APIs that follow specific rules. In particular:
+
+    * resource names are capitalised and singular, for example `/Patient` not
+    `/patients`
+
+    * array names are singular, for example `line` not `lines` for address lines
+
+    * data items that are country-specific and thus not included in the FHIR
+    global base resources are usually wrapped in an `extension` object
+
+
+    There are [libraries and software development kits
+    available](https://digital.nhs.uk/developer/guides-and-documentation/api-technologies-at-nhs-digital#fhir-libraries-and-sdks)
+    to help with FHIR API integration.
+
+
+    ## Network access
+
+    This API is available on the internet and, indirectly, on the [Health and
+    Social Care Network
+    (HSCN)](https://digital.nhs.uk/services/health-and-social-care-network).
+
+    To use this API with [NHS
+    smartcards](https://digital.nhs.uk/developer/guides-and-documentation/security-and-authorisation/nhs-smartcards-for-developers),
+    the end user needs an HSCN connection, although internet-facing alternatives
+    to smartcards are available.
+
+
+    For more details see [Network access for
+    APIs](https://digital.nhs.uk/developer/guides-and-documentation/network-access-for-apis).
+
+
+    ## Security and authorisation
+
+    This API has 2 access modes:
+
+    * user-restricted access (**BETA/LIVE**)
+
+    * application-restricted access (**ALPHA**)
+
+
+    ### User-restricted access
+
+    In LIVE mode the APIs are mostly
+    [user-restricted](https://digital.nhs.uk/developer/guides-and-documentation/security-and-authorisation#user-restricted-apis),
+    meaning we authenticate the end user.
+
+    Our API's only supports [CIS2 separate authentication and
+    authorisation](https://digital.nhs.uk/developer/guides-and-documentation/security-and-authorisation/user-restricted-restful-apis-nhs-cis2-separate-authentication-and-authorisation),do
+    not use combined authentication and authorisation.
+
+    ### Application-restricted access
+
+    The only interaction that is not user-restricted is quering for read only
+    access to test order and status. Use this access mode to communicate in un
+    attended mode using application to application restricted mode.
+
+    To use this access mode, use the following security pattern:
+
+    * [Application-restricted RESTful API - signed JWT
+    authentication](https://digital.nhs.uk/developer/guides-and-documentation/security-and-authorisation/application-restricted-restful-apis-signed-jwt-authentication)
+
+
+    **FOR ALPHA** phase the API would be demonstrated using
+    application-restricted access using [API key
+    authentication](https://digital.nhs.uk/developer/guides-and-documentation/security-and-authorisation/application-restricted-restful-apis-api-key-authentication). 
+
+
+    **FOR PRIVATE BETA / LIVE**  phase the API would be [user-restricted
+    access](https://digital.nhs.uk/developer/guides-and-documentation/security-and-authorisation#user-restricted-apis)
+    based on
+    [CIS2](https://digital.nhs.uk/services/care-identity-service/applications-and-services#cis2-authentication)
+    for end user authentication.
+
+    ## Errors
+
+    We use standard HTTP status codes to show whether an API request succeeded
+    or not. They are usually in the range:
+
+
+    * 200 to 299 if it succeeded, including code 202 if it was accepted by an
+    API that needs to wait for further action
+
+
+    * 400 to 499 if it failed because of a client error by your application
+
+
+    * 500 to 599 if it failed because of an error on our server
+
+
+    Errors specific to each API are shown in the Endpoints section, under
+    Response. See our [reference
+    guide](https://digital.nhs.uk/developer/guides-and-documentation/reference-guide#http-status-codes)
+    for more on errors.
+
+    ## Open source
+
+    You might find the following [open
+    source](https://digital.nhs.uk/developer/guides-and-documentation/reference-guide#open-source)
+    resources useful.
+
+    ## Environment and testing
+
+    | Environment      | Base
+    URL                                                            |
+
+    |------------------|---------------------------------------------------------------------|
+
+    | Sandbox         
+    |`https://sandbox.api.service.nhs.uk/genomic-order-management-service`|
+
+    | Integration         
+    |`https://int.api.service.nhs.uk/genomic-order-management-service`|
+
+     ![Postman](https://run.pstmn.io/button.svg) collection to test against [INT environment](https://github.com/NHSDigital/genomic-order-management-service-api/tree/main/tests).
+
+    ### Sandbox testing
+
+    Our [sandbox
+    environment](https://digital.nhs.uk/developer/guides-and-documentation/testing#sandbox-testing):
+
+
+    * is for early developer testing
+
+    * only covers a limited set of scenarios
+
+    * is stateless, so it does not actually persist any updates
+
+    * is open access, so does not allow you to test authorisation
+
+
+    For details of sandbox testing, or to try out the sandbox using our "Try
+    this API" feature, see the documentation for each endpoint.
+
+
+    ### Integration testing
+
+    Our [integration test
+    environment](https://digital.nhs.uk/developer/guides-and-documentation/testing#integration-testing):
+
+
+    * is for formal integration testing
+
+    * is stateful, so persists updates
+
+    * includes authorisation, with
+    [smartcard](https://digital.nhs.uk/developer/guides-and-documentation/security-and-authorisation/nhs-smartcards-for-developers)
+    and non-smartcard options
+
+
+    For more details see [integration testing with our RESTful
+    APIs](https://digital.nhs.uk/developer/guides-and-documentation/testing#integration-testing-with-our-restful-apis).
+
+
+    ## Onboarding
+
+    You need to get your software approved by us before it can go live with this
+    API. We call this onboarding. The onboarding process can sometimes be quite
+    long, so it is worth planning well ahead.
+
+
+    Whilst this API is in Alpha it is not possible to onboard to this API. As
+    part of this process, you need to demonstrate that you can manage risks and
+    that your software conforms technically with the requirements for this API.
+    Information on this page might impact the design of your software.
+
+
+    To understand how our online digital onboarding process works, see [digital
+    onboarding](https://digital.nhs.uk/developer/guides-and-documentation/digital-onboarding#using-the-digital-onboarding-portal).
+x-spec-publication:
+  operation-order:
+    - operations:
+        - method: POST
+          path: /FHIR/R4
+    - operations:
+        - method: GET
+          path: /FHIR/R4/ServiceRequest
+    - operations:
+        - method: POST
+          path: /FHIR/R4/Task
+    - operations:
+        - method: GET
+          path: /FHIR/R4/Task
+    - operations:
+        - method: POST
+          path: /FHIR/R4/DiagnosticReport
+    - operations:
+        - method: GET
+          path: /FHIR/R4/DiagnosticReport
+    - operations:
+        - method: POST
+          path: /FHIR/R4/Specimen
+    - operations:
+        - method: GET
+          path: /FHIR/R4/Specimen
+    - operations:
+        - method: GET
+          path: /FHIR/R4/Patient
+    - operations:
+        - method: GET
+          path: /FHIR/R4/PractitionerRole
+servers:
+  - url: https://sandbox.api.service.nhs.uk/genomic-order-management-service
+    description: Sandbox
+  - url: https://int.api.service.nhs.uk/genomic-order-management-service
+    description: Integration test
+tags:
+  - name: Process Requests
+  - name: Query Record
+  - name: Query History
+paths:
+  /FHIR/R4:
+    post:
+      operationId: processgenomicrequests
+      summary: Process genomic test request
+      description: |
+        ## Overview
+        [FHIR Restful](https://hl7.org/fhir/R4/http.html) endpoint to 
+         register a **new test or update tests or attache samples, rod or reports etc**. 
+         This end point uses FHIR [bundle](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-Bundle?version=0.3.0) of type **transaction** and the list of resources that forms the payload are listed [here](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/Build/How-to-construct-Message-Bundles?version=0.3.0). 
+      tags:
+        - Process Requests
+      parameters:
+        - $ref: '#/components/parameters/apikey'
+        - $ref: '#/components/parameters/NHSDSessionURID'
+        - $ref: '#/components/parameters/RequestID'
+        - $ref: '#/components/parameters/CorrelationID'
+      requestBody:
+        required: true
+        content:
+          application/fhir+json:
+            schema:
+              type: object
+              required:
+                - resourceType
+                - identifier
+                - type
+                - entry
+              description: >
+                A FHIR
+                [bundle](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-Bundle?version=0.3.0)
+                with collection of [genomics test order request
+                resources.](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/MessageDefinitions/Genomic-Test-Request?version=0.3.0).
+            examples:
+              Non-WGS-Test-Request-Rare-Disease:
+                summary: Bundle-NonWGSTestOrderForm-Example
+                description: >-
+                  Example
+                  [transaction](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/Examples/Bundle/Bundle-NonWGSTestOrderForm-Example?version=0.3.0)
+                  of a Non-WGS test request sent to the central broker, as
+                  described in the Clinica Scenario [**Non-WGS Test Request -
+                  Rare
+                  Disease**](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/Design/Clinical-Scenarios?version=0.3.0#Non-WGS-Test-Request---Rare-Disease).
+                value:
+                  resourceType: Bundle
+                  id: Bundle-NonWGSTestOrderForm-Example
+                  type: transaction
+                  entry:
+                    - fullUrl: >-
+                        http://example.org/fhir/PractitionerRole/PractitionerRole-GeneSmithENT-Example
+                      resource:
+                        resourceType: PractitionerRole
+                        id: PractitionerRole-GeneSmithENT-Example
+                        practitioner:
+                          identifier:
+                            system: https://fhir.nhs.uk/Id/sds-user-id
+                            value: '9999999999'
+                          display: Dr. Gene Smith
+                        organization:
+                          identifier:
+                            system: https://fhir.nhs.uk/Id/ods-organization-code
+                            value: RGT01
+                          display: Addenbrooke's Hospital
+                        specialty:
+                          - coding:
+                              - system: >-
+                                  https://fhir.hl7.org.uk/CodeSystem/UKCore-PracticeSettingCode
+                                code: '120'
+                                display: Ear Nose and Throat
+                        telecom:
+                          - system: phone
+                            value: '01223586638'
+                          - system: email
+                            value: gene.smith@nhs.net
+                          - system: email
+                            value: Add-tr.entsecretaries@nhs.net
+                            extension:
+                              - url: >-
+                                  http://hl7.org/fhir/StructureDefinition/contactpoint-comment
+                                valueString: reporting
+                      request:
+                        method: POST
+                        url: PractitionerRole
+                    - fullUrl: >-
+                        http://example.org/fhir/Patient/Patient-MeirLieberman-Example
+                      resource:
+                        resourceType: Patient
+                        id: Patient-MeirLieberman-Example
+                        extension:
+                          - url: >-
+                              https://fhir.hl7.org.uk/StructureDefinition/Extension-UKCore-BirthSex
+                            valueCodeableConcept:
+                              coding:
+                                - system: >-
+                                    http://terminology.hl7.org/CodeSystem/v3-AdministrativeGender
+                                  code: M
+                                  display: Male
+                          - url: >-
+                              https://fhir.hl7.org.uk/StructureDefinition/Extension-UKCore-EthnicCategory
+                            valueCodeableConcept:
+                              coding:
+                                - system: >-
+                                    https://fhir.hl7.org.uk/CodeSystem/UKCore-EthnicCategoryEngland
+                                  code: A
+                                  display: White - British
+                        identifier:
+                          - system: https://fhir.nhs.uk/Id/nhs-number
+                            value: '9449307873'
+                            extension:
+                              - url: >-
+                                  https://fhir.hl7.org.uk/StructureDefinition/Extension-UKCore-NHSNumberVerificationStatus
+                                valueCodeableConcept:
+                                  coding:
+                                    - system: >-
+                                        https://fhir.hl7.org.uk/CodeSystem/UKCore-NHSNumberVerificationStatusEngland
+                                      version: 2.2.0
+                                      code: '01'
+                                      display: Number present and verified
+                          - system: urn:oid:2.16.840.1.113883.2.1.3.2.4.18.24
+                            value: RGT012423
+                            assigner:
+                              identifier:
+                                system: https://fhir.nhs.uk/Id/ods-organization-code
+                                value: RGT01
+                          - system: https://fhir.nhs.uk/Id/genomics-pedigree-number
+                            value: P12345
+                        name:
+                          - given:
+                              - Meir
+                              - Anah
+                            family: Lieberman
+                        gender: male
+                        birthDate: '2005-12-19'
+                        deceasedBoolean: false
+                        address:
+                          - line:
+                              - 1 Spinney Close
+                              - Worcester Park
+                            city: Surrey
+                            postalCode: KT4 7BS
+                        generalPractitioner:
+                          - identifier:
+                              system: https://fhir.hl7.org.uk/Id/gmp-number
+                              value: G9999999
+                            display: Dr. Aero Smith
+                          - identifier:
+                              system: https://fhir.hl7.org.uk/Id/ODS-code
+                              value: TP123
+                            display: 123 Test Practice
+                        link:
+                          - other:
+                              reference: >-
+                                https://api.service.nhs.uk/personal-demographics/FHIR/R4/Patient/9449307873
+                            type: seealso
+                      request:
+                        method: POST
+                        url: Patient
+                        ifNoneExist: >-
+                          Patient?identifier=https://fhir.nhs.uk/Id/nhs-number|9449307873
+                    - fullUrl: >-
+                        http://example.org/fhir/Observation/Observation-GenomicEthnicity-Example
+                      resource:
+                        resourceType: Observation
+                        id: Observation-GenomicEthnicity-Example
+                        status: preliminary
+                        code:
+                          coding:
+                            - system: http://snomed.info/sct
+                              code: '723621000000103'
+                              display: Ethnicity
+                        subject:
+                          reference: Patient/Patient-MeirLieberman-Example
+                          identifier:
+                            system: https://fhir.nhs.uk/Id/nhs-number
+                            value: '9449307873'
+                        valueString: unknown
+                      request:
+                        method: POST
+                        url: Observation
+                    - fullUrl: >-
+                        http://example.org/fhir/ServiceRequest/ServiceRequest-NonWGSTestOrderForm-Example
+                      resource:
+                        resourceType: ServiceRequest
+                        id: ServiceRequest-NonWGSTestOrderForm-Example
+                        extension:
+                          - url: >-
+                              https://fhir.hl7.org.uk/StructureDefinition/Extension-UKCore-Coverage
+                            valueCodeableConcept:
+                              coding:
+                                - system: >-
+                                    https://fhir.hl7.org.uk/CodeSystem/UKCore-FundingCategory
+                                  code: nhs
+                                  display: NHS
+                        status: active
+                        intent: order
+                        category:
+                          - coding:
+                              - system: >-
+                                  https://fhir.hl7.org.uk/CodeSystem/UKCore-GenomeSequencingCategory
+                                code: rare-disease-non-wgs
+                                display: Rare Disease - Non-WGS
+                        priority: routine
+                        code:
+                          coding:
+                            - system: >-
+                                https://fhir.nhs.uk/CodeSystem/England-GenomicTestDirectory
+                              code: R67.2
+                              display: Monogenic hearing loss
+                        subject:
+                          reference: Patient/Patient-MeirLieberman-Example
+                          identifier:
+                            system: https://fhir.nhs.uk/Id/nhs-number
+                            value: '9449307873'
+                        authoredOn: '2023-08-05'
+                        requester:
+                          reference: >-
+                            PractitionerRole/PractitionerRole-GeneSmithENT-Example
+                        reasonCode:
+                          - coding:
+                              - system: http://snomed.info/sct
+                                code: '103693007'
+                                display: Diagnostic procedure
+                        supportingInfo:
+                          - reference: Observation/Observation-DiseaseStatus-Example
+                          - reference: Observation/Observation-GenomicEthnicity-Example
+                          - reference: Observation/Observation-NoPregnancy-Example
+                          - reference: >-
+                              FamilyMemberHistory/FamilyMemberHistory-NonConsanguinousUnion-Example
+                          - reference: Observation/Observation-NoTransplant-Example
+                          - reference: Observation/Observation-NoTransfusion-Example
+                          - reference: Condition/Condition-HearingLoss-Example
+                        note:
+                          - text: No family history of genomic testing
+                          - text: >-
+                              Free text for diagnosis/reason for referral,
+                              relevant information including family history,
+                              phenotypic details/ HPO Terms/Patient in need of
+                              test...example
+                      request:
+                        method: POST
+                        url: ServiceRequest
+                    - fullUrl: >-
+                        http://example.org/fhir/Observation/Observation-NoPregnancy-Example
+                      resource:
+                        resourceType: Observation
+                        id: Observation-NoPregnancy-Example
+                        status: final
+                        code:
+                          coding:
+                            - system: http://snomed.info/sct
+                              code: '77386006'
+                              display: Pregnancy
+                        subject:
+                          reference: Patient/Patient-MeirLieberman-Example
+                          identifier:
+                            system: https://fhir.nhs.uk/Id/nhs-number
+                            value: '9449307873'
+                        effectiveDateTime: '2023-08-05'
+                        valueBoolean: false
+                      request:
+                        method: POST
+                        url: Observation
+                    - fullUrl: >-
+                        http://example.org/fhir/Observation/Observation-DiseaseStatus-Example
+                      resource:
+                        resourceType: Observation
+                        id: Observation-DiseaseStatus-Example
+                        status: final
+                        code:
+                          coding:
+                            - system: >-
+                                https://fhir.nhs.uk/CodeSystem/England-GenomicTestDirectory
+                              code: R67.2
+                              display: Monogenic hearing loss
+                        subject:
+                          reference: Patient/Patient-MeirLieberman-Example
+                          identifier:
+                            system: https://fhir.nhs.uk/Id/nhs-number
+                            value: '9449307873'
+                        effectiveDateTime: '2023-08-05'
+                        valueCodeableConcept:
+                          coding:
+                            - system: http://snomed.info/sct
+                              code: '103310001'
+                              display: Patient not affected
+                      request:
+                        method: POST
+                        url: Observation
+                    - fullUrl: >-
+                        http://example.org/fhir/FamilyMemberHistory/FamilyMemberHistory-NonConsanguinousUnion-Example
+                      resource:
+                        resourceType: FamilyMemberHistory
+                        id: FamilyMemberHistory-NonConsanguinousUnion-Example
+                        extension:
+                          - url: >-
+                              http://hl7.org/fhir/StructureDefinition/family-member-history-genetics-observation
+                            valueReference:
+                              reference: >-
+                                Observation/Observation-NonConsanguinousUnion-Example
+                        status: completed
+                        patient:
+                          reference: Patient/Patient-MeirLieberman-Example
+                          identifier:
+                            system: https://fhir.nhs.uk/Id/nhs-number
+                            value: '9449307873'
+                        relationship:
+                          coding:
+                            - system: >-
+                                http://terminology.hl7.org/CodeSystem/v3-RoleCode
+                              code: PRN
+                              display: parent
+                      request:
+                        method: POST
+                        url: FamilyMemberHistory
+                    - fullUrl: >-
+                        http://example.org/fhir/Observation/Observation-NonConsanguinousUnion-Example
+                      resource:
+                        resourceType: Observation
+                        id: Observation-NonConsanguinousUnion-Example
+                        status: final
+                        code:
+                          coding:
+                            - system: http://snomed.info/sct
+                              code: '842009'
+                              display: Consanguinity
+                        subject:
+                          reference: Patient/Patient-MeirLieberman-Example
+                          identifier:
+                            system: https://fhir.nhs.uk/Id/nhs-number
+                            value: '9449307873'
+                        effectiveDateTime: '2023-08-05'
+                        valueBoolean: false
+                      request:
+                        method: POST
+                        url: Observation
+                    - fullUrl: >-
+                        http://example.org/fhir/Observation/Observation-NoTransplant-Example
+                      resource:
+                        resourceType: Observation
+                        id: Observation-NoTransplant-Example
+                        status: final
+                        code:
+                          coding:
+                            - system: http://snomed.info/sct
+                              code: '77465005'
+                              display: Transplantation
+                        subject:
+                          reference: Patient/Patient-MeirLieberman-Example
+                          identifier:
+                            system: https://fhir.nhs.uk/Id/nhs-number
+                            value: '9449307873'
+                        effectiveDateTime: '2023-08-05'
+                        valueBoolean: false
+                      request:
+                        method: POST
+                        url: Observation
+                    - fullUrl: >-
+                        http://example.org/fhir/Observation/Observation-NoTransfusion-Example
+                      resource:
+                        resourceType: Observation
+                        id: Observation-NoTransfusion-Example
+                        status: final
+                        code:
+                          coding:
+                            - system: http://snomed.info/sct
+                              code: '5447007'
+                              display: Transfusion
+                        subject:
+                          reference: Patient/Patient-MeirLieberman-Example
+                          identifier:
+                            system: https://fhir.nhs.uk/Id/nhs-number
+                            value: '9449307873'
+                        effectiveDateTime: '2023-08-05'
+                        valueBoolean: false
+                      request:
+                        method: POST
+                        url: Observation
+                    - fullUrl: >-
+                        http://example.org/fhir/Condition/Condition-HearingLoss-Example
+                      resource:
+                        resourceType: Condition
+                        id: Condition-HearingLoss-Example
+                        code:
+                          coding:
+                            - system: http://snomed.info/sct
+                              code: '95820000'
+                              display: Bilateral hearing loss
+                        subject:
+                          reference: Patient/Patient-MeirLieberman-Example
+                          identifier:
+                            system: https://fhir.nhs.uk/Id/nhs-number
+                            value: '9449307873'
+                        note:
+                          - text: hearing loss since childhood (example)
+                      request:
+                        method: POST
+                        url: Condition
+                    - fullUrl: >-
+                        http://example.org/fhir/Specimen/Specimen-BloodEDTA-Example
+                      resource:
+                        resourceType: Specimen
+                        id: Specimen-BloodEDTA-Example
+                        identifier:
+                          - system: https://fhir.add.nhs.uk/Id/specimenId
+                            value: RGT03135
+                        status: unavailable
+                        type:
+                          coding:
+                            - system: http://snomed.info/sct
+                              code: '445295009'
+                              display: Blood specimen with EDTA
+                        subject:
+                          reference: Patient/Patient-MeirLieberman-Example
+                          identifier:
+                            system: https://fhir.nhs.uk/Id/nhs-number
+                            value: '9449307873'
+                        request:
+                          - reference: >-
+                              ServiceRequest/ServiceRequest-NonWGSTestOrderForm-Example
+                      request:
+                        method: POST
+                        url: Specimen
+              WGS-Test-Request-Rare-Disease:
+                summary: Bundle-WGSTestOrderForm-Example
+                description: >-
+                  Example
+                  [transaction](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/Examples/Bundle/Bundle-WGSTestOrderForm-Example?version=0.3.0)
+                  of a Non-WGS test request sent to the central broker, as
+                  described in the Clinica Scenario [**WGS-Test-Request -
+                  Rare-Disease**](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/Design/Clinical-Scenarios?version=0.3.0#WGS-Test-Request---Rare-Disease).
+                value:
+                  resourceType: Bundle
+                  id: Bundle-WGSTestOrderForm-Example
+                  type: transaction
+                  entry:
+                    - fullUrl: >-
+                        http://example.org/fhir/PractitionerRole/PractitionerRole-HazelSmithRenal-Example
+                      resource:
+                        resourceType: PractitionerRole
+                        id: PractitionerRole-HazelSmithRenal-Example
+                        practitioner:
+                          identifier:
+                            system: https://fhir.nhs.uk/Id/sds-user-id
+                            value: '9999999998'
+                          display: Dr. Hazel Smith
+                        organization:
+                          identifier:
+                            system: https://fhir.nhs.uk/Id/ods-organization-code
+                            value: RAX01
+                          display: Kingston Hospital NHS Foundation Trust
+                        specialty:
+                          - coding:
+                              - system: >-
+                                  https://fhir.hl7.org.uk/CodeSystem/UKCore-PracticeSettingCode
+                                code: '361'
+                                display: Renal Medicine
+                        telecom:
+                          - system: phone
+                            value: '02085467711'
+                          - system: email
+                            value: Hazel.smith12@nhs.net
+                          - system: email
+                            value: renalseckingston@nhs.net
+                            extension:
+                              - url: >-
+                                  http://hl7.org/fhir/StructureDefinition/contactpoint-comment
+                                valueString: reporting
+                      request:
+                        method: POST
+                        url: PractitionerRole
+                    - fullUrl: >-
+                        http://example.org/fhir/Patient/Patient-LindsaySorrell-Example
+                      resource:
+                        resourceType: Patient
+                        id: Patient-LindsaySorrell-Example
+                        extension:
+                          - url: >-
+                              https://fhir.hl7.org.uk/StructureDefinition/Extension-UKCore-BirthSex
+                            valueCodeableConcept:
+                              coding:
+                                - system: >-
+                                    http://terminology.hl7.org/CodeSystem/v3-AdministrativeGender
+                                  code: M
+                                  display: Male
+                          - url: >-
+                              https://fhir.hl7.org.uk/StructureDefinition/Extension-UKCore-EthnicCategory
+                            valueCodeableConcept:
+                              coding:
+                                - system: >-
+                                    https://fhir.hl7.org.uk/CodeSystem/UKCore-EthnicCategoryEngland
+                                  code: A
+                                  display: White - British
+                        identifier:
+                          - system: https://fhir.nhs.uk/Id/nhs-number
+                            value: '9449307946'
+                            extension:
+                              - url: >-
+                                  https://fhir.hl7.org.uk/StructureDefinition/Extension-UKCore-NHSNumberVerificationStatus
+                                valueCodeableConcept:
+                                  coding:
+                                    - system: >-
+                                        https://fhir.hl7.org.uk/CodeSystem/UKCore-NHSNumberVerificationStatusEngland
+                                      version: 2.2.0
+                                      code: '01'
+                                      display: Number present and verified
+                          - system: urn:oid:2.16.840.1.113883.2.1.3.2.4.18.24
+                            value: RWT14789
+                            assigner:
+                              identifier:
+                                system: https://fhir.nhs.uk/Id/ods-organization-code
+                                value: RAX01
+                        name:
+                          - given:
+                              - Lindsay
+                            family: Sorrell
+                        gender: male
+                        birthDate: '2011-04-12'
+                        deceasedBoolean: false
+                        address:
+                          - line:
+                              - 31 THE AVENUE
+                              - BERWICK COURT
+                            postalCode: KT4 7BS
+                        generalPractitioner:
+                          - identifier:
+                              system: https://fhir.hl7.org.uk/Id/gmp-number
+                              value: G9999999
+                            display: Dr. Aero Smith
+                          - identifier:
+                              system: https://fhir.hl7.org.uk/Id/ODS-code
+                              value: AP123
+                            display: anywhere place
+                        link:
+                          - other:
+                              reference: >-
+                                https://api.service.nhs.uk/personal-demographics/FHIR/R4/Patient/9449307946
+                            type: seealso
+                      request:
+                        method: POST
+                        url: Patient
+                        ifNoneExist: >-
+                          Patient?identifier=https://fhir.nhs.uk/Id/nhs-number|9449307946
+                    - fullUrl: >-
+                        http://example.org/fhir/Observation/Observation-GenomicEthnicity-Example
+                      resource:
+                        resourceType: Observation
+                        id: Observation-GenomicEthnicity-Example
+                        status: preliminary
+                        code:
+                          coding:
+                            - system: http://snomed.info/sct
+                              code: '723621000000103'
+                              display: Ethnicity
+                        subject:
+                          reference: Patient/Patient-LindsaySorrell-Example
+                          identifier:
+                            system: https://fhir.nhs.uk/Id/nhs-number
+                            value: '9449307946'
+                        valueString: unknown
+                      request:
+                        method: POST
+                        url: Observation
+                    - fullUrl: >-
+                        http://example.org/fhir/ServiceRequest/ServiceRequest-WGSTestOrderForm-Example
+                      resource:
+                        resourceType: ServiceRequest
+                        id: ServiceRequest-WGSTestOrderForm-Example
+                        extension:
+                          - url: >-
+                              https://fhir.hl7.org.uk/StructureDefinition/Extension-UKCore-Coverage
+                            valueCodeableConcept:
+                              coding:
+                                - system: >-
+                                    https://fhir.hl7.org.uk/CodeSystem/UKCore-FundingCategory
+                                  code: nhs
+                                  display: NHS
+                        status: active
+                        intent: order
+                        category:
+                          - coding:
+                              - system: >-
+                                  https://fhir.hl7.org.uk/CodeSystem/UKCore-GenomeSequencingCategory
+                                code: rare-disease-wgs
+                                display: Rare Disease - WGS
+                        priority: routine
+                        code:
+                          coding:
+                            - system: >-
+                                https://fhir.nhs.uk/CodeSystem/England-GenomicTestDirectory
+                              code: R193.4
+                              display: Cystic renal disease
+                        subject:
+                          reference: Patient/Patient-LindsaySorrell-Example
+                          identifier:
+                            system: https://fhir.nhs.uk/Id/nhs-number
+                            value: '9449307946'
+                        authoredOn: '2023-08-08'
+                        requester:
+                          reference: >-
+                            PractitionerRole/PractitionerRole-HazelSmithRenal-Example
+                        reasonCode:
+                          - coding:
+                              - system: http://snomed.info/sct
+                                code: '103693007'
+                                display: Diagnostic procedure
+                        supportingInfo:
+                          - reference: Observation/Observation-DiseaseStatus-Example
+                          - reference: Observation/Observation-GenomicEthnicity-Example
+                          - reference: Observation/Observation-NoPregnancy-Example
+                          - reference: >-
+                              FamilyMemberHistory/FamilyMemberHistory-NonConsanguinousUnion-Example
+                          - reference: >-
+                              Observation/Observation-NoBoneMarrowTransplant-Example
+                          - reference: Observation/Observation-NoTransfusion-Example
+                          - reference: Observation/Observation-MultipleRenalCysts-Example
+                          - reference: Observation/Observation-Nephronophthisis-Example
+                          - reference: Observation/Observation-HepaticCysts-Example
+                          - reference: Observation/Observation-EnlargedKidney-Example
+                          - reference: Observation/Observation-RenalInsufficiency-Example
+                          - reference: Consent/Consent-RoDToFollow-Example
+                        note:
+                          - text: No family history of genomic testing
+                          - text: >-
+                              Free text for diagnosis/reason for referral,
+                              relevant information including family history,
+                              phenotypic details/ HPO Terms/ Patient diagnoses
+                              with ADPKD (example)
+                      request:
+                        method: POST
+                        url: ServiceRequest
+                    - fullUrl: >-
+                        http://example.org/fhir/Observation/Observation-NoPregnancy-Example
+                      resource:
+                        resourceType: Observation
+                        id: Observation-NoPregnancy-Example
+                        status: final
+                        code:
+                          coding:
+                            - system: http://snomed.info/sct
+                              code: '77386006'
+                              display: Pregnancy
+                        subject:
+                          reference: Patient/Patient-LindsaySorrell-Example
+                          identifier:
+                            system: https://fhir.nhs.uk/Id/nhs-number
+                            value: '9449307946'
+                        effectiveDateTime: '2023-08-05'
+                        valueBoolean: false
+                      request:
+                        method: POST
+                        url: Observation
+                    - fullUrl: >-
+                        http://example.org/fhir/Observation/Observation-DiseaseStatus-Example
+                      resource:
+                        resourceType: Observation
+                        id: Observation-DiseaseStatus-Example
+                        status: final
+                        code:
+                          coding:
+                            - system: >-
+                                https://fhir.nhs.uk/CodeSystem/England-GenomicTestDirectory
+                              code: R193.4
+                              display: Cystic renal disease
+                        subject:
+                          reference: Patient/Patient-LindsaySorrell-Example
+                          identifier:
+                            system: https://fhir.nhs.uk/Id/nhs-number
+                            value: '9449307946'
+                        effectiveDateTime: '2023-08-05'
+                        valueCodeableConcept:
+                          coding:
+                            - system: http://snomed.info/sct
+                              code: '103310001'
+                              display: Patient not affected
+                      request:
+                        method: POST
+                        url: Observation
+                    - fullUrl: >-
+                        http://example.org/fhir/FamilyMemberHistory/FamilyMemberHistory-NonConsanguinousUnion-Example
+                      resource:
+                        resourceType: FamilyMemberHistory
+                        id: FamilyMemberHistory-NonConsanguinousUnion-Example
+                        extension:
+                          - url: >-
+                              http://hl7.org/fhir/StructureDefinition/family-member-history-genetics-observation
+                            valueReference:
+                              reference: >-
+                                Observation/Observation-NonConsanguinousUnion-Example
+                        status: completed
+                        patient:
+                          reference: Patient/Patient-LindsaySorrell-Example
+                          identifier:
+                            system: https://fhir.nhs.uk/Id/nhs-number
+                            value: '9449307946'
+                        relationship:
+                          coding:
+                            - system: >-
+                                http://terminology.hl7.org/CodeSystem/v3-RoleCode
+                              code: PRN
+                              display: parent
+                      request:
+                        method: POST
+                        url: FamilyMemberHistory
+                    - fullUrl: >-
+                        http://example.org/fhir/Observation/Observation-NonConsanguinousUnion-Example
+                      resource:
+                        resourceType: Observation
+                        id: Observation-NonConsanguinousUnion-Example
+                        status: final
+                        code:
+                          coding:
+                            - system: http://snomed.info/sct
+                              code: '842009'
+                              display: Consanguinity
+                        subject:
+                          reference: Patient/Patient-LindsaySorrell-Example
+                          identifier:
+                            system: https://fhir.nhs.uk/Id/nhs-number
+                            value: '9449307946'
+                        effectiveDateTime: '2023-08-05'
+                        valueBoolean: false
+                      request:
+                        method: POST
+                        url: Observation
+                    - fullUrl: >-
+                        http://example.org/fhir/Observation/Observation-NoBoneMarrowTransplant-Example
+                      resource:
+                        resourceType: Observation
+                        id: Observation-NoBoneMarrowTransplant-Example
+                        status: final
+                        code:
+                          coding:
+                            - system: http://snomed.info/sct
+                              code: '23719005'
+                              display: Transplantation of bone marrow
+                        subject:
+                          reference: Patient/Patient-LindsaySorrell-Example
+                          identifier:
+                            system: https://fhir.nhs.uk/Id/nhs-number
+                            value: '9449307946'
+                        effectiveDateTime: '2023-08-05'
+                        valueBoolean: false
+                      request:
+                        method: POST
+                        url: Observation
+                    - fullUrl: >-
+                        http://example.org/fhir/Observation/Observation-NoTransfusion-Example
+                      resource:
+                        resourceType: Observation
+                        id: Observation-NoTransfusion-Example
+                        status: final
+                        code:
+                          coding:
+                            - system: http://snomed.info/sct
+                              code: '5447007'
+                              display: Transfusion
+                        subject:
+                          reference: Patient/Patient-LindsaySorrell-Example
+                          identifier:
+                            system: https://fhir.nhs.uk/Id/nhs-number
+                            value: '9449307946'
+                        effectiveDateTime: '2023-08-05'
+                        valueBoolean: false
+                      request:
+                        method: POST
+                        url: Observation
+                    - fullUrl: >-
+                        http://example.org/fhir/Observation/Observation-MultipleRenalCysts-Example
+                      resource:
+                        resourceType: Observation
+                        id: Observation-MultipleRenalCysts-Example
+                        status: final
+                        code:
+                          coding:
+                            - system: https://hpo.jax.org/app/
+                              code: HP:0005562
+                              display: Multiple renal cysts
+                        subject:
+                          reference: Patient/Patient-LindsaySorrell-Example
+                          identifier:
+                            system: https://fhir.nhs.uk/Id/nhs-number
+                            value: '9449307946'
+                        effectiveDateTime: '2023-08-05'
+                        valueBoolean: false
+                      request:
+                        method: POST
+                        url: Observation
+                    - fullUrl: >-
+                        http://example.org/fhir/Observation/Observation-Nephronophthisis-Example
+                      resource:
+                        resourceType: Observation
+                        id: Observation-Nephronophthisis-Example
+                        status: final
+                        code:
+                          coding:
+                            - system: https://hpo.jax.org/app/
+                              code: HP:0000090
+                              display: Nephronophthisis
+                        subject:
+                          reference: Patient/Patient-LindsaySorrell-Example
+                          identifier:
+                            system: https://fhir.nhs.uk/Id/nhs-number
+                            value: '9449307946'
+                        effectiveDateTime: '2023-08-05'
+                        valueBoolean: false
+                      request:
+                        method: POST
+                        url: Observation
+                    - fullUrl: >-
+                        http://example.org/fhir/Observation/Observation-HepaticCysts-Example
+                      resource:
+                        resourceType: Observation
+                        id: Observation-HepaticCysts-Example
+                        status: final
+                        code:
+                          coding:
+                            - system: https://hpo.jax.org/app/
+                              code: HP:0001407
+                              display: Hepatic cysts
+                        subject:
+                          reference: Patient/Patient-LindsaySorrell-Example
+                          identifier:
+                            system: https://fhir.nhs.uk/Id/nhs-number
+                            value: '9449307946'
+                        effectiveDateTime: '2023-08-05'
+                        valueBoolean: false
+                      request:
+                        method: POST
+                        url: Observation
+                    - fullUrl: >-
+                        http://example.org/fhir/Observation/Observation-EnlargedKidney-Example
+                      resource:
+                        resourceType: Observation
+                        id: Observation-EnlargedKidney-Example
+                        status: final
+                        code:
+                          coding:
+                            - system: https://hpo.jax.org/app/
+                              code: HP:0000105
+                              display: Enlarged kidney
+                        subject:
+                          reference: Patient/Patient-LindsaySorrell-Example
+                          identifier:
+                            system: https://fhir.nhs.uk/Id/nhs-number
+                            value: '9449307946'
+                        effectiveDateTime: '2023-08-05'
+                        valueBoolean: true
+                      request:
+                        method: POST
+                        url: Observation
+                    - fullUrl: >-
+                        http://example.org/fhir/Observation/Observation-RenalInsufficiency-Example
+                      resource:
+                        resourceType: Observation
+                        id: Observation-RenalInsufficiency-Example
+                        status: final
+                        code:
+                          coding:
+                            - system: https://hpo.jax.org/app/
+                              code: HP:0000083
+                              display: Renal insufficiency
+                        subject:
+                          reference: Patient/Patient-LindsaySorrell-Example
+                          identifier:
+                            system: https://fhir.nhs.uk/Id/nhs-number
+                            value: '9449307946'
+                        effectiveDateTime: '2023-08-05'
+                        valueBoolean: true
+                      request:
+                        method: POST
+                        url: Observation
+                    - fullUrl: >-
+                        http://example.org/fhir/Specimen/Specimen-BloodEDTA-Example
+                      resource:
+                        resourceType: Specimen
+                        id: Specimen-BloodEDTA-Example
+                        identifier:
+                          - system: https://fhir.add.nhs.uk/Id/specimenId
+                            value: RGT03135
+                        status: unavailable
+                        type:
+                          coding:
+                            - system: http://snomed.info/sct
+                              code: '445295009'
+                              display: Blood specimen with EDTA
+                        subject:
+                          reference: Patient/Patient-LindsaySorrell-Example
+                          identifier:
+                            system: https://fhir.nhs.uk/Id/nhs-number
+                            value: '9449307946'
+                        request:
+                          - reference: >-
+                              ServiceRequest/ServiceRequest-NonWGSTestOrderForm-Example
+                      request:
+                        method: POST
+                        url: Specimen
+                    - fullUrl: >-
+                        http://example.org/fhir/Consent/Consent-RoDToFollow-Example
+                      resource:
+                        resourceType: Consent
+                        id: Consent-RoDToFollow-Example
+                        status: proposed
+                        scope:
+                          coding:
+                            - system: >-
+                                http://terminology.hl7.org/CodeSystem/consentscope
+                              code: research
+                              display: Research
+                        category:
+                          - coding:
+                              - system: >-
+                                  http://terminology.hl7.org/CodeSystem/consentcategorycodes
+                                code: research
+                                display: Research Information Access
+                        policy:
+                          - authority: https://www.england.nhs.uk
+                            uri: >-
+                              https://www.england.nhs.uk/publication/nhs-genomic-medicine-service-record-of-discussion-form
+                      request:
+                        method: POST
+                        url: Consent
+              Re-analysis-R387:
+                summary: Bundle-NonWGSTestOrderForm-Reanalysis-Example
+                description: >-
+                  Example
+                  [transaction](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/Examples/Bundle?version=0.3.0#Bundle-NonWGSTestOrderForm-Reanalysis-Example)
+                  of a Non-WGS test request sent to the central broker, as
+                  described in the Clinica Scenario
+                  [**Re-analysis-R387**](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/Design/Clinical-Scenarios?version=0.3.0#Re-analysis--R387).
+                value:
+                  resourceType: Bundle
+                  id: Bundle-NonWGSTestOrderForm-Reanalysis-Example
+                  type: transaction
+                  entry:
+                    - fullUrl: >-
+                        http://example.org/fhir/PractitionerRole/PractitionerRole-HazelSmithRenal-Example
+                      resource:
+                        resourceType: PractitionerRole
+                        id: PractitionerRole-HazelSmithRenal-Example
+                        practitioner:
+                          identifier:
+                            system: https://fhir.nhs.uk/Id/sds-user-id
+                            value: '9999999998'
+                          display: Dr. Hazel Smith
+                        organization:
+                          identifier:
+                            system: https://fhir.nhs.uk/Id/ods-organization-code
+                            value: RAX01
+                          display: Kingston Hospital NHS Foundation Trust
+                        specialty:
+                          - coding:
+                              - system: >-
+                                  https://fhir.hl7.org.uk/CodeSystem/UKCore-PracticeSettingCode
+                                code: '361'
+                                display: Renal Medicine
+                        telecom:
+                          - system: phone
+                            value: '02085467711'
+                          - system: email
+                            value: Hazel.smith12@nhs.net
+                          - system: email
+                            value: renalseckingston@nhs.net
+                            extension:
+                              - url: >-
+                                  http://hl7.org/fhir/StructureDefinition/contactpoint-comment
+                                valueString: reporting
+                          - system: email
+                            value: neuroseckingston@nhs.net
+                            extension:
+                              - url: >-
+                                  http://hl7.org/fhir/StructureDefinition/contactpoint-comment
+                                valueString: reporting
+                      request:
+                        method: POST
+                        url: PractitionerRole
+                    - fullUrl: >-
+                        http://example.org/fhir/Patient/Patient-DemeizaSeo-Example
+                      resource:
+                        resourceType: Patient
+                        id: Patient-DemeizaSeo-Example
+                        extension:
+                          - url: >-
+                              https://fhir.hl7.org.uk/StructureDefinition/Extension-UKCore-BirthSex
+                            valueCodeableConcept:
+                              coding:
+                                - system: >-
+                                    http://terminology.hl7.org/CodeSystem/v3-AdministrativeGender
+                                  code: F
+                                  display: Female
+                          - url: >-
+                              https://fhir.hl7.org.uk/StructureDefinition/Extension-UKCore-EthnicCategory
+                            valueCodeableConcept:
+                              coding:
+                                - system: >-
+                                    https://fhir.hl7.org.uk/CodeSystem/UKCore-EthnicCategoryEngland
+                                  code: R
+                                  display: Other Ethnic Groups - Chinese
+                        identifier:
+                          - system: https://fhir.nhs.uk/Id/nhs-number
+                            value: '9449306559'
+                            extension:
+                              - url: >-
+                                  https://fhir.hl7.org.uk/StructureDefinition/Extension-UKCore-NHSNumberVerificationStatus
+                                valueCodeableConcept:
+                                  coding:
+                                    - system: >-
+                                        https://fhir.hl7.org.uk/CodeSystem/UKCore-NHSNumberVerificationStatusEngland
+                                      version: 2.2.0
+                                      code: '01'
+                                      display: Number present and verified
+                          - system: urn:oid:2.16.840.1.113883.2.1.3.2.4.18.24
+                            value: RWT16378
+                            assigner:
+                              identifier:
+                                system: https://fhir.nhs.uk/Id/ods-organization-code
+                                value: RAX
+                        name:
+                          - given:
+                              - Demeiza
+                            family: Seo
+                        gender: female
+                        birthDate: '2011-01-26'
+                        deceasedBoolean: false
+                        address:
+                          - line:
+                              - 1 Aragon Avenue,
+                              - Thames Ditton
+                            city: Surrey
+                            postalCode: KT7 0PY
+                        generalPractitioner:
+                          - identifier:
+                              system: https://fhir.hl7.org.uk/Id/gmp-number
+                              value: G9999999
+                            display: Dr. Aero Smith
+                          - identifier:
+                              system: https://fhir.hl7.org.uk/Id/ODS-code
+                              value: TP123
+                            display: 123 Test Practice
+                        link:
+                          - other:
+                              reference: >-
+                                https://api.service.nhs.uk/personal-demographics/FHIR/R4/Patient/9449307559
+                            type: seealso
+                      request:
+                        method: POST
+                        url: Patient
+                        ifNoneExist: >-
+                          Patient?identifier=https://fhir.nhs.uk/Id/nhs-number|9449307559
+                    - fullUrl: >-
+                        http://example.org/fhir/Observation/Observation-GenomicEthnicity-Example
+                      resource:
+                        resourceType: Observation
+                        id: Observation-GenomicEthnicity-Example
+                        status: preliminary
+                        code:
+                          coding:
+                            - system: http://snomed.info/sct
+                              code: '723621000000103'
+                              display: Ethnicity
+                        subject:
+                          reference: Patient/Patient-DemeizaSeo-Example
+                          identifier:
+                            system: https://fhir.nhs.uk/Id/nhs-number
+                            value: '9449307559'
+                        valueString: unknown
+                      request:
+                        method: POST
+                        url: Observation
+                    - fullUrl: >-
+                        http://example.org/fhir/ServiceRequest/ServiceRequest-NonWGSTestOrderForm-ReAnalysis-Example
+                      resource:
+                        resourceType: ServiceRequest
+                        id: ServiceRequest-NonWGSTestOrderForm-ReAnalysis-Example
+                        basedOn:
+                          - reference: >-
+                              ServiceRequest/ServiceRequest-NonWGSTestOrderForm-SyndromicEpilepsy-Example
+                        extension:
+                          - url: >-
+                              https://fhir.hl7.org.uk/StructureDefinition/Extension-UKCore-Coverage
+                            valueCodeableConcept:
+                              coding:
+                                - system: >-
+                                    https://fhir.hl7.org.uk/CodeSystem/UKCore-FundingCategory
+                                  code: nhs
+                                  display: NHS
+                        status: active
+                        intent: order
+                        category:
+                          - coding:
+                              - system: >-
+                                  https://fhir.hl7.org.uk/CodeSystem/UKCore-GenomeSequencingCategory
+                                code: rare-disease-non-wgs
+                        priority: routine
+                        code:
+                          coding:
+                            - system: >-
+                                https://fhir.nhs.uk/CodeSystem/England-GenomicTestDirectory
+                              code: R387
+                              display: Re-analysis
+                        orderDetail:
+                          - coding:
+                              - system: >-
+                                  https://fhir.nhs.uk/CodeSystem/England-GenomicTestDirectory
+                                code: R59
+                                display: Early onset or syndromic epilepsy
+                        subject:
+                          reference: Patient/Patient-DemeizaSeo-Example
+                          identifier:
+                            system: https://fhir.nhs.uk/Id/nhs-number
+                            value: '9449306559'
+                        authoredOn: '2023-09-06T09:00:00Z'
+                        requester:
+                          reference: >-
+                            PractitionerRole/PractitionerRole-HazelSmithRenal-Example
+                        reasonCode:
+                          - coding:
+                              - system: >-
+                                  https://fhir.nhs.uk/CodeSystem/England-GenomicTestDirectory
+                                code: '719641000000101'
+                                display: Data analysis (qualifier value)
+                            text: >-
+                              Significant new treatment and or clinical
+                              management implication for the patient.Please
+                              provide details/treatment for management of
+                              epilepsy
+                        supportingInfo:
+                          - reference: Observation/Observation-GenomicEthnicity-Example
+                          - reference: Observation/Observation-DiseaseStatus-Example
+                          - reference: Observation/Observation-NoPregnancy-Example
+                          - reference: >-
+                              Observation/Observation-NonConsanguinousUnion-Example
+                          - reference: >-
+                              FamilyMemberHistory/FamilyMemberHistory-NonConsanguinousUnion-Example
+                          - reference: >-
+                              Observation/Observation-NoBoneMarrowTransplant-Example
+                          - reference: Observation/Observation-NoTransfusion-Example
+                        specimen:
+                          - display: No Sample Required
+                        note:
+                          - text: No family history of genomic testing
+                          - text: >-
+                              Free text for diagnosis/reason for referral,
+                              relevant information including family history,
+                              phenotypic details/ HPO Terms/E.g. Reanlaysis -
+                              change in observed phenotype. Epilepsy test
+                              previously ordered on patient 5 years ago. 
+                      request:
+                        method: POST
+                        url: ServiceRequest
+                    - fullUrl: >-
+                        http://example.org/fhir/Observation/Observation-NoPregnancy-Example
+                      resource:
+                        resourceType: Observation
+                        id: Observation-NoPregnancy-Example
+                        status: final
+                        code:
+                          coding:
+                            - system: http://snomed.info/sct
+                              code: '77386006'
+                              display: Pregnancy
+                        subject:
+                          reference: Patient/Patient-DemeizaSeo-Example
+                          identifier:
+                            system: https://fhir.nhs.uk/Id/nhs-number
+                            value: '9449307559'
+                        effectiveDateTime: '2023-09-06'
+                        valueBoolean: false
+                      request:
+                        method: POST
+                        url: Observation
+                    - fullUrl: >-
+                        http://example.org/fhir/Observation/Observation-DiseaseStatus-Example
+                      resource:
+                        resourceType: Observation
+                        id: Observation-DiseaseStatus-Example
+                        status: final
+                        code:
+                          coding:
+                            - system: >-
+                                https://fhir.nhs.uk/CodeSystem/England-GenomicTestDirectory
+                              code: R67.2
+                              display: Monogenic hearing loss
+                        subject:
+                          reference: Patient/Patient-DemeizaSeo-Example
+                          identifier:
+                            system: https://fhir.nhs.uk/Id/nhs-number
+                            value: '9449307559'
+                        effectiveDateTime: '2023-09-06'
+                        valueCodeableConcept:
+                          coding:
+                            - system: http://snomed.info/sct
+                              code: '103310001'
+                              display: Patient not affected
+                      request:
+                        method: POST
+                        url: Observation
+                    - fullUrl: >-
+                        http://example.org/fhir/FamilyMemberHistory/FamilyMemberHistory-NonConsanguinousUnion-Example
+                      resource:
+                        resourceType: FamilyMemberHistory
+                        id: FamilyMemberHistory-NonConsanguinousUnion-Example
+                        extension:
+                          - url: >-
+                              http://hl7.org/fhir/StructureDefinition/family-member-history-genetics-observation
+                            valueReference:
+                              reference: >-
+                                Observation/Observation-NonConsanguinousUnion-Example
+                        status: completed
+                        patient:
+                          reference: Patient/Patient-DemeizaSeo-Example
+                          identifier:
+                            system: https://fhir.nhs.uk/Id/nhs-number
+                            value: '9449307559'
+                        relationship:
+                          coding:
+                            - system: >-
+                                http://terminology.hl7.org/CodeSystem/v3-RoleCode
+                              code: PRN
+                              display: parent
+                      request:
+                        method: POST
+                        url: FamilyMemberHistory
+                    - fullUrl: >-
+                        http://example.org/fhir/Observation/Observation-NonConsanguinousUnion-Example
+                      resource:
+                        resourceType: Observation
+                        id: Observation-NonConsanguinousUnion-Example
+                        status: final
+                        code:
+                          coding:
+                            - system: http://snomed.info/sct
+                              code: '842009'
+                              display: Consanguinity
+                        subject:
+                          reference: Patient/Patient-DemeizaSeo-Example
+                          identifier:
+                            system: https://fhir.nhs.uk/Id/nhs-number
+                            value: '9449307559'
+                        effectiveDateTime: '2023-09-06'
+                        valueBoolean: false
+                      request:
+                        method: POST
+                        url: Observation
+                    - fullUrl: >-
+                        http://example.org/fhir/Observation/Observation-NoBoneMarrowTransplant-Example
+                      resource:
+                        resourceType: Observation
+                        id: Observation-NoBoneMarrowTransplant-Example
+                        status: final
+                        code:
+                          coding:
+                            - system: http://snomed.info/sct
+                              code: '23719005'
+                              display: Transplantation of bone marrow
+                        subject:
+                          reference: Patient/Patient-DemeizaSeo-Example
+                          identifier:
+                            system: https://fhir.nhs.uk/Id/nhs-number
+                            value: '9449307559'
+                        effectiveDateTime: '2023-08-05'
+                        valueBoolean: false
+                      request:
+                        method: POST
+                        url: Observation
+                    - fullUrl: >-
+                        http://example.org/fhir/Observation/Observation-NoTransfusion-Example
+                      resource:
+                        resourceType: Observation
+                        id: Observation-NoTransfusion-Example
+                        status: final
+                        code:
+                          coding:
+                            - system: http://snomed.info/sct
+                              code: '5447007'
+                              display: Transfusion
+                        subject:
+                          reference: Patient/Patient-DemeizaSeo-Example
+                          identifier:
+                            system: https://fhir.nhs.uk/Id/nhs-number
+                            value: '9449307559'
+                        effectiveDateTime: '2023-09-06'
+                        valueBoolean: false
+                      request:
+                        method: POST
+                        url: Observation
+      responses:
+        '200':
+          $ref: '#/components/responses/200-goms-bundle-service-request-post'
+        4XX:
+          $ref: '#/components/responses/4XX-goms-error'
+  /FHIR/R4/ServiceRequest:
+    get:
+      operationId: getServiceRequests
+      summary: Search for ServiceRequests
+      description: >
+        ## Overview
+
+        This endpoint allows you to retrieve the records of ServiceRequests
+        using various query parameters.
+      tags:
+        - Query Record
+      parameters:
+        - $ref: '#/components/parameters/apikey'
+        - $ref: '#/components/parameters/NHSDSessionURID'
+        - $ref: '#/components/parameters/RequestID'
+        - $ref: '#/components/parameters/CorrelationID'
+        - $ref: '#/components/parameters/PatientIdentifier'
+        - $ref: '#/components/parameters/LogicalIdentifier'
+        - $ref: '#/components/parameters/Identifier'
+        - $ref: '#/components/parameters/Authored'
+        - $ref: '#/components/parameters/Requestor'
+        - $ref: '#/components/parameters/Performer'
+        - $ref: '#/components/parameters/Status'
+        - $ref: '#/components/parameters/Category'
+        - $ref: '#/components/parameters/TestID'
+        - $ref: '#/components/parameters/Include'
+        - $ref: '#/components/parameters/RevInclude'
+        - $ref: '#/components/parameters/SupportingInfo'
+      responses:
+        '200':
+          $ref: '#/components/responses/200-goms-bundle-servicerequests-get'
+        4XX:
+          $ref: '#/components/responses/4XX-goms-error'
+  /FHIR/R4/Task:
+    get:
+      operationId: getTasks
+      summary: Search for Tasks
+      description: >
+        ## Overview
+
+        This endpoint allows you to retrieve the records of Tasks using various
+        query parameters.
+      tags:
+        - Query Record
+      parameters:
+        - $ref: '#/components/parameters/apikey'
+        - $ref: '#/components/parameters/NHSDSessionURID'
+        - $ref: '#/components/parameters/RequestID'
+        - $ref: '#/components/parameters/CorrelationID'
+        - $ref: '#/components/parameters/PatientIdentifier'
+        - $ref: '#/components/parameters/LogicalIdentifier'
+        - $ref: '#/components/parameters/TaskAuthored'
+        - $ref: '#/components/parameters/Requestor'
+        - $ref: '#/components/parameters/Owner'
+        - $ref: '#/components/parameters/Status'
+        - $ref: '#/components/parameters/TaskCode'
+        - $ref: '#/components/parameters/BusinessStatus'
+        - $ref: '#/components/parameters/TaskInclude'
+      responses:
+        '200':
+          $ref: '#/components/responses/200-goms-bundle-tasks-get'
+        4XX:
+          $ref: '#/components/responses/4XX-goms-error'
+  /FHIR/R4/DiagnosticReport:
+    get:
+      operationId: getDiagnosticReports
+      summary: Search for DiagnosticReports
+      description: >
+        ## Overview
+
+        This endpoint allows you to retrieve the records of DiagnosticReport
+        using various query parameters.
+      tags:
+        - Query Record
+      parameters:
+        - $ref: '#/components/parameters/apikey'
+        - $ref: '#/components/parameters/NHSDSessionURID'
+        - $ref: '#/components/parameters/RequestID'
+        - $ref: '#/components/parameters/CorrelationID'
+        - $ref: '#/components/parameters/PatientIdentifier'
+        - $ref: '#/components/parameters/LogicalIdentifier'
+        - $ref: '#/components/parameters/Identifier'
+        - $ref: '#/components/parameters/ReportIssued'
+        - $ref: '#/components/parameters/Performer'
+        - $ref: '#/components/parameters/ResultsInterpreter'
+        - $ref: '#/components/parameters/Status'
+        - $ref: '#/components/parameters/DiagnosticReportInclude'
+      responses:
+        '200':
+          $ref: '#/components/responses/200-goms-bundle-diagnosticreports-get'
+        4XX:
+          $ref: '#/components/responses/4XX-goms-error'
+  /FHIR/R4/Specimen:
+    get:
+      operationId: getSpecimens
+      summary: Search for Specimens
+      description: >
+        ## Overview
+
+        This endpoint allows you to retrieve the records of Specimens using
+        various query parameters.
+      tags:
+        - Query Record
+      parameters:
+        - $ref: '#/components/parameters/apikey'
+        - $ref: '#/components/parameters/NHSDSessionURID'
+        - $ref: '#/components/parameters/RequestID'
+        - $ref: '#/components/parameters/CorrelationID'
+        - $ref: '#/components/parameters/PatientIdentifier'
+        - $ref: '#/components/parameters/LogicalIdentifier'
+        - $ref: '#/components/parameters/Identifier'
+        - $ref: '#/components/parameters/SpecimenCollected'
+        - $ref: '#/components/parameters/ContainerIdentifier'
+        - $ref: '#/components/parameters/Status'
+        - $ref: '#/components/parameters/SpecimenInclude'
+      responses:
+        '200':
+          $ref: '#/components/responses/200-goms-bundle-specimens-get'
+        4XX:
+          $ref: '#/components/responses/4XX-goms-error'
+  /FHIR/R4/Patient:
+    get:
+      operationId: getPatient
+      summary: Search for Patient
+      description: >
+        ## Overview
+
+        This endpoint allows you to retrieve the record of a patient held
+        within  genomic order management service using various query parameters.
+      tags:
+        - Query Record
+      parameters:
+        - $ref: '#/components/parameters/apikey'
+        - $ref: '#/components/parameters/NHSDSessionURID'
+        - $ref: '#/components/parameters/RequestID'
+        - $ref: '#/components/parameters/CorrelationID'
+        - $ref: '#/components/parameters/LogicalIdentifier'
+        - $ref: '#/components/parameters/Identifier'
+        - $ref: '#/components/parameters/GivenName'
+        - $ref: '#/components/parameters/FamilyName'
+        - $ref: '#/components/parameters/DateOfBirth'
+        - $ref: '#/components/parameters/Gender'
+      responses:
+        '200':
+          $ref: '#/components/responses/200-goms-bundle-patient-get'
+        4XX:
+          $ref: '#/components/responses/4XX-goms-error'
+  /FHIR/R4/PractitionerRole:
+    get:
+      operationId: getPractitionerRole
+      summary: Search for PractitionerRole
+      description: >
+        ## Overview
+
+        This endpoint allows you to retrieve the record of a PractitionerRole
+        held within  genomic order management service using various query
+        parameters.
+      tags:
+        - Query Record
+      parameters:
+        - $ref: '#/components/parameters/apikey'
+        - $ref: '#/components/parameters/NHSDSessionURID'
+        - $ref: '#/components/parameters/RequestID'
+        - $ref: '#/components/parameters/CorrelationID'
+        - $ref: '#/components/parameters/LogicalIdentifier'
+        - $ref: '#/components/parameters/PractitionerIdentifier'
+        - $ref: '#/components/parameters/Organisation'
+      responses:
+        '200':
+          $ref: '#/components/responses/200-goms-bundle-practitionerrole-get'
+        4XX:
+          $ref: '#/components/responses/4XX-goms-error'
+  /FHIR/R4/{resourceName}/{id}:
+    get:
+      operationId: readResource
+      summary: Search for resource by its logical id
+      description: >
+        ## Overview
+
+        This endpoint allows you to retrieve the record of a single FHIR
+        resource latest version by its logical id.
+      tags:
+        - Query History
+      parameters:
+        - $ref: '#/components/parameters/apikey'
+        - $ref: '#/components/parameters/NHSDSessionURID'
+        - $ref: '#/components/parameters/RequestID'
+        - $ref: '#/components/parameters/CorrelationID'
+        - $ref: '#/components/parameters/ResourceName'
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          $ref: >-
+            #/components/responses/200-goms-bundle-practitionerrole-get-logical-id
+        4XX:
+          $ref: '#/components/responses/4XX-goms-error'
+  /FHIR/R4/{resourceName}/{id}/_history:
+    get:
+      summary: Retrieve resource history by its logical id
+      operationId: readResourceHistory
+      description: >
+        ## Overview
+
+        This endpoint allows you to retrieve the full history of a single FHIR
+        resource by its logical id.
+
+
+        ## Sandbox testing
+
+        You can test the following scenarios in our sandbox environment:
+
+
+        | Scenario                                |
+        Request                                                                                                                                                        
+        |
+        Response                                                               
+        |
+
+        | ----------------------------------------|
+        ----------------------------------------------------------------------------------------------------------------------------------------------------------------|
+        ------------------------------------------------------------------------|
+
+        |                                        
+        |                                                                                                                                                                
+        |                                                                        
+        |
+      tags:
+        - Query History
+      parameters:
+        - $ref: '#/components/parameters/apikey'
+        - $ref: '#/components/parameters/NHSDSessionURID'
+        - $ref: '#/components/parameters/RequestID'
+        - $ref: '#/components/parameters/CorrelationID'
+        - $ref: '#/components/parameters/ResourceName'
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          $ref: '#/components/responses/200-goms-bundle-service-request-history'
+        4XX:
+          $ref: '#/components/responses/4XX-goms-error'
+  /FHIR/R4/{resourceName}/{id}/_history/{versionId}:
+    get:
+      summary: Retrieve Resource version by its logical id
+      operationId: readResourceHistoryVersion
+      description: >
+        ## Overview
+
+        This endpoint allows you to retrieve a single resource specified version
+        by its logical id.
+
+
+        ## Sandbox testing
+
+        You can test the following scenarios in our sandbox environment:
+
+
+        | Scenario                                |
+        Request                                                                                                                                                        
+        |
+        Response                                                               
+        |
+
+        | ----------------------------------------|
+        ----------------------------------------------------------------------------------------------------------------------------------------------------------------|
+        ------------------------------------------------------------------------|
+
+        |                                        
+        |                                                                                                                                                                
+        |                                                                        
+        |
+      tags:
+        - Query History
+      parameters:
+        - $ref: '#/components/parameters/apikey'
+        - $ref: '#/components/parameters/NHSDSessionURID'
+        - $ref: '#/components/parameters/RequestID'
+        - $ref: '#/components/parameters/CorrelationID'
+        - $ref: '#/components/parameters/ResourceName'
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/VersionId'
+      responses:
+        '200':
+          $ref: '#/components/responses/200-goms-bundle-service-request-read'
+        4XX:
+          $ref: '#/components/responses/4XX-goms-error'
+components:
+  responses:
+    4XX-goms-error:
+      description: >
+        Below are examples of potential HTTP status codes and their associated
+        error codes, which could be returned in the event of a fault.
+
+
+        | HTTP status | Error code                 | Description |
+
+        | ----------- | -------------------------- |
+        --------------------------------------------- |
+
+        | 400         | INVALID                    | The provided event ID is
+        either missing or not in the expected format. |
+
+        | 400         | BAD_REQUEST                | Search could not be
+        processed or failed basic FHIR validation rules  |
+
+        | 401         | UNAUTHORISED               | Authorization is required
+        for the interaction that was attempted  |
+
+        | 400         | BAD_REQUEST                | The resource could not be
+        parsed or failed basic FHIR validation rules  |
+
+        | 404         | NOT_FOUND                  | The requested resource was
+        not found. |
+
+        | 405         | NOT_ALLOWED                | The requested method is not
+        allowed  |
+
+        | 422         | UNPROCESSABLE_ENTITY       | The proposed resource
+        violated applicable FHIR profiles or server business rules. This should
+        be accompanied by an OperationOutcome resource providing additional
+        detail  |
+      content:
+        application/fhir+json:
+          schema:
+            type: object
+            description: >
+              Outcome of an operation that does not result in a resource or
+              bundle being returned (for example, error, async/batch
+              submission).
+            properties:
+              resourceType:
+                type: string
+                description: FHIR Resource Type.
+                enum:
+                  - OperationOutcome
+                example: OperationOutcome
+              issue:
+                type: array
+                description: List of issues that have occurred.
+                minItems: 1
+                items:
+                  type: object
+                  required:
+                    - severity
+                    - code
+                  properties:
+                    severity:
+                      type: string
+                      enum:
+                        - fatal
+                        - error
+                        - warning
+                        - information
+                      description: Severity of the error.
+                      example: error
+                    code:
+                      type: string
+                      description: FHIR error code.
+                      example: invalid
+                      enum:
+                        - invalid
+                        - structure
+                        - required
+                        - value
+                        - invariant
+                        - security
+                        - login
+                        - unknown
+                        - expired
+                        - forbidden
+                        - suppressed
+                        - processing
+                        - not-supported
+                        - duplicate
+                        - multiple-matches
+                        - not-found
+                        - deleted
+                        - too-long
+                        - code-invalid
+                        - extension
+                        - too-costly
+                        - business-rule
+                        - conflict
+                        - transient
+                        - lock-error
+                        - no-store
+                        - exception
+                        - timeout
+                        - incomplete
+                        - throttled
+                        - informational
+                    details:
+                      type: object
+                      description: Internal error code.
+                      properties:
+                        coding:
+                          type: array
+                          items:
+                            type: object
+                            required:
+                              - system
+                              - code
+                            properties:
+                              system:
+                                type: string
+                                description: URI of the coding system specification.
+                                enum:
+                                  - >-
+                                    https://fhir.nhs.uk/R4/CodeSystem/Spine-ErrorOrWarningCode
+                              code:
+                                type: string
+                                description: Symbol in syntax defined by the system.
+                                example: INVALID_VALUE
+                              display:
+                                type: string
+                                description: Representation defined by the system.
+                                example: Provided value is invalid
+                    diagnostics:
+                      type: string
+                      pattern: '[ \r\n\t\S]+'
+                      description: Additional diagnostic information about the issue.
+                    location:
+                      type: array
+                      items:
+                        type: string
+                        pattern: '[ \r\n\t\S]+'
+                        description: >-
+                          This element is deprecated because it is XML specific.
+                          It is replaced by issue.expression, which is format
+                          independent, and simpler to parse. 
+
+
+                          For resource issues, this will be a simple XPath
+                          limited to element names, repetition indicators and
+                          the default child accessor that identifies one of the
+                          elements in the resource that caused this issue to be
+                          raised.  For HTTP errors, will be "http." + the
+                          parameter name.
+                    expression:
+                      type: array
+                      items:
+                        type: string
+                        pattern: '[ \r\n\t\S]+'
+                        description: >-
+                          A [simple subset of FHIRPath](fhirpath.html#simple)
+                          limited to element names, repetition indicators and
+                          the default child accessor that identifies one of the
+                          elements in the resource that caused this issue to be
+                          raised.
+          examples:
+            single_item:
+              description: |
+                An error response to a request.
+              value:
+                resourceType: OperationOutcome
+                meta:
+                  lastUpdated: '2022-10-21T13:47:00+00:00'
+                issue:
+                  - severity: error
+                    code: value
+                    details:
+                      coding:
+                        - system: >-
+                            https://fhir.nhs.uk/R4/CodeSystem/Spine-ErrorOrWarningCode
+                          code: MISSING_FIELD
+                          display: ResourceType Bundle must contain 'entry' field
+    200-goms-bundle-service-request-post:
+      description: A response from the /FHIR/R4/ServiceRequest endpoint.
+      content:
+        application/fhir+json:
+          schema:
+            type: object
+            description: A response from the /FHIR/R4/ServiceRequest endpoint.
+            properties:
+              resourceType:
+                type: string
+                description: FHIR Resource Type.
+                enum:
+                  - OperationOutcome
+                example: OperationOutcome
+              issue:
+                type: array
+                description: Successfull processing of request.
+                minItems: 1
+                items:
+                  type: object
+                  required:
+                    - severity
+                    - code
+                  properties:
+                    severity:
+                      type: string
+                      enum:
+                        - success
+                      description: Severity set to 'success'.
+                      example: success
+                    code:
+                      type: string
+                      description: FHIR error code.
+                      example: invalid
+                      enum:
+                        - success
+                    details:
+                      type: object
+                      description: Internal error code.
+                      properties:
+                        coding:
+                          type: array
+                          items:
+                            type: object
+                            required:
+                              - text
+                            properties:
+                              text:
+                                type: string
+                                description: URI of the coding system specification.
+                                enum:
+                                  - >-
+                                    https://fhir.nhs.uk/R4/CodeSystem/Spine-ErrorOrWarningCode
+                              code:
+                                type: string
+                                description: Symbol in syntax defined by the system.
+                                example: INVALID_VALUE
+                              display:
+                                type: string
+                                description: Representation defined by the system.
+                                example: Provided value is invalid
+                    expression:
+                      type: string
+                      description: FHIRPath of element(s) related to the error.
+                      example: Patient.name.given
+          examples:
+            single-item:
+              description: A successful response containing a single outcome item.
+              value:
+                resourceType: Bundle
+                type: transaction-response
+                entry:
+                  - fullUrl: urn:uuid:4d70678c-81e4-4ff4-8c67-17596fd0aa46
+                    response:
+                      status: 201 Created
+                      outcome:
+                        resourceType: OperationOutcome
+                        meta:
+                          lastUpdated: '2023-09-11T10:11:12.000Z'
+                        issue:
+                          - severity: success
+                            code: success
+                            diagnostics: No issues detected during validation.
+            multiple-items:
+              description: A successful response containing multiple outcome items.
+              value:
+                resourceType: Bundle
+                type: transaction-response
+                entry:
+                  - fullUrl: urn:uuid:4d70678c-81e4-4ff4-8c67-17596fd0aa46
+                    response:
+                      status: 201 Created
+                      location: Patient/e87361ea-b6fb-482e-a252-af3199792582/
+                      outcome:
+                        resourceType: OperationOutcome
+                        meta:
+                          lastUpdated: '2023-09-11T10:11:12.000Z'
+                        issue:
+                          - severity: information
+                            code: success
+                            diagnostics: No issues detected during validation.
+                  - fullUrl: urn:uuid:0ae4daf3-f24b-479d-b8fa-b69e2d873b60
+                    response:
+                      status: 201 Created
+                      location: ServiceRequest/4d70678c-81e4-4ff4-8c67-17596fd0aa46/
+                      outcome:
+                        resourceType: OperationOutcome
+                        meta:
+                          lastUpdated: '2023-09-11T10:11:12.000Z'
+                        issue:
+                          - severity: information
+                            code: success
+                            diagnostics: No issues detected during validation.
+    20X-goms-bundle-task-create-update:
+      description: A response from the /FHIR/R4/Task create update action.
+      content:
+        application/fhir+json:
+          schema:
+            type: object
+            required:
+              - resourceType
+              - identifier
+              - type
+              - entry
+            description: >
+              A FHIR
+              [Task](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-Task?version=0.3.0)
+          examples:
+            single-item:
+              description: Task for creation
+              value:
+                resourceType: Task
+                id: 8322cbf4-8fd0-46ab-bffe-abf39ee7a3f6
+                status: cancelled
+                statusReason:
+                  coding:
+                    - system: >-
+                        https://fhir.nhs.uk/CodeSystem/task-statusReason-genomics
+                      code: TestNoLongerRequired
+                      display: Test No Longer Required
+                intent: order
+                priority: routine
+                code:
+                  coding:
+                    - system: https://fhir.nhs.uk/CodeSystem/task-code-genomics
+                      code: ProcessGenomicTestRequest
+                      display: Process Genomic Test Request
+                focus:
+                  reference: >-
+                    ServiceRequest/ServiceRequest-NonWGSTestOrderForm-Cancellation-Example
+                for:
+                  reference: Patient/Patient-MeirLieberman-Example
+                  identifier:
+                    system: https://fhir.nhs.uk/Id/nhs-number
+                    value: '9449307873'
+                authoredOn: '2023-08-08T15:43:00Z'
+                lastModified: '2023-08-08T15:43:00Z'
+                requester:
+                  reference: PractitionerRole/PractitionerRole-GeneSmithENT-Example
+                owner:
+                  identifier:
+                    system: https://fhir.nhs.uk/Id/ods-organization-code
+                    value: RGT01
+                  display: ADDENBROOKE'S HOSPITAL
+                note: null
+    200-goms-bundle-task-post:
+      description: A response from the /FHIR/R4/Task endpoint.
+      content:
+        application/fhir+json:
+          schema:
+            type: object
+            description: A response from the /FHIR/R4/Task endpoint.
+            properties:
+              resourceType:
+                type: string
+                description: FHIR Resource Type.
+                enum:
+                  - OperationOutcome
+                example: OperationOutcome
+              issue:
+                type: array
+                description: Successfull processing of request.
+                minItems: 1
+                items:
+                  type: object
+                  required:
+                    - severity
+                    - code
+                  properties:
+                    severity:
+                      type: string
+                      enum:
+                        - success
+                      description: Severity set to 'success'.
+                      example: success
+                    code:
+                      type: string
+                      description: FHIR error code.
+                      example: invalid
+                      enum:
+                        - success
+                    details:
+                      type: object
+                      description: Internal error code.
+                      properties:
+                        coding:
+                          type: array
+                          items:
+                            type: object
+                            required:
+                              - text
+                            properties:
+                              text:
+                                type: string
+                                description: URI of the coding system specification.
+                                enum:
+                                  - >-
+                                    https://fhir.nhs.uk/R4/CodeSystem/Spine-ErrorOrWarningCode
+                              code:
+                                type: string
+                                description: Symbol in syntax defined by the system.
+                                example: INVALID_VALUE
+                              display:
+                                type: string
+                                description: Representation defined by the system.
+                                example: Provided value is invalid
+                    expression:
+                      type: string
+                      description: FHIRPath of element(s) related to the error.
+                      example: Patient.name.given
+          examples:
+            single-item:
+              description: >-
+                A successful response to a task create, contains a single
+                outcome item.
+              value:
+                resourceType: Bundle
+                type: transaction-response
+                entry:
+                  - fullUrl: urn:uuid:4d70678c-81e4-4ff4-8c67-17596fd0aa46
+                    response:
+                      status: 201 Created
+                      outcome:
+                        resourceType: OperationOutcome
+                        meta:
+                          lastUpdated: '2023-09-11T10:11:12.000Z'
+                        issue:
+                          - severity: success
+                            code: success
+                            diagnostics: No issues detected during validation.
+    20X-goms-bundle-diagnostic-report-create-update:
+      description: A response from the /FHIR/R4/DiagnosticReport create update operation
+      content:
+        application/fhir+json:
+          schema:
+            type: object
+            required:
+              - resourceType
+              - identifier
+              - type
+              - entry
+            description: >
+              A FHIR
+              [DiagnosticReport](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-DiagnosticReport?version=0.3.0)
+          examples:
+            single-item:
+              description: DiagnosticReport for creation
+              value:
+                resourceType: DiagnosticReport
+                id: ad23e6a8-914a-49d3-842e-f8058f639225
+                identifier:
+                  - system: https://www.guysandstthomas.nhs.uk/SEGLH/lims
+                    value: FHGenomicReport
+                    assigner:
+                      identifier:
+                        system: https://fhir.nhs.uk/Id/ods-organization-code
+                        value: RJ1
+                basedOn:
+                  - reference: >-
+                      ServiceRequest/ServiceRequest-NonWGSTestOrderForm-NewFollowupTest-Example
+                status: final
+                category:
+                  - coding:
+                      - system: http://terminology.hl7.org/CodeSystem/v2-0074
+                        code: GE
+                        display: Genetics
+                code:
+                  coding:
+                    - system: http://snomed.info/sct
+                      code: '1054161000000101'
+                      display: Genetic report
+                subject:
+                  reference: Patient/Patient-AnitaLamberts-Example
+                issued: '2023-11-24T09:45:00Z'
+                performer:
+                  - identifier:
+                      system: https://fhir.nhs.uk/Id/ods-organization-code
+                      value: RJ1
+                specimen:
+                  - reference: Specimen/Specimen-BloodEDTA-Example
+                presentedForm:
+                  - contentType: application/pdf
+                    language: en-GB
+                    url: https://o719on.axshare.com/?id=8aol33&p=introduction&g=1
+                    size: 43272
+                    title: Genomic Report for Anita Lamberts
+                    creation: '2023-11-24'
+    200-goms-bundle-diagnosticreport-post:
+      description: A response from the /FHIR/R4/Task endpoint.
+      content:
+        application/fhir+json:
+          schema:
+            type: object
+            description: A response from the /FHIR/R4/Task endpoint.
+            properties:
+              resourceType:
+                type: string
+                description: FHIR Resource Type.
+                enum:
+                  - OperationOutcome
+                example: OperationOutcome
+              issue:
+                type: array
+                description: Successfull processing of request.
+                minItems: 1
+                items:
+                  type: object
+                  required:
+                    - severity
+                    - code
+                  properties:
+                    severity:
+                      type: string
+                      enum:
+                        - success
+                      description: Severity set to 'success'.
+                      example: success
+                    code:
+                      type: string
+                      description: FHIR error code.
+                      example: invalid
+                      enum:
+                        - success
+                    details:
+                      type: object
+                      description: Internal error code.
+                      properties:
+                        coding:
+                          type: array
+                          items:
+                            type: object
+                            required:
+                              - text
+                            properties:
+                              text:
+                                type: string
+                                description: URI of the coding system specification.
+                                enum:
+                                  - >-
+                                    https://fhir.nhs.uk/R4/CodeSystem/Spine-ErrorOrWarningCode
+                              code:
+                                type: string
+                                description: Symbol in syntax defined by the system.
+                                example: INVALID_VALUE
+                              display:
+                                type: string
+                                description: Representation defined by the system.
+                                example: Provided value is invalid
+                    expression:
+                      type: string
+                      description: FHIRPath of element(s) related to the error.
+                      example: Patient.name.given
+          examples:
+            single-item:
+              description: >-
+                A successful response to a task create, contains a single
+                outcome item.
+              value:
+                resourceType: Bundle
+                type: transaction-response
+                entry:
+                  - fullUrl: urn:uuid:4d70678c-81e4-4ff4-8c67-17596fd0aa46
+                    response:
+                      status: 201 Created
+                      outcome:
+                        resourceType: OperationOutcome
+                        meta:
+                          lastUpdated: '2023-09-11T10:11:12.000Z'
+                        issue:
+                          - severity: success
+                            code: success
+                            diagnostics: No issues detected during validation.
+    200-goms-bundle-diagnosticreports-get:
+      description: |
+        Read DiagnosticReports operation successful
+      content:
+        application/fhir+json:
+          schema:
+            type: object
+            required:
+              - resourceType
+              - identifier
+              - type
+              - entry
+            description: >-
+              A FHIR
+              [bundle](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-Bundle?version=0.3.0)
+              with collection of [FHIR
+              DiagnosticReports](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-DiagnosticReport?version=0.3.0)
+          examples:
+            single-item:
+              description: >-
+                A successful response to a diagnostic report get, contains a
+                single item.
+              value:
+                resourceType: Bundle
+                type: searchset
+                entry:
+                  - resourceType: DiagnosticReport
+                    id: DiagnosticReport-AnitaLamberts-Example
+                    identifier:
+                      - system: https://www.guysandstthomas.nhs.uk/SEGLH/lims
+                        value: FHGenomicReport
+                        assigner:
+                          identifier:
+                            system: https://fhir.nhs.uk/Id/ods-organization-code
+                            value: RJ1
+                    basedOn:
+                      - reference: >-
+                          ServiceRequest/ServiceRequest-NonWGSTestOrderForm-NewFollowupTest-Example
+                    status: final
+                    category:
+                      - coding:
+                          - system: http://terminology.hl7.org/CodeSystem/v2-0074
+                            code: GE
+                            display: Genetics
+                    code:
+                      coding:
+                        - system: http://snomed.info/sct
+                          code: '1054161000000101'
+                          display: Genetic report
+                    subject:
+                      reference: Patient/Patient-AnitaLamberts-Example
+                    issued: '2023-11-24T09:45:00Z'
+                    performer:
+                      - identifier:
+                          system: https://fhir.nhs.uk/Id/ods-organization-code
+                          value: RJ1
+                    specimen:
+                      - reference: Specimen/Specimen-BloodEDTA-Example
+                    presentedForm:
+                      - contentType: application/pdf
+                        language: en-GB
+                        url: >-
+                          https://o719on.axshare.com/?id=8aol33&p=introduction&g=1
+                        size: 43272
+                        title: Genomic Report for Anita Lamberts
+                        creation: '2023-11-24'
+            multiple-items:
+              description: >-
+                A successful response to a diagnos report get, contains a
+                multiple items.
+              value:
+                resourceType: Bundle
+                type: searchset
+                entry:
+                  - resourceType: DiagnosticReport
+                    id: DiagnosticReport-AnitaLamberts-Example
+                    identifier:
+                      - system: https://www.guysandstthomas.nhs.uk/SEGLH/lims
+                        value: FHGenomicReport
+                        assigner:
+                          identifier:
+                            system: https://fhir.nhs.uk/Id/ods-organization-code
+                            value: RJ1
+                    basedOn:
+                      - reference: >-
+                          ServiceRequest/ServiceRequest-NonWGSTestOrderForm-NewFollowupTest-Example
+                    status: final
+                    category:
+                      - coding:
+                          - system: http://terminology.hl7.org/CodeSystem/v2-0074
+                            code: GE
+                            display: Genetics
+                    code:
+                      coding:
+                        - system: http://snomed.info/sct
+                          code: '1054161000000101'
+                          display: Genetic report
+                    subject:
+                      reference: Patient/Patient-AnitaLamberts-Example
+                    issued: '2023-11-24T09:45:00Z'
+                    performer:
+                      - identifier:
+                          system: https://fhir.nhs.uk/Id/ods-organization-code
+                          value: RJ1
+                    specimen:
+                      - reference: Specimen/Specimen-BloodEDTA-Example
+                    presentedForm:
+                      - contentType: application/pdf
+                        language: en-GB
+                        url: >-
+                          https://o719on.axshare.com/?id=8aol33&p=introduction&g=1
+                        size: 43272
+                        title: Genomic Report for Anita Lamberts
+                        creation: '2023-11-24'
+                  - resourceType: DiagnosticReport
+                    id: DiagnosticReport-FayMutlowGeneticReport-Example
+                    identifier:
+                      - system: https://newcastle-hospitsls.nhs.uk/nwglh/lims
+                        value: FHGenomicReport
+                        assigner:
+                          identifier:
+                            system: https://fhir.nhs.uk/Id/ods-organization-code
+                            value: RTD
+                    basedOn:
+                      - reference: >-
+                          ServiceRequest/ServiceRequest-SavedTestOrderUpdated-CascadeTesting-Example
+                    status: final
+                    category:
+                      - coding:
+                          - system: http://terminology.hl7.org/CodeSystem/v2-0074
+                            code: GE
+                            display: Genetics
+                    code:
+                      coding:
+                        - system: http://snomed.info/sct
+                          code: '1054161000000101'
+                          display: Genetic report
+                    subject:
+                      reference: Patient/Patient-FayMutlow-Example
+                    issued: '2023-10-09T09:45:00Z'
+                    performer:
+                      - identifier:
+                          system: https://fhir.nhs.uk/Id/ods-organization-code
+                          value: RTD
+                    specimen:
+                      - reference: Specimen/Specimen-FayMutlowBloodEDTA-Example
+                    conclusionCode:
+                      - coding:
+                          - system: http://snomed.info/sct
+                            code: '398036000'
+                            display: Familial hypercholesterolemia
+                    presentedForm:
+                      - contentType: application/pdf
+                        language: en-GB
+                        url: https://ytlqh0.axshare.com/?id=swl7sq&p=view_report
+                        size: 43272
+                        title: Genomic Report for Fay Mutlow
+                        creation: '2023-10-22'
+    200-goms-bundle-tasks-get:
+      description: |
+        Read tasks operation successful
+      content:
+        application/fhir+json:
+          schema:
+            type: object
+            required:
+              - resourceType
+              - identifier
+              - type
+              - entry
+            description: >-
+              A FHIR
+              [bundle](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-Bundle?version=0.3.0)
+              with collection of [FHIR
+              Tasks](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-Task?version=0.3.0)
+          examples:
+            single-item:
+              description: A successful response to a task get, contains a single item.
+              value:
+                resourceType: Bundle
+                type: searchset
+                entry:
+                  - resourceType: Task
+                    id: Task-NonWGSRareDiseaseTestOrder-Cancellation-Example
+                    status: cancelled
+                    statusReason:
+                      coding:
+                        - system: >-
+                            https://fhir.nhs.uk/CodeSystem/task-statusReason-genomics
+                          code: TestNoLongerRequired
+                          display: Test No Longer Required
+                    intent: order
+                    priority: routine
+                    code:
+                      coding:
+                        - system: https://fhir.nhs.uk/CodeSystem/task-code-genomics
+                          code: ProcessGenomicTestRequest
+                          display: Process Genomic Test Request
+                    focus:
+                      reference: >-
+                        ServiceRequest/ServiceRequest-NonWGSTestOrderForm-Cancellation-Example
+                    for:
+                      reference: Patient/Patient-MeirLieberman-Example
+                      identifier:
+                        system: https://fhir.nhs.uk/Id/nhs-number
+                        value: '9449307873'
+                    authoredOn: '2023-08-08T15:43:00Z'
+                    lastModified: '2023-08-08T15:43:00Z'
+                    requester:
+                      reference: PractitionerRole/PractitionerRole-GeneSmithENT-Example
+                    owner:
+                      identifier:
+                        system: https://fhir.nhs.uk/Id/ods-organization-code
+                        value: RGT01
+                      display: ADDENBROOKE'S HOSPITAL
+                    note:
+                      - text: Test no longer required.
+            multiple-items:
+              description: A successful response to a task get, contains a multiple items.
+              value:
+                resourceType: Bundle
+                type: searchset
+                entry:
+                  - resourceType: Task
+                    id: Task-NonWGSRareDiseaseTestOrder-Cancellation-Example
+                    status: cancelled
+                    statusReason:
+                      coding:
+                        - system: >-
+                            https://fhir.nhs.uk/CodeSystem/task-statusReason-genomics
+                          code: TestNoLongerRequired
+                          display: Test No Longer Required
+                    intent: order
+                    priority: routine
+                    code:
+                      coding:
+                        - system: https://fhir.nhs.uk/CodeSystem/task-code-genomics
+                          code: ProcessGenomicTestRequest
+                          display: Process Genomic Test Request
+                    focus:
+                      reference: >-
+                        ServiceRequest/ServiceRequest-NonWGSTestOrderForm-Cancellation-Example
+                    for:
+                      reference: Patient/Patient-MeirLieberman-Example
+                      identifier:
+                        system: https://fhir.nhs.uk/Id/nhs-number
+                        value: '9449307873'
+                    authoredOn: '2023-08-08T15:43:00Z'
+                    lastModified: '2023-08-08T15:43:00Z'
+                    requester:
+                      reference: PractitionerRole/PractitionerRole-GeneSmithENT-Example
+                    owner:
+                      identifier:
+                        system: https://fhir.nhs.uk/Id/ods-organization-code
+                        value: RGT01
+                      display: ADDENBROOKE'S HOSPITAL
+                    note:
+                      - text: Test no longer required.
+                  - resourceType: Task
+                    id: Task-NonWGSRareDiseaseTestOrder-Example
+                    status: requested
+                    intent: order
+                    priority: routine
+                    code:
+                      coding:
+                        - system: https://fhir.nhs.uk/CodeSystem/task-code-genomics
+                          code: ProcessGenomicTestRequest
+                          display: Process Genomic Test Request
+                    focus:
+                      reference: ServiceRequest/ServiceRequest-SavedTestOrder-Example
+                    for:
+                      reference: Patient/Patient-MeirLieberman-Example
+                      identifier:
+                        system: https://fhir.nhs.uk/Id/nhs-number
+                        value: '9449307873'
+                    authoredOn: '2023-08-05'
+                    requester:
+                      reference: PractitionerRole/PractitionerRole-GeneSmithENT-Example
+    200-goms-bundle-specimens-get:
+      description: |
+        Read specimens operation successful
+      content:
+        application/fhir+json:
+          schema:
+            type: object
+            required:
+              - resourceType
+              - identifier
+              - type
+              - entry
+            description: >-
+              A FHIR
+              [bundle](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-Bundle?version=0.3.0)
+              with collection of [FHIR
+              Specimens](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-Specimen?version=0.3.0)
+          examples:
+            single-item:
+              description: A successful response to a specimen get, contains a single item.
+              value:
+                resourceType: Bundle
+                type: searchset
+                entry:
+                  - resourceType: Specimen
+                    id: Specimen-BloodEDTA-Example
+                    identifier:
+                      - system: https://fhir.add.nhs.uk/Id/specimenId
+                        value: RGT03135
+                    status: unavailable
+                    type:
+                      coding:
+                        - system: http://snomed.info/sct
+                          code: '445295009'
+                          display: Blood specimen with EDTA
+                    subject:
+                      reference: Patient/Patient-MeirLieberman-Example
+                      identifier:
+                        system: https://fhir.nhs.uk/Id/nhs-number
+                        value: '9449307873'
+                    request:
+                      - reference: >-
+                          ServiceRequest/ServiceRequest-NonWGSTestOrderForm-Example
+            multiple-items:
+              description: >-
+                A successful response to a specimen get, contains a multiple
+                items.
+              value:
+                resourceType: Bundle
+                type: searchset
+                entry:
+                  - resourceType: Specimen
+                    id: Specimen-BloodEDTA-Example
+                    identifier:
+                      - system: https://fhir.add.nhs.uk/Id/specimenId
+                        value: RGT03135
+                    status: unavailable
+                    type:
+                      coding:
+                        - system: http://snomed.info/sct
+                          code: '445295009'
+                          display: Blood specimen with EDTA
+                    subject:
+                      reference: Patient/Patient-MeirLieberman-Example
+                      identifier:
+                        system: https://fhir.nhs.uk/Id/nhs-number
+                        value: '9449307873'
+                    request:
+                      - reference: >-
+                          ServiceRequest/ServiceRequest-NonWGSTestOrderForm-Example
+                  - resourceType: Specimen
+                    id: Specimen-BloodEDTA-WithCollectoinDetails-Example
+                    identifier:
+                      - system: https://fhir.leedsth.nhs.uk//Id/specimenId
+                        value: RR8-696B0-17843
+                    status: available
+                    type:
+                      coding:
+                        - system: http://snomed.info/sct
+                          code: '445295009'
+                          display: Blood specimen with EDTA
+                    subject:
+                      reference: Patient/Patient-FayMutlow-Example
+                      identifier:
+                        system: https://fhir.nhs.uk/Id/nhs-number
+                        value: '9449307806'
+                    collection:
+                      collector:
+                        identifier:
+                          system: https://fhir.nhs.uk/Id/sds-user-id
+                          value: '9999999998'
+                        display: Phletobomist-Lois Lane
+                      collectedDateTime: '2023-10-05T15:30:00Z'
+                    request:
+                      - reference: >-
+                          ServiceRequest/ServiceRequest-SavedTestOrderUpdated-CascadeTesting-Example
+    200-goms-bundle-servicerequests-get:
+      description: |
+        Read Service Request operation successful
+      content:
+        application/fhir+json:
+          schema:
+            type: object
+            required:
+              - resourceType
+              - identifier
+              - type
+              - entry
+            description: >-
+              A FHIR
+              [bundle](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-Bundle?version=0.3.0)
+              with collection of [FHIR
+              ServiceRequests](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-ServiceRequest?version=0.3.0)
+          examples:
+            single-item:
+              description: >-
+                A successful response to a service request get, contains a
+                single item.
+              value:
+                resourceType: Bundle
+                type: searchset
+                entry:
+                  - resourceType: ServiceRequest
+                    id: ServiceRequest-NonWGSTestOrderForm-Example
+                    extension:
+                      - url: >-
+                          https://fhir.hl7.org.uk/StructureDefinition/Extension-UKCore-Coverage
+                        valueCodeableConcept:
+                          coding:
+                            - system: >-
+                                https://fhir.hl7.org.uk/CodeSystem/UKCore-FundingCategory
+                              code: nhs
+                              display: NHS
+                    status: active
+                    intent: order
+                    category:
+                      - coding:
+                          - system: >-
+                              https://fhir.hl7.org.uk/CodeSystem/UKCore-GenomeSequencingCategory
+                            code: rare-disease-non-wgs
+                            display: Rare Disease - Non-WGS
+                    priority: routine
+                    code:
+                      coding:
+                        - system: >-
+                            https://fhir.nhs.uk/CodeSystem/England-GenomicTestDirectory
+                          code: R67.2
+                          display: Monogenic hearing loss
+                    subject:
+                      reference: Patient/Patient-MeirLieberman-Example
+                      identifier:
+                        system: https://fhir.nhs.uk/Id/nhs-number
+                        value: '9449307873'
+                    authoredOn: '2023-08-05'
+                    requester:
+                      reference: PractitionerRole/PractitionerRole-GeneSmithENT-Example
+                    reasonCode:
+                      - coding:
+                          - system: http://snomed.info/sct
+                            code: '103693007'
+                            display: Diagnostic procedure
+                    supportingInfo:
+                      - reference: Observation/Observation-DiseaseStatus-Example
+                      - reference: Observation/Observation-GenomicEthnicity-Example
+                      - reference: Observation/Observation-NoPregnancy-Example
+                      - reference: >-
+                          FamilyMemberHistory/FamilyMemberHistory-NonConsanguinousUnion-Example
+                      - reference: Observation/Observation-NoTransplant-Example
+                      - reference: Observation/Observation-NoTransfusion-Example
+                      - reference: Condition/Condition-HearingLoss-Example
+                    note:
+                      - text: No family history of genomic testing
+                      - text: >-
+                          Free text for diagnosis/reason for referral, relevant
+                          information including family history, phenotypic
+                          details/ HPO Terms/Patient in need of test...example
+            multiple-items:
+              description: >-
+                A successful response to a service request get, contains a
+                multiple items.
+              value:
+                resourceType: Bundle
+                type: searchset
+                entry:
+                  - resourceType: ServiceRequest
+                    id: ServiceRequest-NonWGSTestOrderForm-Example
+                    extension:
+                      - url: >-
+                          https://fhir.hl7.org.uk/StructureDefinition/Extension-UKCore-Coverage
+                        valueCodeableConcept:
+                          coding:
+                            - system: >-
+                                https://fhir.hl7.org.uk/CodeSystem/UKCore-FundingCategory
+                              code: nhs
+                              display: NHS
+                    status: active
+                    intent: order
+                    category:
+                      - coding:
+                          - system: >-
+                              https://fhir.hl7.org.uk/CodeSystem/UKCore-GenomeSequencingCategory
+                            code: rare-disease-non-wgs
+                            display: Rare Disease - Non-WGS
+                    priority: routine
+                    code:
+                      coding:
+                        - system: >-
+                            https://fhir.nhs.uk/CodeSystem/England-GenomicTestDirectory
+                          code: R67.2
+                          display: Monogenic hearing loss
+                    subject:
+                      reference: Patient/Patient-MeirLieberman-Example
+                      identifier:
+                        system: https://fhir.nhs.uk/Id/nhs-number
+                        value: '9449307873'
+                    authoredOn: '2023-08-05'
+                    requester:
+                      reference: PractitionerRole/PractitionerRole-GeneSmithENT-Example
+                    reasonCode:
+                      - coding:
+                          - system: http://snomed.info/sct
+                            code: '103693007'
+                            display: Diagnostic procedure
+                    supportingInfo:
+                      - reference: Observation/Observation-DiseaseStatus-Example
+                      - reference: Observation/Observation-GenomicEthnicity-Example
+                      - reference: Observation/Observation-NoPregnancy-Example
+                      - reference: >-
+                          FamilyMemberHistory/FamilyMemberHistory-NonConsanguinousUnion-Example
+                      - reference: Observation/Observation-NoTransplant-Example
+                      - reference: Observation/Observation-NoTransfusion-Example
+                      - reference: Condition/Condition-HearingLoss-Example
+                    note:
+                      - text: No family history of genomic testing
+                      - text: >-
+                          Free text for diagnosis/reason for referral, relevant
+                          information including family history, phenotypic
+                          details/ HPO Terms/Patient in need of test...example
+                  - resourceType: ServiceRequest
+                    id: ServiceRequest-NonWGSTestOrderForm-FetalScenario-Example
+                    extension:
+                      - url: >-
+                          https://fhir.hl7.org.uk/StructureDefinition/Extension-UKCore-Coverage
+                        valueCodeableConcept:
+                          coding:
+                            - system: >-
+                                https://fhir.hl7.org.uk/CodeSystem/UKCore-FundingCategory
+                              code: nhs
+                              display: NHS
+                    status: active
+                    intent: order
+                    category:
+                      - coding:
+                          - system: >-
+                              https://fhir.hl7.org.uk/CodeSystem/UKCore-GenomeSequencingCategory
+                            code: rare-disease-non-wgs
+                            display: Rare Disease - Non-WGS
+                    priority: urgent
+                    code:
+                      coding:
+                        - system: >-
+                            https://fhir.nhs.uk/CodeSystem/England-GenomicTestDirectory
+                          code: R21
+                          display: Fetal anomalies with a likely genetic cause
+                    subject:
+                      reference: Patient/Patient-FoetusOfRyanneBoulder-Example
+                      identifier:
+                        - system: urn:oid:2.16.840.1.113883.2.1.3.2.4.18.24
+                          value: FT-RWT13521
+                          assigner:
+                            identifier:
+                              system: https://fhir.nhs.uk/Id/ods-organization-code
+                              value: RAX
+                    authoredOn: '2023-09-25'
+                    requester:
+                      reference: >-
+                        PractitionerRole/PractitionerRole-LoisLaneKingstonClinicalGenetics-Example
+                    reasonCode:
+                      - coding:
+                          - system: http://snomed.info/sct
+                            code: '243787009'
+                            display: Antenatal screening
+                    supportingInfo:
+                      - reference: Observation/Observation-HistoryOfFetalLoss-Example
+                      - reference: Observation/Observation-NonConsanguinousUnion-Example
+                      - reference: >-
+                          FamilyMemberHistory/FamilyMemberHistory-NonConsanguinousUnionRyanneBoulder-Example
+                      - reference: Observation/Observation-GenomicEthnicity-Example
+                      - reference: Observation/Observation-PregnancyConfirmation-Example
+                      - reference: Observation/Observation-NoTransplant-Example
+                      - reference: >-
+                          Observation/Observation-NoFirstTrimesterFetalAnomalies-Example
+                      - reference: >-
+                          Observation/Observation-NoSecondTrimesterFetalAnomalies-Example
+                      - reference: Procedure/Procedure-InVitroFertilisation-Example
+                    note:
+                      - text: Samples are to be provided at a later date
+                      - text: No family history of relevant testing
+                      - text: >-
+                          Free text for diagnosis/reason for referral, relevant
+                          information including family history, phenotypic
+                          details/ HPO Terms/ E.g. large echogenic kidneys with
+                          normal bladder
+    200-goms-bundle-service-request-read:
+      description: |
+        Read Service Request operation successful
+      content:
+        application/fhir+json:
+          schema:
+            type: object
+            required:
+              - resourceType
+              - identifier
+              - type
+              - entry
+            description: >-
+              A single [FHIR
+              ServiceRequest](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-ServiceRequest?version=0.3.0)
+          examples:
+            single-item:
+              description: >-
+                A successful response to a service request get, contains a
+                single item.
+              value:
+                resourceType: ServiceRequest
+                id: ServiceRequest-NonWGSTestOrderForm-Example
+                extension:
+                  - url: >-
+                      https://fhir.hl7.org.uk/StructureDefinition/Extension-UKCore-Coverage
+                    valueCodeableConcept:
+                      coding:
+                        - system: >-
+                            https://fhir.hl7.org.uk/CodeSystem/UKCore-FundingCategory
+                          code: nhs
+                          display: NHS
+                status: active
+                intent: order
+                category:
+                  - coding:
+                      - system: >-
+                          https://fhir.hl7.org.uk/CodeSystem/UKCore-GenomeSequencingCategory
+                        code: rare-disease-non-wgs
+                        display: Rare Disease - Non-WGS
+                priority: routine
+                code:
+                  coding:
+                    - system: >-
+                        https://fhir.nhs.uk/CodeSystem/England-GenomicTestDirectory
+                      code: R67.2
+                      display: Monogenic hearing loss
+                subject:
+                  reference: Patient/Patient-MeirLieberman-Example
+                  identifier:
+                    system: https://fhir.nhs.uk/Id/nhs-number
+                    value: '9449307873'
+                authoredOn: '2023-08-05'
+                requester:
+                  reference: PractitionerRole/PractitionerRole-GeneSmithENT-Example
+                reasonCode:
+                  - coding:
+                      - system: http://snomed.info/sct
+                        code: '103693007'
+                        display: Diagnostic procedure
+                supportingInfo:
+                  - reference: Observation/Observation-DiseaseStatus-Example
+                  - reference: Observation/Observation-GenomicEthnicity-Example
+                  - reference: Observation/Observation-NoPregnancy-Example
+                  - reference: >-
+                      FamilyMemberHistory/FamilyMemberHistory-NonConsanguinousUnion-Example
+                  - reference: Observation/Observation-NoTransplant-Example
+                  - reference: Observation/Observation-NoTransfusion-Example
+                  - reference: Condition/Condition-HearingLoss-Example
+                note:
+                  - text: No family history of genomic testing
+                  - text: >-
+                      Free text for diagnosis/reason for referral, relevant
+                      information including family history, phenotypic details/
+                      HPO Terms/Patient in need of test...example
+    200-goms-bundle-service-request-history:
+      description: |
+        Read Service Request history operation successful
+      content:
+        application/fhir+json:
+          schema:
+            type: object
+            required:
+              - resourceType
+              - identifier
+              - type
+              - entry
+            description: >-
+              A Bundle containing [FHIR
+              ServiceRequest](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-ServiceRequest?version=0.3.0) 
+              history
+          examples:
+            multiple-items:
+              description: >-
+                A successful response to a service request get, contains a
+                multiple items.
+              value:
+                resourceType: Bundle
+                type: history
+                entry:
+                  - resourceType: ServiceRequest
+                    id: ServiceRequest-NonWGSTestOrderForm-Example
+                    extension:
+                      - url: >-
+                          https://fhir.hl7.org.uk/StructureDefinition/Extension-UKCore-Coverage
+                        valueCodeableConcept:
+                          coding:
+                            - system: >-
+                                https://fhir.hl7.org.uk/CodeSystem/UKCore-FundingCategory
+                              code: nhs
+                              display: NHS
+                    status: active
+                    intent: order
+                    category:
+                      - coding:
+                          - system: >-
+                              https://fhir.hl7.org.uk/CodeSystem/UKCore-GenomeSequencingCategory
+                            code: rare-disease-non-wgs
+                            display: Rare Disease - Non-WGS
+                    priority: routine
+                    code:
+                      coding:
+                        - system: >-
+                            https://fhir.nhs.uk/CodeSystem/England-GenomicTestDirectory
+                          code: R67.2
+                          display: Monogenic hearing loss
+                    subject:
+                      reference: Patient/Patient-MeirLieberman-Example
+                      identifier:
+                        system: https://fhir.nhs.uk/Id/nhs-number
+                        value: '9449307873'
+                    authoredOn: '2023-08-05'
+                    requester:
+                      reference: PractitionerRole/PractitionerRole-GeneSmithENT-Example
+                    reasonCode:
+                      - coding:
+                          - system: http://snomed.info/sct
+                            code: '103693007'
+                            display: Diagnostic procedure
+                    supportingInfo:
+                      - reference: Observation/Observation-DiseaseStatus-Example
+                      - reference: Observation/Observation-GenomicEthnicity-Example
+                      - reference: Observation/Observation-NoPregnancy-Example
+                      - reference: >-
+                          FamilyMemberHistory/FamilyMemberHistory-NonConsanguinousUnion-Example
+                      - reference: Observation/Observation-NoTransplant-Example
+                      - reference: Observation/Observation-NoTransfusion-Example
+                      - reference: Condition/Condition-HearingLoss-Example
+                    note:
+                      - text: No family history of genomic testing
+                      - text: >-
+                          Free text for diagnosis/reason for referral, relevant
+                          information including family history, phenotypic
+                          details/ HPO Terms/Patient in need of test...example
+                  - resourceType: ServiceRequest
+                    id: ServiceRequest-NonWGSTestOrderForm-FetalScenario-Example
+                    extension:
+                      - url: >-
+                          https://fhir.hl7.org.uk/StructureDefinition/Extension-UKCore-Coverage
+                        valueCodeableConcept:
+                          coding:
+                            - system: >-
+                                https://fhir.hl7.org.uk/CodeSystem/UKCore-FundingCategory
+                              code: nhs
+                              display: NHS
+                    status: active
+                    intent: order
+                    category:
+                      - coding:
+                          - system: >-
+                              https://fhir.hl7.org.uk/CodeSystem/UKCore-GenomeSequencingCategory
+                            code: rare-disease-non-wgs
+                            display: Rare Disease - Non-WGS
+                    priority: urgent
+                    code:
+                      coding:
+                        - system: >-
+                            https://fhir.nhs.uk/CodeSystem/England-GenomicTestDirectory
+                          code: R21
+                          display: Fetal anomalies with a likely genetic cause
+                    subject:
+                      reference: Patient/Patient-FoetusOfRyanneBoulder-Example
+                      identifier:
+                        - system: urn:oid:2.16.840.1.113883.2.1.3.2.4.18.24
+                          value: FT-RWT13521
+                          assigner:
+                            identifier:
+                              system: https://fhir.nhs.uk/Id/ods-organization-code
+                              value: RAX
+                    authoredOn: '2023-09-25'
+                    requester:
+                      reference: >-
+                        PractitionerRole/PractitionerRole-LoisLaneKingstonClinicalGenetics-Example
+                    reasonCode:
+                      - coding:
+                          - system: http://snomed.info/sct
+                            code: '243787009'
+                            display: Antenatal screening
+                    supportingInfo:
+                      - reference: Observation/Observation-HistoryOfFetalLoss-Example
+                      - reference: Observation/Observation-NonConsanguinousUnion-Example
+                      - reference: >-
+                          FamilyMemberHistory/FamilyMemberHistory-NonConsanguinousUnionRyanneBoulder-Example
+                      - reference: Observation/Observation-GenomicEthnicity-Example
+                      - reference: Observation/Observation-PregnancyConfirmation-Example
+                      - reference: Observation/Observation-NoTransplant-Example
+                      - reference: >-
+                          Observation/Observation-NoFirstTrimesterFetalAnomalies-Example
+                      - reference: >-
+                          Observation/Observation-NoSecondTrimesterFetalAnomalies-Example
+                      - reference: Procedure/Procedure-InVitroFertilisation-Example
+                    note:
+                      - text: Samples are to be provided at a later date
+                      - text: No family history of relevant testing
+                      - text: >-
+                          Free text for diagnosis/reason for referral, relevant
+                          information including family history, phenotypic
+                          details/ HPO Terms/ E.g. large echogenic kidneys with
+                          normal bladder
+    200-goms-bundle-diagnostic-report-read:
+      description: |
+        Read diagnostic report operation successful
+      content:
+        application/fhir+json:
+          schema:
+            type: object
+            required:
+              - resourceType
+              - identifier
+              - type
+              - entry
+            description: >-
+              A single [FHIR
+              DiagnosticReport](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-DiagnosticReport?version=0.3.0)
+          examples:
+            single-item:
+              description: >-
+                A successful response to a diagnostic report get, contains a
+                single item.
+              value:
+                resourceType: DiagnosticReport
+                id: DiagnosticReport-AnitaLamberts-Example
+                identifier:
+                  - system: https://www.guysandstthomas.nhs.uk/SEGLH/lims
+                    value: FHGenomicReport
+                    assigner:
+                      identifier:
+                        system: https://fhir.nhs.uk/Id/ods-organization-code
+                        value: RJ1
+                basedOn:
+                  - reference: >-
+                      ServiceRequest/ServiceRequest-NonWGSTestOrderForm-NewFollowupTest-Example
+                status: final
+                category:
+                  - coding:
+                      - system: http://terminology.hl7.org/CodeSystem/v2-0074
+                        code: GE
+                        display: Genetics
+                code:
+                  coding:
+                    - system: http://snomed.info/sct
+                      code: '1054161000000101'
+                      display: Genetic report
+                subject:
+                  reference: Patient/Patient-AnitaLamberts-Example
+                issued: '2023-11-24T09:45:00Z'
+                performer:
+                  - identifier:
+                      system: https://fhir.nhs.uk/Id/ods-organization-code
+                      value: RJ1
+                specimen:
+                  - reference: Specimen/Specimen-BloodEDTA-Example
+                presentedForm:
+                  - contentType: application/pdf
+                    language: en-GB
+                    url: https://o719on.axshare.com/?id=8aol33&p=introduction&g=1
+                    size: 43272
+                    title: Genomic Report for Anita Lamberts
+                    creation: '2023-11-24'
+    200-goms-bundle-task-read:
+      description: |
+        Read Task operation successful
+      content:
+        application/fhir+json:
+          schema:
+            type: object
+            required:
+              - resourceType
+              - identifier
+              - type
+              - entry
+            description: >-
+              A single [FHIR
+              Task](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-Task?version=0.3.0)
+          examples:
+            single-item:
+              description: A successful response to a task get, contains a single item.
+              value:
+                resourceType: Task
+                id: Task-NonWGSRareDiseaseTestOrder-Example
+                status: requested
+                intent: order
+                priority: routine
+                code:
+                  coding:
+                    - system: https://fhir.nhs.uk/CodeSystem/task-code-genomics
+                      code: ProcessGenomicTestRequest
+                      display: Process Genomic Test Request
+                focus:
+                  reference: ServiceRequest/ServiceRequest-SavedTestOrder-Example
+                for:
+                  reference: Patient/Patient-MeirLieberman-Example
+                  identifier:
+                    system: https://fhir.nhs.uk/Id/nhs-number
+                    value: '9449307873'
+                authoredOn: '2023-08-05'
+                requester:
+                  reference: PractitionerRole/PractitionerRole-GeneSmithENT-Example
+    20X-goms-bundle-specimen-create-update:
+      description: A response from the /FHIR/R4/Specimen create update action.
+      content:
+        application/fhir+json:
+          schema:
+            type: object
+            required:
+              - resourceType
+              - identifier
+              - type
+              - entry
+            description: >
+              A FHIR
+              [Specimen](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-Specimen?version=0.3.0)
+          examples:
+            single-item:
+              description: Specimen for update
+              value:
+                resourceType: Specimen
+                id: 9e2e2b25-1d24-460d-965e-6b86727eb3b4
+                identifier:
+                  - system: https://fhir.leedsth.nhs.uk//Id/specimenId
+                    value: RR8-696B0-17843
+                status: available
+                type:
+                  coding:
+                    - system: http://snomed.info/sct
+                      code: '445295009'
+                      display: Blood specimen with EDTA
+                subject:
+                  reference: Patient/Patient-FayMutlow-Example
+                  identifier:
+                    system: https://fhir.nhs.uk/Id/nhs-number
+                    value: '9449307806'
+                collection:
+                  collector:
+                    identifier:
+                      system: https://fhir.nhs.uk/Id/sds-user-id
+                      value: '9999999998'
+                    display: Phletobomist-Lois Lane
+                  collectedDateTime: '2023-10-05T15:30:00Z'
+                request:
+                  - reference: >-
+                      ServiceRequest/ServiceRequest-SavedTestOrderUpdated-CascadeTesting-Example
+    200-goms-bundle-specimen-read:
+      description: |
+        Read Specimen operation successful
+      content:
+        application/fhir+json:
+          schema:
+            type: object
+            required:
+              - resourceType
+              - identifier
+              - type
+              - entry
+            description: >-
+              A single [FHIR
+              Specimen](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-Specimen?version=0.3.0)
+          examples:
+            single-item:
+              description: A successful response to a specimen get, contains a single item.
+              value:
+                resourceType: Specimen
+                id: Specimen-PheobeSmitham-Example
+                identifier:
+                  - system: https://fhir.leedssth.nhs.uk//Id/specimenId
+                    value: RGD-69050-P-RR12764
+                status: available
+                type:
+                  coding:
+                    - system: http://snomed.info/sct
+                      code: '445295009'
+                      display: Blood specimen with EDTA
+                subject:
+                  reference: Patient/Patient-PheobeSmitham-Example
+                  identifier:
+                    system: https://fhir.nhs.uk/Id/nhs-number
+                    value: '9449307539'
+                collection:
+                  collector:
+                    identifier:
+                      system: https://fhir.nhs.uk/Id/sds-user-id
+                      value: '9999999998'
+                    display: Phletobomist-Lois Lane
+                  collectedDateTime: '2023-09-17'
+                request:
+                  - reference: >-
+                      ServiceRequest/ServiceRequest-WGSTestOrderForm-TrioTestingProband-Example
+    200-goms-bundle-practitionerrole-get-logical-id:
+      description: |
+        Read patient operation successful
+      content:
+        application/fhir+json:
+          schema:
+            type: object
+            required:
+              - resourceType
+              - identifier
+              - type
+              - entry
+            description: >-
+              A single [FHIR
+              Patient](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-Patient?version=0.3.0)
+          examples:
+            single-item:
+              description: A successful response to a patient get, contains a single item.
+              value:
+                resourceType: PractitionerRole
+                id: PractitionerRole-EugeneSmith-Example
+                practitioner:
+                  identifier:
+                    system: https://fhir.nhs.uk/Id/sds-user-id
+                    value: '9999999998'
+                  display: Dr. Eugene Smith
+                organization:
+                  identifier:
+                    system: https://fhir.nhs.uk/Id/ods-organization-code
+                    value: RPA02
+                  display: MEDWAY MARITIME HOSPITAL
+                specialty:
+                  - coding:
+                      - system: >-
+                          https://fhir.hl7.org.uk/CodeSystem/UKCore-PracticeSettingCode
+                        code: '820'
+                        display: General Pathology
+                telecom:
+                  - system: phone
+                    value: '01634976477'
+                  - system: email
+                    value: medwaypath@nhs.net
+                  - system: email
+                    value: clinicalgeneticsmedway@nhs.net
+                    extension:
+                      - url: >-
+                          http://hl7.org/fhir/StructureDefinition/contactpoint-comment
+                        valueString: reporting
+                  - system: email
+                    value: asmithgppracticeg@nhs.net
+                    extension:
+                      - url: >-
+                          http://hl7.org/fhir/StructureDefinition/contactpoint-comment
+                        valueString: reporting
+    200-goms-bundle-practitionerrole-get:
+      description: |
+        Read patient operation successful
+      content:
+        application/fhir+json:
+          schema:
+            type: object
+            required:
+              - resourceType
+              - identifier
+              - type
+              - entry
+            description: >-
+              A FHIR
+              [bundle](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-Bundle?version=0.3.0)
+              with collection of [FHIR
+              Patient](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-Patient?version=0.3.0)
+          examples:
+            single-item:
+              description: A successful response to a patient get, contains a single item.
+              value:
+                resourceType: Bundle
+                type: searchset
+                entry:
+                  - resourceType: PractitionerRole
+                    id: PractitionerRole-EugeneSmith-Example
+                    practitioner:
+                      identifier:
+                        system: https://fhir.nhs.uk/Id/sds-user-id
+                        value: '9999999998'
+                      display: Dr. Eugene Smith
+                    organization:
+                      identifier:
+                        system: https://fhir.nhs.uk/Id/ods-organization-code
+                        value: RPA02
+                      display: MEDWAY MARITIME HOSPITAL
+                    specialty:
+                      - coding:
+                          - system: >-
+                              https://fhir.hl7.org.uk/CodeSystem/UKCore-PracticeSettingCode
+                            code: '820'
+                            display: General Pathology
+                    telecom:
+                      - system: phone
+                        value: '01634976477'
+                      - system: email
+                        value: medwaypath@nhs.net
+                      - system: email
+                        value: clinicalgeneticsmedway@nhs.net
+                        extension:
+                          - url: >-
+                              http://hl7.org/fhir/StructureDefinition/contactpoint-comment
+                            valueString: reporting
+                      - system: email
+                        value: asmithgppracticeg@nhs.net
+                        extension:
+                          - url: >-
+                              http://hl7.org/fhir/StructureDefinition/contactpoint-comment
+                            valueString: reporting
+    200-goms-bundle-patient-get-logical-id:
+      description: |
+        Read patient operation successful
+      content:
+        application/fhir+json:
+          schema:
+            type: object
+            required:
+              - resourceType
+              - identifier
+              - type
+              - entry
+            description: >-
+              A single [FHIR
+              Patient](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-Patient?version=0.3.0)
+          examples:
+            single-item:
+              description: A successful response to a patient get, contains a single item.
+              value:
+                resourceType: Patient
+                id: Patient-MeirLieberman-Example
+                extension:
+                  - url: >-
+                      https://fhir.hl7.org.uk/StructureDefinition/Extension-UKCore-BirthSex
+                    valueCodeableConcept:
+                      coding:
+                        - system: >-
+                            http://terminology.hl7.org/CodeSystem/v3-AdministrativeGender
+                          code: M
+                          display: Male
+                  - url: >-
+                      https://fhir.hl7.org.uk/StructureDefinition/Extension-UKCore-EthnicCategory
+                    valueCodeableConcept:
+                      coding:
+                        - system: >-
+                            https://fhir.hl7.org.uk/CodeSystem/UKCore-EthnicCategoryEngland
+                          code: A
+                          display: White - British
+                identifier:
+                  - system: https://fhir.nhs.uk/Id/nhs-number
+                    value: '9449307873'
+                    extension:
+                      - url: >-
+                          https://fhir.hl7.org.uk/StructureDefinition/Extension-UKCore-NHSNumberVerificationStatus
+                        valueCodeableConcept:
+                          coding:
+                            - system: >-
+                                https://fhir.hl7.org.uk/CodeSystem/UKCore-NHSNumberVerificationStatusEngland
+                              version: 2.2.0
+                              code: '01'
+                              display: Number present and verified
+                  - system: urn:oid:2.16.840.1.113883.2.1.3.2.4.18.24
+                    value: RGT012423
+                    assigner:
+                      identifier:
+                        system: https://fhir.nhs.uk/Id/ods-organization-code
+                        value: RGT01
+                  - system: https://fhir.nhs.uk/Id/genomics-pedigree-number
+                    value: P12345
+                name:
+                  - given:
+                      - Meir
+                      - Anah
+                    family: Lieberman
+                gender: male
+                birthDate: '2005-12-19'
+                deceasedBoolean: false
+                address:
+                  - line:
+                      - 1 Spinney Close
+                      - Worcester Park
+                    city: Surrey
+                    postalCode: KT4 7BS
+                generalPractitioner:
+                  - identifier:
+                      system: https://fhir.hl7.org.uk/Id/gmp-number
+                      value: G9999999
+                    display: Dr. Aero Smith
+                  - identifier:
+                      system: https://fhir.hl7.org.uk/Id/ODS-code
+                      value: TP123
+                    display: 123 Test Practice
+                link:
+                  - other:
+                      reference: >-
+                        https://api.service.nhs.uk/personal-demographics/FHIR/R4/Patient/9449307873
+                    type: seealso
+    200-goms-bundle-patient-get:
+      description: |
+        Read patient operation successful
+      content:
+        application/fhir+json:
+          schema:
+            type: object
+            required:
+              - resourceType
+              - identifier
+              - type
+              - entry
+            description: >-
+              A FHIR
+              [bundle](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-Bundle?version=0.3.0)
+              with collection of [FHIR
+              Patient](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-Patient?version=0.3.0)
+          examples:
+            single-item:
+              description: A successful response to a patient get, contains a single item.
+              value:
+                resourceType: Bundle
+                type: searchset
+                entry:
+                  - resourceType: Patient
+                    id: Patient-MeirLieberman-Example
+                    extension:
+                      - url: >-
+                          https://fhir.hl7.org.uk/StructureDefinition/Extension-UKCore-BirthSex
+                        valueCodeableConcept:
+                          coding:
+                            - system: >-
+                                http://terminology.hl7.org/CodeSystem/v3-AdministrativeGender
+                              code: M
+                              display: Male
+                      - url: >-
+                          https://fhir.hl7.org.uk/StructureDefinition/Extension-UKCore-EthnicCategory
+                        valueCodeableConcept:
+                          coding:
+                            - system: >-
+                                https://fhir.hl7.org.uk/CodeSystem/UKCore-EthnicCategoryEngland
+                              code: A
+                              display: White - British
+                    identifier:
+                      - system: https://fhir.nhs.uk/Id/nhs-number
+                        value: '9449307873'
+                        extension:
+                          - url: >-
+                              https://fhir.hl7.org.uk/StructureDefinition/Extension-UKCore-NHSNumberVerificationStatus
+                            valueCodeableConcept:
+                              coding:
+                                - system: >-
+                                    https://fhir.hl7.org.uk/CodeSystem/UKCore-NHSNumberVerificationStatusEngland
+                                  version: 2.2.0
+                                  code: '01'
+                                  display: Number present and verified
+                      - system: urn:oid:2.16.840.1.113883.2.1.3.2.4.18.24
+                        value: RGT012423
+                        assigner:
+                          identifier:
+                            system: https://fhir.nhs.uk/Id/ods-organization-code
+                            value: RGT01
+                      - system: https://fhir.nhs.uk/Id/genomics-pedigree-number
+                        value: P12345
+                    name:
+                      - given:
+                          - Meir
+                          - Anah
+                        family: Lieberman
+                    gender: male
+                    birthDate: '2005-12-19'
+                    deceasedBoolean: false
+                    address:
+                      - line:
+                          - 1 Spinney Close
+                          - Worcester Park
+                        city: Surrey
+                        postalCode: KT4 7BS
+                    generalPractitioner:
+                      - identifier:
+                          system: https://fhir.hl7.org.uk/Id/gmp-number
+                          value: G9999999
+                        display: Dr. Aero Smith
+                      - identifier:
+                          system: https://fhir.hl7.org.uk/Id/ODS-code
+                          value: TP123
+                        display: 123 Test Practice
+                    link:
+                      - other:
+                          reference: >-
+                            https://api.service.nhs.uk/personal-demographics/FHIR/R4/Patient/9449307873
+                        type: seealso
+  parameters:
+    CorrelationID:
+      in: header
+      name: X-Correlation-ID
+      required: false
+      description: >
+        An optional ID which you can use to track transactions across multiple
+        systems. It can take any value, but we recommend avoiding `.`
+        characters. Mirrored back in a response header.
+      schema:
+        type: string
+        pattern: >-
+          ^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$
+        example: 60E0B220-8136-4CA5-AE46-1D97EF59D068
+    RequestID:
+      in: header
+      name: X-Request-ID
+      required: false
+      description: >
+        A optional globally unique identifier (GUID) for the request, which we
+        use to de-duplicate repeated requests and to trace the request if you
+        contact our helpdesk.
+
+        Must be a universally unique identifier (UUID) (ideally version 4).
+
+        Mirrored back in a response header.
+
+        If you re-send a failed request, use the same value in this header.
+      schema:
+        type: string
+        pattern: >-
+          ^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$
+        example: 60E0B220-8136-4CA5-AE46-1D97EF59D068
+    PatientIdentifier:
+      in: query
+      name: patient:identifier
+      description: >
+        The patient's NHS number.
+
+        Expressed as `<type>|<value>` where `<type>` must be
+        `https://fhir.nhs.uk/Id/nhs-number` and `<value>` must be a [valid NHS
+        number](https://www.datadictionary.nhs.uk/attributes/nhs_number.html).
+      schema:
+        type: string
+        example: https://fhir.nhs.uk/Id/nhs-number|9000000009
+    Identifier:
+      in: query
+      name: identifier
+      description: |
+        The resource identifier.
+        Expressed as `<system>|<value>`
+      schema:
+        type: string
+        example: https://example.org.system|ABCD1234
+    PractitionerIdentifier:
+      in: query
+      name: practitioner:identifier
+      description: >
+        The practitioner identifier within PractitionerRole.practitioner
+        reference object.
+
+        Expressed as `<system>|<value>`
+      schema:
+        type: string
+        example: https://example.org.system|ABCD1234
+    DateFrom:
+      in: query
+      name: '-date.from'
+      description: The earliest date to be included (e.g. 2020-01-01)
+      schema:
+        type: string
+        format: date
+        default: '1900-01-01'
+    DateTo:
+      in: query
+      name: '-date.to'
+      description: The latest date to be included (e.g. 2020-12-31)
+      schema:
+        type: string
+        format: date
+        default: '9999-12-31'
+    Authored:
+      in: query
+      name: authored
+      description: Search by date request signed - ServiceRequest.authoredOn
+      schema:
+        type: string
+        format: date
+        default: '1900-01-01'
+    TaskAuthored:
+      in: query
+      name: authored-on
+      description: Search by creation date - Task.authoredOn
+      schema:
+        type: string
+        format: date
+        default: '1900-01-01'
+    ReportIssued:
+      in: query
+      name: issued
+      description: When the report was issued - DiagnosticReport.issued
+      schema:
+        type: string
+        format: date
+        default: '1900-01-01'
+    SpecimenCollected:
+      in: query
+      name: collected
+      description: The date the specimen was collected  Specimen.collection.collected
+      schema:
+        type: string
+        format: date
+        default: '1900-01-01'
+    ContainerIdentifier:
+      in: query
+      name: container-id
+      description: >-
+        Search based on the unique identifier associated with the specimen
+        container - Specimen.container.identifier
+      schema:
+        type: string
+        example: b4dccd9f-1f49-45aa-8566-3a517fc98d3d
+    LogicalIdentifier:
+      in: query
+      name: _id
+      description: The logical identifier of the resource
+      schema:
+        type: string
+        example: b4dccd9f-1f49-45aa-8566-3a517fc98d3d
+    Include:
+      in: query
+      name: _include
+      description: >-
+        The parameter _include is used to follow links 'forward'. For example,
+        `ServiceRequest:patient`, will include patient demographic details
+        referenced within the ServiceRequest.
+      schema:
+        type: string
+        default: null
+    TaskInclude:
+      in: query
+      name: _include
+      description: >-
+        The parameter _include is used to follow links 'forward'. For example,
+        `Task:owner`, will include Organisation details of the owning the task.
+      schema:
+        type: string
+        default: null
+    SpecimenInclude:
+      in: query
+      name: _include
+      description: >-
+        The parameter _include is used to follow links 'forward'. For example,
+        `Specimen:request`, will include ServiceRequest details managing the
+        Specimen.
+      schema:
+        type: string
+        default: null
+    DiagnosticReportInclude:
+      in: query
+      name: _include
+      description: >-
+        The parameter _include is used to follow links 'forward'.
+        `DiagnosticReport:patient`, will include patient demographic details
+        referenced within the DiagnosticReport.
+      schema:
+        type: string
+        default: null
+    RevInclude:
+      in: query
+      name: _revinclude
+      description: >-
+        The parameter _revinclude is used to follow reverse links. For example
+        `Task:focus`, will include Tasks that references the ServiceRequest
+        through focus attributes.
+      schema:
+        type: string
+        default: null
+    TaskRevInclude:
+      in: query
+      name: _revinclude
+      description: >-
+        The parameter _revinclude is used to follow reverse links. For example
+        `Task:focus`, will include Tasks that references the ServiceRequest
+        through focus attributes.
+      schema:
+        type: string
+        default: null
+    Requestor:
+      in: query
+      name: requester
+      description: Parameter to search based on requesting Organisation
+      schema:
+        type: string
+        default: null
+    Performer:
+      in: query
+      name: performer
+      description: Parameter to search based on performing Organisation
+      schema:
+        type: string
+        default: null
+    ResultsInterpreter:
+      in: query
+      name: results-interpreter
+      description: Parameter to search based on ResultsInterpreter Organisation
+      schema:
+        type: string
+        default: null
+    Owner:
+      in: query
+      name: owner
+      description: Parameter to search based on owning Organisation
+      schema:
+        type: string
+        default: null
+    Status:
+      in: query
+      name: status
+      description: Parameter to search based on Status of a Resource
+      schema:
+        type: string
+        default: null
+    Organisation:
+      in: query
+      name: organization:identifier
+      description: Parameter to search based on organisation code
+      schema:
+        type: string
+        default: null
+    GivenName:
+      in: query
+      name: given
+      description: Parameter to search based on GivenName of a Patient
+      schema:
+        type: string
+        default: null
+    FamilyName:
+      in: query
+      name: family
+      description: Parameter to search based on FamilyName of a Patient
+      schema:
+        type: string
+        default: null
+    DateOfBirth:
+      in: query
+      name: birthdate
+      description: Parameter to search based on DateOfBirth of a Patient
+      schema:
+        type: string
+        format: date
+        default: '9999-12-31'
+    Gender:
+      in: query
+      name: gender
+      description: Parameter to search based on Gender of a Patient
+      schema:
+        type: string
+        default: null
+    TestID:
+      in: query
+      name: code
+      description: >-
+        Parameter to search Service Request based on [test directory
+        code](https://www.england.nhs.uk/publication/national-genomic-test-directories/)
+      schema:
+        type: string
+        default: null
+    Category:
+      in: query
+      name: category
+      description: >-
+        Parameter to search Service Request based on
+        [category](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/ValueSets?version=0.3.0#Genomic-Test-Types)
+      schema:
+        type: string
+        default: null
+    SupportingInfo:
+      in: query
+      name: supporting-info
+      description: Parameter to search Service Request based on supporting info in the test
+      schema:
+        type: string
+        default: null
+    BusinessStatus:
+      in: query
+      name: business-status
+      description: >-
+        Parameter to search based on
+        [BusinessStatus](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/ValueSets?version=0.3.0#Genomic-Business-Status)
+        of a Task Resource
+      schema:
+        type: string
+        default: null
+    TaskCode:
+      in: query
+      name: code
+      description: >-
+        Parameter to search based on
+        [TaskCode](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/CodeSystems?version=0.3.0#Genomic-Task-Code)
+        of a Task Resource
+      schema:
+        type: string
+        default: null
+    NHSDSessionURID:
+      in: header
+      name: NHSD-Session-URID
+      description: >
+        The user role ID (URID) for the current session. Also known as a user
+        role profile ID (URPID).
+
+        If you are using User-restricted RESTful APIs - NHS login separate
+        authentication and authorisation, see [determine the user's
+        role](https://digital.nhs.uk/developer/guides-and-documentation/security-and-authorisation/user-restricted-restful-apis-nhs-cis2-separate-authentication-and-authorisation#step-9-determine-the-user-s-role)
+        for guidance. This field is optional.
+      required: false
+      schema:
+        type: string
+        pattern: ^[0-9]+$
+        example: '555254240100'
+    apikey:
+      in: header
+      name: apikey
+      description: >
+        An [apikey based on
+        ](https://digital.nhs.uk/developer/guides-and-documentation/security-and-authorisation/application-restricted-restful-apis-api-key-authentication)
+        application restricted restful apis.
+      required: true
+      schema:
+        type: string
+        format: ^apikey\ [[:ascii:]]+$
+        example: 58d6862a-61aa-4bdb-9361-392fe4a00dd4
+    Authorization:
+      in: header
+      name: Authorization
+      description: >
+        An [OAuth 2.0 bearer
+        token](https://digital.nhs.uk/developer/guides-and-documentation/security-and-authorisation#user-restricted-apis).
+        Required in all environments except sandbox.
+      required: true
+      schema:
+        type: string
+        format: ^Bearer\ [[:ascii:]]+$
+        example: Bearer g1112R_ccQ1Ebbb4gtHBP1aaaNM
+    Id:
+      in: path
+      name: id
+      required: true
+      description: |
+        A required ID which you can use to identify an unique resource object.
+        Mirrored back in a response header.
+      schema:
+        type: string
+        example: 29dc4e84-7e72-11ee-b962-0242ac120002
+    VersionId:
+      in: path
+      name: versionId
+      required: true
+      description: >-
+        The specific version Id which you can use to identify an unique resource
+        object with its logical Id.
+      schema:
+        type: string
+        example: '1'
+    ResourceName:
+      in: path
+      name: resourceName
+      required: true
+      description: The specific resource type
+      schema:
+        type: string
+        enum:
+          - ServiceRequest
+          - Specimen
+          - DiagnosticReport
+          - Task
+          - PractitionerRole
+          - Patient
+        example: ServiceRequest
+  schemas: {}
+  requestBodies: {}
+  headers:
+    Location:
+      schema:
+        type: string
+        example: 29dc4e84-7e72-11ee-b962-0242ac120002
+      description: The location of the resource.
