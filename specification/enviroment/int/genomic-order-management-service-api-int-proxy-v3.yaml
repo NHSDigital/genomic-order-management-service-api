@@ -1777,6 +1777,30 @@ paths:
           $ref: '#/components/responses/200-goms-bundle-servicerequests-get'
         4XX:
           $ref: '#/components/responses/4XX-goms-error'
+  /FHIR/R4/ServiceRequest/{id}/$graph:
+    get:
+      operationId: getservicerequestinformation
+      summary: Get detailed information around a service request.
+      description: >
+        This endpoint allows to retrieve all related records of a ServiceRequest
+
+        using logical identifier and [graph
+        definition](https://simplifier.net/guide/FHIR-Genomics-Implementation-Guide/Home/FHIRAssets/GraphDefinitions?version=current)
+        on the server. 
+      tags:
+        - order
+      parameters:
+        - $ref: '#/components/parameters/apikey'
+        - $ref: '#/components/parameters/NHSDSessionURID'
+        - $ref: '#/components/parameters/RequestID'
+        - $ref: '#/components/parameters/CorrelationID'
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/Graph'
+      responses:
+        '200':
+          $ref: '#/components/responses/200-goms-bundle-servicerequests-get'
+        4XX:
+          $ref: '#/components/responses/4XX-goms-error'
   /FHIR/R4/ServiceRequest/{id}:
     put:
       operationId: updateservicerequest
@@ -2269,10 +2293,12 @@ paths:
         - $ref: '#/components/parameters/PatientIdentifier'
         - $ref: '#/components/parameters/LogicalIdentifier'
         - $ref: '#/components/parameters/Identifier'
+        - $ref: '#/components/parameters/SpecimenRequest'
         - $ref: '#/components/parameters/SpecimenCollected'
         - $ref: '#/components/parameters/ContainerIdentifier'
         - $ref: '#/components/parameters/Status'
         - $ref: '#/components/parameters/SpecimenInclude'
+        - $ref: '#/components/parameters/SpecimenRevInclude'
       responses:
         '200':
           $ref: '#/components/responses/200-goms-bundle-specimens-get'
@@ -4642,6 +4668,17 @@ components:
       schema:
         type: string
         default: null
+    Graph:
+      in: query
+      name: graph
+      description: >-
+        The parameter to get all information related to a service request based
+        on  it logical identifier and associated [graph
+        definition](https://simplifier.net/guide/FHIR-Genomics-Implementation-Guide/Home/FHIRAssets/GraphDefinitions?version=current)
+        on server.
+      schema:
+        type: string
+        default: genomics-test-order
     TaskInclude:
       in: query
       name: _include
@@ -4658,6 +4695,22 @@ components:
         The parameter _include is used to follow links 'forward'. For example,
         `Specimen:request`, will include ServiceRequest details managing the
         Specimen.
+      schema:
+        type: string
+        default: null
+    SpecimenRevInclude:
+      in: query
+      name: _revinclude
+      description: >-
+        The parameter _revinclude is used to follow reverse links. For example.
+        'Task:input' will include all tasks managing the specimen workflows.
+      schema:
+        type: string
+        default: null
+    SpecimenRequest:
+      in: query
+      name: request
+      description: The parameter search specimen based on service request logical id.
       schema:
         type: string
         default: null
