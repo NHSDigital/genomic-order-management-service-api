@@ -102,7 +102,11 @@ info:
 
     * upload interpretation reports
 
+    
+    
+    The API's provide the core capabilities around the patient Unified Genomic Record (**UGR**). 
 
+    
     ## Who can use this API
       This API can only be used where there is a legal basis to do so. Make sure you have a valid use case before you go too far with your development.
 
