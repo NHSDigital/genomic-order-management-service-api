@@ -102,11 +102,12 @@ info:
 
     * upload interpretation reports
 
-    
-    
-    The API's provide the core capabilities around the patient Unified Genomic Record (**UGR**). 
 
-    
+
+    The API's provide the core capabilities around the patient Unified Genomic
+    Record (**UGR**). 
+
+
     ## Who can use this API
       This API can only be used where there is a legal basis to do so. Make sure you have a valid use case before you go too far with your development.
 
@@ -1784,6 +1785,8 @@ paths:
   /FHIR/R4/ServiceRequest/{id}/$graph:
     get:
       operationId: getservicerequestinformation
+      security:
+        - app-level0: []
       summary: Get detailed information around a service request.
       description: >
         This endpoint allows to retrieve all related records of a ServiceRequest
@@ -2086,7 +2089,7 @@ paths:
     get:
       operationId: getDiagnosticReports
       security:
-        - app-level0: []	
+        - app-level0: []
       summary: Search for DiagnosticReports
       description: >
         ## Overview
@@ -2115,6 +2118,8 @@ paths:
           $ref: '#/components/responses/4XX-goms-error'
     post:
       operationId: adddiagnosticreport
+      security:
+        - app-level0: []
       summary: Create a new DiagnosticReport
       description: |
         ## Overview
@@ -2310,6 +2315,8 @@ paths:
           $ref: '#/components/responses/4XX-goms-error'
     post:
       operationId: addSpecimen
+      security:
+        - app-level0: []
       summary: Create a new Specimen
       description: |
         ## Overview
@@ -2608,8 +2615,9 @@ paths:
           $ref: '#/components/responses/4XX-goms-error'
 components:
   securitySchemes:
-   app-level0:
-    $ref: https://proxygen.prod.api.platform.nhs.uk/components/securitySchemes/app-level0
+    app-level0:
+      $ref: >-
+        https://proxygen.prod.api.platform.nhs.uk/components/securitySchemes/app-level0
   responses:
     4XX-goms-error:
       description: >
@@ -4959,9 +4967,9 @@ x-nhsd-apim:
       header: X-Api-Key
       secret: order-management-service-int-api-key
   access:
-  - title: Application Restricted
-    grants:
-      app-level0: []
+    - title: Application Restricted
+      grants:
+        app-level0: []
   ratelimiting:
     proxy:
       limit: 50
