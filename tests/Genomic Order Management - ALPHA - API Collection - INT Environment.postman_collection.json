@@ -145,7 +145,7 @@
 							}
 						],
 						"url": {
-							"raw": "http://development.eba-wa3guwsz.eu-west-2.elasticbeanstalk.com/Test/GetClinicalIndication/M91",
+							"raw": "http://development.eba-wa3guwsz.eu-west-2.elasticbeanstalk.com/Test/GetClinicalIndication/R14",
 							"protocol": "http",
 							"host": [
 								"development",
@@ -157,7 +157,7 @@
 							"path": [
 								"Test",
 								"GetClinicalIndication",
-								"M91"
+								"R14"
 							]
 						}
 					},
@@ -558,6 +558,221 @@
 								}
 							],
 							"description": "This collection test the following scenario\n\n1. Send a test request for Rare Disease R132.1 using requestor org \"699W0\" to /FHIR/R4 endpoint using transaction message. Capture the logical Id for Patient and Service Request.\n    \n2. A generic /ServiceRequest GET using \"699W0\" as requester.\n    \n3. A ServiceRequest/LOGICAL_ID GET can confirming is the ID's match"
+						},
+						{
+							"name": "Use Existing Patient",
+							"item": [
+								{
+									"name": "Search Existing Patient",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"const responseJson = pm.response.json();\r",
+													"\r",
+													"pm.test(\"HTTP Status code is 200\", function () {\r",
+													"  pm.response.to.have.status(200);\r",
+													"});\r",
+													"\r",
+													"pm.test(\"Content-Type header is present\", () => {\r",
+													"  pm.response.to.have.header(\"Content-Type\");\r",
+													"});\r",
+													"\r",
+													"pm.test(\"resourceType type = 'Patient'\", () => {\r",
+													"  pm.expect(responseJson.entry[0].resource.resourceType).to.eql(\"Patient\");\r",
+													"});\r",
+													"\r",
+													"const Patient_Logical_Id = responseJson.entry[0].resource.id;\r",
+													"pm.environment.set(\"Patient_Logical_Id\",Patient_Logical_Id);\r",
+													"\r",
+													"pm.test('Patient_Logical_Id is a valid UUID', () => {\r",
+													"    pm.expect(Patient_Logical_Id).to.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i);\r",
+													"});"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{int.api.url}}FHIR/R4/Patient?identifier=https%3A%2F%2Ffhir.nhs.uk%2FId%2Fnhs-number%7C{{patient_nhs_no}}",
+											"host": [
+												"{{int.api.url}}FHIR"
+											],
+											"path": [
+												"R4",
+												"Patient"
+											],
+											"query": [
+												{
+													"key": "identifier",
+													"value": "https%3A%2F%2Ffhir.nhs.uk%2FId%2Fnhs-number%7C{{patient_nhs_no}}"
+												},
+												{
+													"key": "given",
+													"value": "BEAUREGARD",
+													"disabled": true
+												},
+												{
+													"key": "family",
+													"value": "Sorrell",
+													"disabled": true
+												},
+												{
+													"key": "gender",
+													"value": "male",
+													"disabled": true
+												},
+												{
+													"key": "birthdate",
+													"value": "2011-04-12",
+													"disabled": true
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Rare Disease - Non-WGS-R132.1 -Patient Reference",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													"const bundle_id = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"const focus_id = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"const patient_id = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"const role_id = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"const specimen_id = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"const test_order_id = pm.variables.replaceIn(\"{{$randomBankAccount}}\");\r",
+													"const test_specimen_id = pm.variables.replaceIn(\"{{$randomBankAccount}}\");\r",
+													"const bundle_time=pm.variables.replaceIn(\"{{$isoTimestamp}}\");\r",
+													"const message_time=pm.variables.replaceIn(\"{{$isoTimestamp}}\");\r",
+													"const service_request_time=pm.variables.replaceIn(\"{{$isoTimestamp}}\");\r",
+													"const specimen_collection_time=pm.variables.replaceIn(\"{{$isoTimestamp}}\");\r",
+													"const genomic_eth_id = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"const obs_nopregnancy = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"const obs_diseasestatus = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"const obs_consanunion = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"const familyhist_consanunion = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"const obs_nobonemarrowtrans = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"const obs_trans = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"const obs_multiplerenalcyst = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"const obs_nephronophthisis = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"const obs_hepaticcysts = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"const obs_enlargedkidney = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"const obs_renalinsuf = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"const consent_id = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"const nhsNo = _.random(1000000000,9999999999);\r",
+													"const practionerId = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"console.log(nhsNo);\r",
+													"\r",
+													"pm.environment.set(\"bundle_id\",bundle_id);\r",
+													"pm.environment.set(\"service_id\",focus_id);\r",
+													"pm.environment.set(\"patient_id\",patient_id);\r",
+													"pm.environment.set(\"specimen_id\",specimen_id);\r",
+													"pm.environment.set(\"role_id\",role_id);\r",
+													"pm.environment.set(\"test_order_id\",test_order_id);\r",
+													"pm.environment.set(\"test_specimen_id\",test_specimen_id);\r",
+													"pm.environment.set(\"bundle_time\",bundle_time);\r",
+													"pm.environment.set(\"message_time\",message_time);\r",
+													"pm.environment.set(\"service_request_time\",service_request_time);\r",
+													"pm.environment.set(\"specimen_collection_time\",specimen_collection_time);\r",
+													"pm.environment.set(\"genomic_eth_id\",genomic_eth_id);\r",
+													"pm.environment.set(\"obs_nopregnancy\",obs_nopregnancy);\r",
+													"pm.environment.set(\"obs_diseasestatus\",obs_diseasestatus);\r",
+													"pm.environment.set(\"obs_consanunion\",obs_consanunion);\r",
+													"pm.environment.set(\"familyhist_consanunion\",familyhist_consanunion);\r",
+													"pm.environment.set(\"obs_nobonemarrowtrans\",obs_nobonemarrowtrans);\r",
+													"pm.environment.set(\"obs_trans\",obs_trans);\r",
+													"pm.environment.set(\"obs_multiplerenalcyst\",obs_multiplerenalcyst);\r",
+													"pm.environment.set(\"obs_nephronophthisis\",obs_nephronophthisis);\r",
+													"pm.environment.set(\"obs_hepaticcysts\",obs_hepaticcysts);\r",
+													"pm.environment.set(\"obs_enlargedkidney\",obs_enlargedkidney);\r",
+													"pm.environment.set(\"obs_renalinsuf\",obs_renalinsuf);\r",
+													"pm.environment.set(\"consent_id\",consent_id);\r",
+													"pm.environment.set(\"practionerId\",practionerId);"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"const responseJson = pm.response.json();\r",
+													"\r",
+													"//console.log(responseJson.entry[3].fullUrl.split(\"/\")[1]);\r",
+													"//console.log(responseJson.entry.length);\r",
+													"\r",
+													"pm.test(\"HTTP Status code is 200\", function () {\r",
+													"  pm.response.to.have.status(200);\r",
+													"});\r",
+													"\r",
+													"pm.test(\"Content-Type header is present\", () => {\r",
+													"  pm.response.to.have.header(\"Content-Type\");\r",
+													"});\r",
+													"\r",
+													"pm.test(\"Response type = 'transaction-response'\", () => {\r",
+													"  pm.expect(responseJson.type).to.eql(\"transaction-response\");\r",
+													"});\r",
+													"\r",
+													"// Get the logical id assuming the outcome resources come in the same order as the request resources\r",
+													"const Service_Request_Logical_Id = responseJson.entry[2].fullUrl.split(\"/\")[1];\r",
+													"pm.environment.set(\"Service_Request_Logical_Id\",Service_Request_Logical_Id);\r",
+													"\r",
+													"const Patient_Logical_Id = responseJson.entry[1].fullUrl.split(\"/\")[1];\r",
+													"pm.environment.set(\"Patient_Logical_Id\",Patient_Logical_Id);\r",
+													"\r",
+													"pm.test('Service_Request_Logical_Id is a valid UUID', () => {\r",
+													"    pm.expect(Service_Request_Logical_Id).to.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i);\r",
+													"});\r",
+													"\r",
+													"pm.test('Patient_Logical_Id is a valid UUID', () => {\r",
+													"    pm.expect(Patient_Logical_Id).to.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i);\r",
+													"});\r",
+													"\r",
+													"pm.test('No of operation outcomes matches the resources sent == 15', () => {\r",
+													"    pm.expect(responseJson.entry.length).to.eql(15);\r",
+													"});\r",
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"resourceType\": \"Bundle\",\r\n    \"id\": \"{{bundle_id}}\",\r\n    \"type\": \"transaction\",\r\n    \"entry\":  [\r\n        {\r\n            \"fullUrl\": \"urn:uuid:{{role_id}}\",\r\n            \"resource\": {\r\n                \"resourceType\": \"PractitionerRole\",\r\n                \"id\": \"{{role_id}}\",\r\n                \"practitioner\": {\r\n                    \"identifier\": {\r\n                        \"system\": \"https://fhir.nhs.uk/Id/sds-user-id\",\r\n                        \"value\": \"{{practionerId}}\"\r\n                    },\r\n                    \"display\": \"Dr. Hazel Smith\"\r\n                },\r\n                \"organization\": {\r\n                    \"identifier\": {\r\n                        \"system\": \"https://fhir.nhs.uk/Id/ods-organization-code\",\r\n                        \"value\": \"699W0\"\r\n                    },\r\n                    \"display\": \"Royal Brompton and Harefield\"\r\n                },\r\n                \"specialty\":  [\r\n                    {\r\n                        \"coding\":  [\r\n                            {\r\n                                \"system\": \"https://fhir.hl7.org.uk/CodeSystem/UKCore-PracticeSettingCode\",\r\n                                \"code\": \"361\",\r\n                                \"display\": \"Renal Medicine\"\r\n                            }\r\n                        ]\r\n                    }\r\n                ],\r\n                \"telecom\":  [\r\n                    {\r\n                        \"system\": \"phone\",\r\n                        \"value\": \"02085467711\"\r\n                    },\r\n                    {\r\n                        \"system\": \"email\",\r\n                        \"value\": \"Hazel.smith12@nhs.net\"\r\n                    },\r\n                    {\r\n                        \"system\": \"email\",\r\n                        \"value\": \"renalseckingston@nhs.net\",\r\n                        \"extension\":  [\r\n                            {\r\n                                \"url\": \"http://hl7.org/fhir/StructureDefinition/contactpoint-comment\",\r\n                                \"valueString\": \"reporting\"\r\n                            }\r\n                        ]\r\n                    }\r\n                ]\r\n            },\r\n            \"request\": {\r\n                \"method\": \"POST\",\r\n                \"url\": \"PractitionerRole\"\r\n            }\r\n        },\r\n        {\r\n            \"fullUrl\": \"urn:uuid:{{genomic_eth_id}}\",\r\n            \"resource\": {\r\n                \"resourceType\": \"Observation\",\r\n                \"id\": \"{{genomic_eth_id}}\",\r\n                \"status\": \"preliminary\",\r\n                \"code\": {\r\n                    \"coding\":  [\r\n                        {\r\n                            \"system\": \"http://snomed.info/sct\",\r\n                            \"code\": \"723621000000103\",\r\n                            \"display\": \"Ethnicity\"\r\n                        }\r\n                    ]\r\n                },\r\n                \"subject\": {\r\n                    \"reference\": \"Patient/{{Patient_Logical_Id}}\",\r\n                    \"identifier\": {\r\n                        \"system\": \"https://fhir.nhs.uk/Id/nhs-number\",\r\n                        \"value\": \"{{patient_nhs_no}}\"\r\n                    }\r\n                },\r\n                \"valueString\": \"unknown\"\r\n            },\r\n            \"request\": {\r\n                \"method\": \"POST\",\r\n                \"url\": \"Observation\"\r\n            }\r\n        },\r\n        {\r\n            \"fullUrl\": \"urn:uuid:{{service_id}}\",\r\n            \"resource\": {\r\n                \"resourceType\": \"ServiceRequest\",\r\n                \"id\": \"{{service_id}}\",\r\n                \"extension\":  [\r\n                    {\r\n                        \"url\": \"https://fhir.hl7.org.uk/StructureDefinition/Extension-UKCore-Coverage\",\r\n                        \"valueCodeableConcept\": {\r\n                            \"coding\":  [\r\n                                {\r\n                                    \"system\": \"https://fhir.hl7.org.uk/CodeSystem/UKCore-FundingCategory\",\r\n                                    \"code\": \"nhs\",\r\n                                    \"display\": \"NHS\"\r\n                                }\r\n                            ]\r\n                        }\r\n                    }\r\n                ],\r\n                \"identifier\":  [\r\n                    {\r\n                        \"system\": \"https://RBH.EPR.SYSTEM/EPIC\",\r\n                        \"value\": \"{{test_order_id}}\"\r\n                    }\r\n                ],\r\n                \"status\": \"active\",\r\n                \"intent\": \"order\",\r\n                \"category\":  [\r\n                    {\r\n                        \"coding\":  [\r\n                            {\r\n                                \"system\": \"https://fhir.hl7.org.uk/CodeSystem/UKCore-GenomeSequencingCategory\",\r\n                                \"code\": \"rare-disease-non-wgs\",\r\n                                \"display\": \"Rare Disease - Non-WGS\"\r\n                            }\r\n                        ]\r\n                    }\r\n                ],\r\n                \"priority\": \"routine\",\r\n                \"code\": {\r\n                    \"coding\":  [\r\n                        {\r\n                            \"system\": \"https://fhir.nhs.uk/CodeSystem/England-GenomicTestDirectory\",\r\n                            \"code\": \"R132.1\",\r\n                            \"display\": \"Dilated and Arrhythmogenic cardiomyopathy\"\r\n                        }\r\n                    ]\r\n                },\r\n                \"subject\": {\r\n                    \"reference\": \"Patient/{{Patient_Logical_Id}}\",\r\n                    \"identifier\": {\r\n                        \"system\": \"https://fhir.nhs.uk/Id/nhs-number\",\r\n                        \"value\": \"{{patient_nhs_no}}\"\r\n                    }\r\n                },\r\n                \"authoredOn\": \"{{service_request_time}}\",\r\n                \"requester\": {\r\n                    \"reference\": \"urn:uuid:{{role_id}}\"\r\n                },\r\n                \"reasonCode\":  [\r\n                    {\r\n                        \"coding\":  [\r\n                            {\r\n                                \"system\": \"http://snomed.info/sct\",\r\n                                \"code\": \"103693007\",\r\n                                \"display\": \"Diagnostic procedure\"\r\n                            }\r\n                        ]\r\n                    }\r\n                ],\r\n                \"supportingInfo\":  [\r\n                    {\r\n                        \"reference\": \"urn:uuid:{{obs_diseasestatus}}\"\r\n                    },\r\n                    {\r\n                        \"reference\": \"urn:uuid:{{genomic_eth_id}}\"\r\n                    },\r\n                    {\r\n                        \"reference\": \"urn:uuid:{{obs_nopregnancy}}\"\r\n                    },\r\n                    {\r\n                        \"reference\": \"urn:uuid:{{familyhist_consanunion}}\"\r\n                    },\r\n                    {\r\n                        \"reference\": \"urn:uuid:{{obs_nobonemarrowtrans}}\"\r\n                    },\r\n                    {\r\n                        \"reference\": \"urn:uuid:{{obs_trans}}\"\r\n                    },\r\n                    {\r\n                        \"reference\": \"urn:uuid:{{obs_multiplerenalcyst}}\"\r\n                    },\r\n                    {\r\n                        \"reference\": \"urn:uuid:{{obs_nephronophthisis}}\"\r\n                    },\r\n                    {\r\n                        \"reference\": \"urn:uuid:{{obs_hepaticcysts}}\"\r\n                    },\r\n                    {\r\n                        \"reference\": \"urn:uuid:{{obs_enlargedkidney}}\"\r\n                    },\r\n                    {\r\n                        \"reference\": \"urn:uuid:{{obs_renalinsuf}}\"\r\n                    }\r\n                ],\r\n                \"note\":  [\r\n                    {\r\n                        \"text\": \"No family history of genomic testing\"\r\n                    },\r\n                    {\r\n                        \"text\": \"Free text for diagnosis/reason for referral, relevant information including family history, phenotypic details/ HPO Terms/ Patient diagnoses with ADPKD (example)\"\r\n                    }\r\n                ]\r\n            },\r\n            \"request\": {\r\n                \"method\": \"POST\",\r\n                \"url\": \"ServiceRequest\"\r\n            }\r\n        },\r\n        {\r\n            \"fullUrl\": \"urn:uuid:{{obs_nopregnancy}}\",\r\n            \"resource\": {\r\n                \"resourceType\": \"Observation\",\r\n                \"id\": \"{{obs_nopregnancy}}\",\r\n                \"status\": \"final\",\r\n                \"code\": {\r\n                    \"coding\":  [\r\n                        {\r\n                            \"system\": \"http://snomed.info/sct\",\r\n                            \"code\": \"77386006\",\r\n                            \"display\": \"Pregnancy\"\r\n                        }\r\n                    ]\r\n                },\r\n                \"subject\": {\r\n                    \"reference\": \"Patient/{{Patient_Logical_Id}}\",\r\n                    \"identifier\": {\r\n                        \"system\": \"https://fhir.nhs.uk/Id/nhs-number\",\r\n                        \"value\": \"{{patient_nhs_no}}\"\r\n                    }\r\n                },\r\n                \"effectiveDateTime\": \"2023-08-05\",\r\n                \"valueBoolean\": false\r\n            },\r\n            \"request\": {\r\n                \"method\": \"POST\",\r\n                \"url\": \"Observation\"\r\n            }\r\n        },\r\n        {\r\n            \"fullUrl\": \"urn:uuid:{{obs_diseasestatus}}\",\r\n            \"resource\": {\r\n                \"resourceType\": \"Observation\",\r\n                \"id\": \"{{obs_diseasestatus}}\",\r\n                \"status\": \"final\",\r\n                \"code\": {\r\n                    \"coding\":  [\r\n                        {\r\n                            \"system\": \"https://fhir.nhs.uk/CodeSystem/England-GenomicTestDirectory\",\r\n                            \"code\": \"R193.4\",\r\n                            \"display\": \"Cystic renal disease\"\r\n                        }\r\n                    ]\r\n                },\r\n                \"subject\": {\r\n                    \"reference\": \"Patient/{{Patient_Logical_Id}}\",\r\n                    \"identifier\": {\r\n                        \"system\": \"https://fhir.nhs.uk/Id/nhs-number\",\r\n                        \"value\": \"{{patient_nhs_no}}\"\r\n                    }\r\n                },\r\n                \"effectiveDateTime\": \"2023-08-05\",\r\n                \"valueCodeableConcept\": {\r\n                    \"coding\":  [\r\n                        {\r\n                            \"system\": \"http://snomed.info/sct\",\r\n                            \"code\": \"103310001\",\r\n                            \"display\": \"Patient not affected\"\r\n                        }\r\n                    ]\r\n                }\r\n            },\r\n            \"request\": {\r\n                \"method\": \"POST\",\r\n                \"url\": \"Observation\"\r\n            }\r\n        },\r\n        {\r\n            \"fullUrl\": \"urn:uuid:{{familyhist_consanunion}}\",\r\n            \"resource\": {\r\n                \"resourceType\": \"FamilyMemberHistory\",\r\n                \"id\": \"{{familyhist_consanunion}}\",\r\n                \"extension\":  [\r\n                    {\r\n                        \"url\": \"http://hl7.org/fhir/StructureDefinition/family-member-history-genetics-observation\",\r\n                        \"valueReference\": {\r\n                            \"reference\": \"urn:uuid:{{obs_consanunion}}\"\r\n                        }\r\n                    }\r\n                ],\r\n                \"status\": \"completed\",\r\n                \"patient\": {\r\n                    \"reference\": \"Patient/{{Patient_Logical_Id}}\",\r\n                    \"identifier\": {\r\n                        \"system\": \"https://fhir.nhs.uk/Id/nhs-number\",\r\n                        \"value\": \"{{patient_nhs_no}}\"\r\n                    }\r\n                },\r\n                \"relationship\": {\r\n                    \"coding\":  [\r\n                        {\r\n                            \"system\": \"http://terminology.hl7.org/CodeSystem/v3-RoleCode\",\r\n                            \"code\": \"PRN\",\r\n                            \"display\": \"parent\"\r\n                        }\r\n                    ]\r\n                }\r\n            },\r\n            \"request\": {\r\n                \"method\": \"POST\",\r\n                \"url\": \"FamilyMemberHistory\"\r\n            }\r\n        },\r\n        {\r\n            \"fullUrl\": \"urn:uuid:{{obs_consanunion}}\",\r\n            \"resource\": {\r\n                \"resourceType\": \"Observation\",\r\n                \"id\": \"{{obs_consanunion}}\",\r\n                \"status\": \"final\",\r\n                \"code\": {\r\n                    \"coding\":  [\r\n                        {\r\n                            \"system\": \"http://snomed.info/sct\",\r\n                            \"code\": \"842009\",\r\n                            \"display\": \"Consanguinity\"\r\n                        }\r\n                    ]\r\n                },\r\n                \"subject\": {\r\n                    \"reference\": \"Patient/{{Patient_Logical_Id}}\",\r\n                    \"identifier\": {\r\n                        \"system\": \"https://fhir.nhs.uk/Id/nhs-number\",\r\n                        \"value\": \"{{patient_nhs_no}}\"\r\n                    }\r\n                },\r\n                \"effectiveDateTime\": \"2023-08-05\",\r\n                \"valueBoolean\": false\r\n            },\r\n            \"request\": {\r\n                \"method\": \"POST\",\r\n                \"url\": \"Observation\"\r\n            }\r\n        },\r\n        {\r\n            \"fullUrl\": \"urn:uuid:{{obs_nobonemarrowtrans}}\",\r\n            \"resource\": {\r\n                \"resourceType\": \"Observation\",\r\n                \"id\": \"{{obs_nobonemarrowtrans}}\",\r\n                \"status\": \"final\",\r\n                \"code\": {\r\n                    \"coding\":  [\r\n                        {\r\n                            \"system\": \"http://snomed.info/sct\",\r\n                            \"code\": \"23719005\",\r\n                            \"display\": \"Transplantation of bone marrow\"\r\n                        }\r\n                    ]\r\n                },\r\n                \"subject\": {\r\n                    \"reference\": \"Patient/{{Patient_Logical_Id}}\",\r\n                    \"identifier\": {\r\n                        \"system\": \"https://fhir.nhs.uk/Id/nhs-number\",\r\n                        \"value\": \"{{patient_nhs_no}}\"\r\n                    }\r\n                },\r\n                \"effectiveDateTime\": \"2023-08-05\",\r\n                \"valueBoolean\": false\r\n            },\r\n            \"request\": {\r\n                \"method\": \"POST\",\r\n                \"url\": \"Observation\"\r\n            }\r\n        },\r\n        {\r\n            \"fullUrl\": \"urn:uuid:{{obs_trans}}\",\r\n            \"resource\": {\r\n                \"resourceType\": \"Observation\",\r\n                \"id\": \"{{obs_trans}}\",\r\n                \"status\": \"final\",\r\n                \"code\": {\r\n                    \"coding\":  [\r\n                        {\r\n                            \"system\": \"http://snomed.info/sct\",\r\n                            \"code\": \"5447007\",\r\n                            \"display\": \"Transfusion\"\r\n                        }\r\n                    ]\r\n                },\r\n                \"subject\": {\r\n                    \"reference\": \"Patient/{{Patient_Logical_Id}}\",\r\n                    \"identifier\": {\r\n                        \"system\": \"https://fhir.nhs.uk/Id/nhs-number\",\r\n                        \"value\": \"{{patient_nhs_no}}\"\r\n                    }\r\n                },\r\n                \"effectiveDateTime\": \"2023-08-05\",\r\n                \"valueBoolean\": false\r\n            },\r\n            \"request\": {\r\n                \"method\": \"POST\",\r\n                \"url\": \"Observation\"\r\n            }\r\n        },\r\n        {\r\n            \"fullUrl\": \"urn:uuid:{{obs_multiplerenalcyst}}\",\r\n            \"resource\": {\r\n                \"resourceType\": \"Observation\",\r\n                \"id\": \"{{obs_multiplerenalcyst}}\",\r\n                \"status\": \"final\",\r\n                \"code\": {\r\n                    \"coding\":  [\r\n                        {\r\n                            \"system\": \"https://hpo.jax.org/app/\",\r\n                            \"code\": \"HP:0005562\",\r\n                            \"display\": \"Multiple renal cysts\"\r\n                        }\r\n                    ]\r\n                },\r\n                \"subject\": {\r\n                    \"reference\": \"Patient/{{Patient_Logical_Id}}\",\r\n                    \"identifier\": {\r\n                        \"system\": \"https://fhir.nhs.uk/Id/nhs-number\",\r\n                        \"value\": \"{{patient_nhs_no}}\"\r\n                    }\r\n                },\r\n                \"effectiveDateTime\": \"2023-08-05\",\r\n                \"valueBoolean\": false\r\n            },\r\n            \"request\": {\r\n                \"method\": \"POST\",\r\n                \"url\": \"Observation\"\r\n            }\r\n        },\r\n        {\r\n            \"fullUrl\": \"urn:uuid:{{obs_nephronophthisis}}\",\r\n            \"resource\": {\r\n                \"resourceType\": \"Observation\",\r\n                \"id\": \"{{obs_nephronophthisis}}\",\r\n                \"status\": \"final\",\r\n                \"code\": {\r\n                    \"coding\":  [\r\n                        {\r\n                            \"system\": \"https://hpo.jax.org/app/\",\r\n                            \"code\": \"HP:0000090\",\r\n                            \"display\": \"Nephronophthisis\"\r\n                        }\r\n                    ]\r\n                },\r\n                \"subject\": {\r\n                    \"reference\": \"Patient/{{Patient_Logical_Id}}\",\r\n                    \"identifier\": {\r\n                        \"system\": \"https://fhir.nhs.uk/Id/nhs-number\",\r\n                        \"value\": \"{{patient_nhs_no}}\"\r\n                    }\r\n                },\r\n                \"effectiveDateTime\": \"2023-08-05\",\r\n                \"valueBoolean\": false\r\n            },\r\n            \"request\": {\r\n                \"method\": \"POST\",\r\n                \"url\": \"Observation\"\r\n            }\r\n        },\r\n        {\r\n            \"fullUrl\": \"urn:uuid:{{obs_hepaticcysts}}\",\r\n            \"resource\": {\r\n                \"resourceType\": \"Observation\",\r\n                \"id\": \"{{obs_hepaticcysts}}\",\r\n                \"status\": \"final\",\r\n                \"code\": {\r\n                    \"coding\":  [\r\n                        {\r\n                            \"system\": \"https://hpo.jax.org/app/\",\r\n                            \"code\": \"HP:0001407\",\r\n                            \"display\": \"Hepatic cysts\"\r\n                        }\r\n                    ]\r\n                },\r\n                \"subject\": {\r\n                    \"reference\": \"Patient/{{Patient_Logical_Id}}\",\r\n                    \"identifier\": {\r\n                        \"system\": \"https://fhir.nhs.uk/Id/nhs-number\",\r\n                        \"value\": \"{{patient_nhs_no}}\"\r\n                    }\r\n                },\r\n                \"effectiveDateTime\": \"2023-08-05\",\r\n                \"valueBoolean\": false\r\n            },\r\n            \"request\": {\r\n                \"method\": \"POST\",\r\n                \"url\": \"Observation\"\r\n            }\r\n        },\r\n        {\r\n            \"fullUrl\": \"urn:uuid:{{obs_enlargedkidney}}\",\r\n            \"resource\": {\r\n                \"resourceType\": \"Observation\",\r\n                \"id\": \"{{obs_enlargedkidney}}\",\r\n                \"status\": \"final\",\r\n                \"code\": {\r\n                    \"coding\":  [\r\n                        {\r\n                            \"system\": \"https://hpo.jax.org/app/\",\r\n                            \"code\": \"HP:0000105\",\r\n                            \"display\": \"Enlarged kidney\"\r\n                        }\r\n                    ]\r\n                },\r\n                \"subject\": {\r\n                    \"reference\": \"Patient/{{Patient_Logical_Id}}\",\r\n                    \"identifier\": {\r\n                        \"system\": \"https://fhir.nhs.uk/Id/nhs-number\",\r\n                        \"value\": \"{{patient_nhs_no}}\"\r\n                    }\r\n                },\r\n                \"effectiveDateTime\": \"2023-08-05\",\r\n                \"valueBoolean\": true\r\n            },\r\n            \"request\": {\r\n                \"method\": \"POST\",\r\n                \"url\": \"Observation\"\r\n            }\r\n        },\r\n        {\r\n            \"fullUrl\": \"urn:uuid:{{obs_renalinsuf}}\",\r\n            \"resource\": {\r\n                \"resourceType\": \"Observation\",\r\n                \"id\": \"{{obs_renalinsuf}}\",\r\n                \"status\": \"final\",\r\n                \"code\": {\r\n                    \"coding\":  [\r\n                        {\r\n                            \"system\": \"https://hpo.jax.org/app/\",\r\n                            \"code\": \"HP:0000083\",\r\n                            \"display\": \"Renal insufficiency\"\r\n                        }\r\n                    ]\r\n                },\r\n                \"subject\": {\r\n                    \"reference\": \"Patient/{{Patient_Logical_Id}}\",\r\n                    \"identifier\": {\r\n                        \"system\": \"https://fhir.nhs.uk/Id/nhs-number\",\r\n                        \"value\": \"{{patient_nhs_no}}\"\r\n                    }\r\n                },\r\n                \"effectiveDateTime\": \"2023-08-05\",\r\n                \"valueBoolean\": true\r\n            },\r\n            \"request\": {\r\n                \"method\": \"POST\",\r\n                \"url\": \"Observation\"\r\n            }\r\n        },\r\n        {\r\n            \"fullUrl\": \"urn:uuid:{{specimen_id}}\",\r\n            \"resource\": {\r\n                \"resourceType\": \"Specimen\",\r\n                \"id\": \"{{specimen_id}}\",\r\n                \"identifier\":  [\r\n                    {\r\n                        \"system\": \"https://fhir.add.nhs.uk/Id/specimenId\",\r\n                        \"value\": \"RGT{{test_specimen_id}}\"\r\n                    }\r\n                ],\r\n                \"status\": \"unavailable\",\r\n                \"type\": {\r\n                    \"coding\":  [\r\n                        {\r\n                            \"system\": \"http://snomed.info/sct\",\r\n                            \"code\": \"445295009\",\r\n                            \"display\": \"Blood specimen with EDTA\"\r\n                        }\r\n                    ]\r\n                },\r\n                \"subject\": {\r\n                    \"reference\": \"Patient/{{Patient_Logical_Id}}\",\r\n                    \"identifier\": {\r\n                        \"system\": \"https://fhir.nhs.uk/Id/nhs-number\",\r\n                        \"value\": \"{{patient_nhs_no}}\"\r\n                    }\r\n                },\r\n                \"request\":  [\r\n                    {\r\n                        \"reference\": \"urn:uuid:{{service_id}}\"\r\n                    }\r\n                ]\r\n            },\r\n            \"request\": {\r\n                \"method\": \"POST\",\r\n                \"url\": \"Specimen\"\r\n            }\r\n        }\r\n    ]\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{int.api.url}}FHIR/R4",
+											"host": [
+												"{{int.api.url}}FHIR"
+											],
+											"path": [
+												"R4"
+											]
+										}
+									},
+									"response": []
+								}
+							]
 						},
 						{
 							"name": "Duo - RARE - NONWGS",
@@ -4235,221 +4450,6 @@
 							]
 						},
 						{
-							"name": "Use Existing Patient",
-							"item": [
-								{
-									"name": "Search Existing Patient",
-									"event": [
-										{
-											"listen": "test",
-											"script": {
-												"exec": [
-													"const responseJson = pm.response.json();\r",
-													"\r",
-													"pm.test(\"HTTP Status code is 200\", function () {\r",
-													"  pm.response.to.have.status(200);\r",
-													"});\r",
-													"\r",
-													"pm.test(\"Content-Type header is present\", () => {\r",
-													"  pm.response.to.have.header(\"Content-Type\");\r",
-													"});\r",
-													"\r",
-													"pm.test(\"resourceType type = 'Patient'\", () => {\r",
-													"  pm.expect(responseJson.entry[0].resource.resourceType).to.eql(\"Patient\");\r",
-													"});\r",
-													"\r",
-													"const Patient_Logical_Id = responseJson.entry[0].resource.id;\r",
-													"pm.environment.set(\"Patient_Logical_Id\",Patient_Logical_Id);\r",
-													"\r",
-													"pm.test('Patient_Logical_Id is a valid UUID', () => {\r",
-													"    pm.expect(Patient_Logical_Id).to.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i);\r",
-													"});"
-												],
-												"type": "text/javascript",
-												"packages": {}
-											}
-										}
-									],
-									"request": {
-										"method": "GET",
-										"header": [],
-										"url": {
-											"raw": "{{int.api.url}}FHIR/R4/Patient?identifier=https%3A%2F%2Ffhir.nhs.uk%2FId%2Fnhs-number%7C{{patient_nhs_no}}",
-											"host": [
-												"{{int.api.url}}FHIR"
-											],
-											"path": [
-												"R4",
-												"Patient"
-											],
-											"query": [
-												{
-													"key": "identifier",
-													"value": "https%3A%2F%2Ffhir.nhs.uk%2FId%2Fnhs-number%7C{{patient_nhs_no}}"
-												},
-												{
-													"key": "given",
-													"value": "BEAUREGARD",
-													"disabled": true
-												},
-												{
-													"key": "family",
-													"value": "Sorrell",
-													"disabled": true
-												},
-												{
-													"key": "gender",
-													"value": "male",
-													"disabled": true
-												},
-												{
-													"key": "birthdate",
-													"value": "2011-04-12",
-													"disabled": true
-												}
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "Rare Disease - Non-WGS-R132.1 -Patient Reference",
-									"event": [
-										{
-											"listen": "prerequest",
-											"script": {
-												"exec": [
-													"const bundle_id = pm.variables.replaceIn(\"{{$guid}}\");\r",
-													"const focus_id = pm.variables.replaceIn(\"{{$guid}}\");\r",
-													"const patient_id = pm.variables.replaceIn(\"{{$guid}}\");\r",
-													"const role_id = pm.variables.replaceIn(\"{{$guid}}\");\r",
-													"const specimen_id = pm.variables.replaceIn(\"{{$guid}}\");\r",
-													"const test_order_id = pm.variables.replaceIn(\"{{$randomBankAccount}}\");\r",
-													"const test_specimen_id = pm.variables.replaceIn(\"{{$randomBankAccount}}\");\r",
-													"const bundle_time=pm.variables.replaceIn(\"{{$isoTimestamp}}\");\r",
-													"const message_time=pm.variables.replaceIn(\"{{$isoTimestamp}}\");\r",
-													"const service_request_time=pm.variables.replaceIn(\"{{$isoTimestamp}}\");\r",
-													"const specimen_collection_time=pm.variables.replaceIn(\"{{$isoTimestamp}}\");\r",
-													"const genomic_eth_id = pm.variables.replaceIn(\"{{$guid}}\");\r",
-													"const obs_nopregnancy = pm.variables.replaceIn(\"{{$guid}}\");\r",
-													"const obs_diseasestatus = pm.variables.replaceIn(\"{{$guid}}\");\r",
-													"const obs_consanunion = pm.variables.replaceIn(\"{{$guid}}\");\r",
-													"const familyhist_consanunion = pm.variables.replaceIn(\"{{$guid}}\");\r",
-													"const obs_nobonemarrowtrans = pm.variables.replaceIn(\"{{$guid}}\");\r",
-													"const obs_trans = pm.variables.replaceIn(\"{{$guid}}\");\r",
-													"const obs_multiplerenalcyst = pm.variables.replaceIn(\"{{$guid}}\");\r",
-													"const obs_nephronophthisis = pm.variables.replaceIn(\"{{$guid}}\");\r",
-													"const obs_hepaticcysts = pm.variables.replaceIn(\"{{$guid}}\");\r",
-													"const obs_enlargedkidney = pm.variables.replaceIn(\"{{$guid}}\");\r",
-													"const obs_renalinsuf = pm.variables.replaceIn(\"{{$guid}}\");\r",
-													"const consent_id = pm.variables.replaceIn(\"{{$guid}}\");\r",
-													"const nhsNo = _.random(1000000000,9999999999);\r",
-													"const practionerId = pm.variables.replaceIn(\"{{$guid}}\");\r",
-													"console.log(nhsNo);\r",
-													"\r",
-													"pm.environment.set(\"bundle_id\",bundle_id);\r",
-													"pm.environment.set(\"service_id\",focus_id);\r",
-													"pm.environment.set(\"patient_id\",patient_id);\r",
-													"pm.environment.set(\"specimen_id\",specimen_id);\r",
-													"pm.environment.set(\"role_id\",role_id);\r",
-													"pm.environment.set(\"test_order_id\",test_order_id);\r",
-													"pm.environment.set(\"test_specimen_id\",test_specimen_id);\r",
-													"pm.environment.set(\"bundle_time\",bundle_time);\r",
-													"pm.environment.set(\"message_time\",message_time);\r",
-													"pm.environment.set(\"service_request_time\",service_request_time);\r",
-													"pm.environment.set(\"specimen_collection_time\",specimen_collection_time);\r",
-													"pm.environment.set(\"genomic_eth_id\",genomic_eth_id);\r",
-													"pm.environment.set(\"obs_nopregnancy\",obs_nopregnancy);\r",
-													"pm.environment.set(\"obs_diseasestatus\",obs_diseasestatus);\r",
-													"pm.environment.set(\"obs_consanunion\",obs_consanunion);\r",
-													"pm.environment.set(\"familyhist_consanunion\",familyhist_consanunion);\r",
-													"pm.environment.set(\"obs_nobonemarrowtrans\",obs_nobonemarrowtrans);\r",
-													"pm.environment.set(\"obs_trans\",obs_trans);\r",
-													"pm.environment.set(\"obs_multiplerenalcyst\",obs_multiplerenalcyst);\r",
-													"pm.environment.set(\"obs_nephronophthisis\",obs_nephronophthisis);\r",
-													"pm.environment.set(\"obs_hepaticcysts\",obs_hepaticcysts);\r",
-													"pm.environment.set(\"obs_enlargedkidney\",obs_enlargedkidney);\r",
-													"pm.environment.set(\"obs_renalinsuf\",obs_renalinsuf);\r",
-													"pm.environment.set(\"consent_id\",consent_id);\r",
-													"pm.environment.set(\"practionerId\",practionerId);"
-												],
-												"type": "text/javascript",
-												"packages": {}
-											}
-										},
-										{
-											"listen": "test",
-											"script": {
-												"exec": [
-													"const responseJson = pm.response.json();\r",
-													"\r",
-													"//console.log(responseJson.entry[3].fullUrl.split(\"/\")[1]);\r",
-													"//console.log(responseJson.entry.length);\r",
-													"\r",
-													"pm.test(\"HTTP Status code is 200\", function () {\r",
-													"  pm.response.to.have.status(200);\r",
-													"});\r",
-													"\r",
-													"pm.test(\"Content-Type header is present\", () => {\r",
-													"  pm.response.to.have.header(\"Content-Type\");\r",
-													"});\r",
-													"\r",
-													"pm.test(\"Response type = 'transaction-response'\", () => {\r",
-													"  pm.expect(responseJson.type).to.eql(\"transaction-response\");\r",
-													"});\r",
-													"\r",
-													"// Get the logical id assuming the outcome resources come in the same order as the request resources\r",
-													"const Service_Request_Logical_Id = responseJson.entry[2].fullUrl.split(\"/\")[1];\r",
-													"pm.environment.set(\"Service_Request_Logical_Id\",Service_Request_Logical_Id);\r",
-													"\r",
-													"const Patient_Logical_Id = responseJson.entry[1].fullUrl.split(\"/\")[1];\r",
-													"pm.environment.set(\"Patient_Logical_Id\",Patient_Logical_Id);\r",
-													"\r",
-													"pm.test('Service_Request_Logical_Id is a valid UUID', () => {\r",
-													"    pm.expect(Service_Request_Logical_Id).to.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i);\r",
-													"});\r",
-													"\r",
-													"pm.test('Patient_Logical_Id is a valid UUID', () => {\r",
-													"    pm.expect(Patient_Logical_Id).to.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i);\r",
-													"});\r",
-													"\r",
-													"pm.test('No of operation outcomes matches the resources sent == 15', () => {\r",
-													"    pm.expect(responseJson.entry.length).to.eql(15);\r",
-													"});\r",
-													""
-												],
-												"type": "text/javascript",
-												"packages": {}
-											}
-										}
-									],
-									"request": {
-										"method": "POST",
-										"header": [],
-										"body": {
-											"mode": "raw",
-											"raw": "{\r\n    \"resourceType\": \"Bundle\",\r\n    \"id\": \"{{bundle_id}}\",\r\n    \"type\": \"transaction\",\r\n    \"entry\":  [\r\n        {\r\n            \"fullUrl\": \"urn:uuid:{{role_id}}\",\r\n            \"resource\": {\r\n                \"resourceType\": \"PractitionerRole\",\r\n                \"id\": \"{{role_id}}\",\r\n                \"practitioner\": {\r\n                    \"identifier\": {\r\n                        \"system\": \"https://fhir.nhs.uk/Id/sds-user-id\",\r\n                        \"value\": \"{{practionerId}}\"\r\n                    },\r\n                    \"display\": \"Dr. Hazel Smith\"\r\n                },\r\n                \"organization\": {\r\n                    \"identifier\": {\r\n                        \"system\": \"https://fhir.nhs.uk/Id/ods-organization-code\",\r\n                        \"value\": \"699W0\"\r\n                    },\r\n                    \"display\": \"Royal Brompton and Harefield\"\r\n                },\r\n                \"specialty\":  [\r\n                    {\r\n                        \"coding\":  [\r\n                            {\r\n                                \"system\": \"https://fhir.hl7.org.uk/CodeSystem/UKCore-PracticeSettingCode\",\r\n                                \"code\": \"361\",\r\n                                \"display\": \"Renal Medicine\"\r\n                            }\r\n                        ]\r\n                    }\r\n                ],\r\n                \"telecom\":  [\r\n                    {\r\n                        \"system\": \"phone\",\r\n                        \"value\": \"02085467711\"\r\n                    },\r\n                    {\r\n                        \"system\": \"email\",\r\n                        \"value\": \"Hazel.smith12@nhs.net\"\r\n                    },\r\n                    {\r\n                        \"system\": \"email\",\r\n                        \"value\": \"renalseckingston@nhs.net\",\r\n                        \"extension\":  [\r\n                            {\r\n                                \"url\": \"http://hl7.org/fhir/StructureDefinition/contactpoint-comment\",\r\n                                \"valueString\": \"reporting\"\r\n                            }\r\n                        ]\r\n                    }\r\n                ]\r\n            },\r\n            \"request\": {\r\n                \"method\": \"POST\",\r\n                \"url\": \"PractitionerRole\"\r\n            }\r\n        },\r\n        {\r\n            \"fullUrl\": \"urn:uuid:{{genomic_eth_id}}\",\r\n            \"resource\": {\r\n                \"resourceType\": \"Observation\",\r\n                \"id\": \"{{genomic_eth_id}}\",\r\n                \"status\": \"preliminary\",\r\n                \"code\": {\r\n                    \"coding\":  [\r\n                        {\r\n                            \"system\": \"http://snomed.info/sct\",\r\n                            \"code\": \"723621000000103\",\r\n                            \"display\": \"Ethnicity\"\r\n                        }\r\n                    ]\r\n                },\r\n                \"subject\": {\r\n                    \"reference\": \"Patient/{{Patient_Logical_Id}}\",\r\n                    \"identifier\": {\r\n                        \"system\": \"https://fhir.nhs.uk/Id/nhs-number\",\r\n                        \"value\": \"{{patient_nhs_no}}\"\r\n                    }\r\n                },\r\n                \"valueString\": \"unknown\"\r\n            },\r\n            \"request\": {\r\n                \"method\": \"POST\",\r\n                \"url\": \"Observation\"\r\n            }\r\n        },\r\n        {\r\n            \"fullUrl\": \"urn:uuid:{{service_id}}\",\r\n            \"resource\": {\r\n                \"resourceType\": \"ServiceRequest\",\r\n                \"id\": \"{{service_id}}\",\r\n                \"extension\":  [\r\n                    {\r\n                        \"url\": \"https://fhir.hl7.org.uk/StructureDefinition/Extension-UKCore-Coverage\",\r\n                        \"valueCodeableConcept\": {\r\n                            \"coding\":  [\r\n                                {\r\n                                    \"system\": \"https://fhir.hl7.org.uk/CodeSystem/UKCore-FundingCategory\",\r\n                                    \"code\": \"nhs\",\r\n                                    \"display\": \"NHS\"\r\n                                }\r\n                            ]\r\n                        }\r\n                    }\r\n                ],\r\n                \"identifier\":  [\r\n                    {\r\n                        \"system\": \"https://RBH.EPR.SYSTEM/EPIC\",\r\n                        \"value\": \"{{test_order_id}}\"\r\n                    }\r\n                ],\r\n                \"status\": \"active\",\r\n                \"intent\": \"order\",\r\n                \"category\":  [\r\n                    {\r\n                        \"coding\":  [\r\n                            {\r\n                                \"system\": \"https://fhir.hl7.org.uk/CodeSystem/UKCore-GenomeSequencingCategory\",\r\n                                \"code\": \"rare-disease-non-wgs\",\r\n                                \"display\": \"Rare Disease - Non-WGS\"\r\n                            }\r\n                        ]\r\n                    }\r\n                ],\r\n                \"priority\": \"routine\",\r\n                \"code\": {\r\n                    \"coding\":  [\r\n                        {\r\n                            \"system\": \"https://fhir.nhs.uk/CodeSystem/England-GenomicTestDirectory\",\r\n                            \"code\": \"R132.1\",\r\n                            \"display\": \"Dilated and Arrhythmogenic cardiomyopathy\"\r\n                        }\r\n                    ]\r\n                },\r\n                \"subject\": {\r\n                    \"reference\": \"Patient/{{Patient_Logical_Id}}\",\r\n                    \"identifier\": {\r\n                        \"system\": \"https://fhir.nhs.uk/Id/nhs-number\",\r\n                        \"value\": \"{{patient_nhs_no}}\"\r\n                    }\r\n                },\r\n                \"authoredOn\": \"{{service_request_time}}\",\r\n                \"requester\": {\r\n                    \"reference\": \"urn:uuid:{{role_id}}\"\r\n                },\r\n                \"reasonCode\":  [\r\n                    {\r\n                        \"coding\":  [\r\n                            {\r\n                                \"system\": \"http://snomed.info/sct\",\r\n                                \"code\": \"103693007\",\r\n                                \"display\": \"Diagnostic procedure\"\r\n                            }\r\n                        ]\r\n                    }\r\n                ],\r\n                \"supportingInfo\":  [\r\n                    {\r\n                        \"reference\": \"urn:uuid:{{obs_diseasestatus}}\"\r\n                    },\r\n                    {\r\n                        \"reference\": \"urn:uuid:{{genomic_eth_id}}\"\r\n                    },\r\n                    {\r\n                        \"reference\": \"urn:uuid:{{obs_nopregnancy}}\"\r\n                    },\r\n                    {\r\n                        \"reference\": \"urn:uuid:{{familyhist_consanunion}}\"\r\n                    },\r\n                    {\r\n                        \"reference\": \"urn:uuid:{{obs_nobonemarrowtrans}}\"\r\n                    },\r\n                    {\r\n                        \"reference\": \"urn:uuid:{{obs_trans}}\"\r\n                    },\r\n                    {\r\n                        \"reference\": \"urn:uuid:{{obs_multiplerenalcyst}}\"\r\n                    },\r\n                    {\r\n                        \"reference\": \"urn:uuid:{{obs_nephronophthisis}}\"\r\n                    },\r\n                    {\r\n                        \"reference\": \"urn:uuid:{{obs_hepaticcysts}}\"\r\n                    },\r\n                    {\r\n                        \"reference\": \"urn:uuid:{{obs_enlargedkidney}}\"\r\n                    },\r\n                    {\r\n                        \"reference\": \"urn:uuid:{{obs_renalinsuf}}\"\r\n                    }\r\n                ],\r\n                \"note\":  [\r\n                    {\r\n                        \"text\": \"No family history of genomic testing\"\r\n                    },\r\n                    {\r\n                        \"text\": \"Free text for diagnosis/reason for referral, relevant information including family history, phenotypic details/ HPO Terms/ Patient diagnoses with ADPKD (example)\"\r\n                    }\r\n                ]\r\n            },\r\n            \"request\": {\r\n                \"method\": \"POST\",\r\n                \"url\": \"ServiceRequest\"\r\n            }\r\n        },\r\n        {\r\n            \"fullUrl\": \"urn:uuid:{{obs_nopregnancy}}\",\r\n            \"resource\": {\r\n                \"resourceType\": \"Observation\",\r\n                \"id\": \"{{obs_nopregnancy}}\",\r\n                \"status\": \"final\",\r\n                \"code\": {\r\n                    \"coding\":  [\r\n                        {\r\n                            \"system\": \"http://snomed.info/sct\",\r\n                            \"code\": \"77386006\",\r\n                            \"display\": \"Pregnancy\"\r\n                        }\r\n                    ]\r\n                },\r\n                \"subject\": {\r\n                    \"reference\": \"Patient/{{Patient_Logical_Id}}\",\r\n                    \"identifier\": {\r\n                        \"system\": \"https://fhir.nhs.uk/Id/nhs-number\",\r\n                        \"value\": \"{{patient_nhs_no}}\"\r\n                    }\r\n                },\r\n                \"effectiveDateTime\": \"2023-08-05\",\r\n                \"valueBoolean\": false\r\n            },\r\n            \"request\": {\r\n                \"method\": \"POST\",\r\n                \"url\": \"Observation\"\r\n            }\r\n        },\r\n        {\r\n            \"fullUrl\": \"urn:uuid:{{obs_diseasestatus}}\",\r\n            \"resource\": {\r\n                \"resourceType\": \"Observation\",\r\n                \"id\": \"{{obs_diseasestatus}}\",\r\n                \"status\": \"final\",\r\n                \"code\": {\r\n                    \"coding\":  [\r\n                        {\r\n                            \"system\": \"https://fhir.nhs.uk/CodeSystem/England-GenomicTestDirectory\",\r\n                            \"code\": \"R193.4\",\r\n                            \"display\": \"Cystic renal disease\"\r\n                        }\r\n                    ]\r\n                },\r\n                \"subject\": {\r\n                    \"reference\": \"Patient/{{Patient_Logical_Id}}\",\r\n                    \"identifier\": {\r\n                        \"system\": \"https://fhir.nhs.uk/Id/nhs-number\",\r\n                        \"value\": \"{{patient_nhs_no}}\"\r\n                    }\r\n                },\r\n                \"effectiveDateTime\": \"2023-08-05\",\r\n                \"valueCodeableConcept\": {\r\n                    \"coding\":  [\r\n                        {\r\n                            \"system\": \"http://snomed.info/sct\",\r\n                            \"code\": \"103310001\",\r\n                            \"display\": \"Patient not affected\"\r\n                        }\r\n                    ]\r\n                }\r\n            },\r\n            \"request\": {\r\n                \"method\": \"POST\",\r\n                \"url\": \"Observation\"\r\n            }\r\n        },\r\n        {\r\n            \"fullUrl\": \"urn:uuid:{{familyhist_consanunion}}\",\r\n            \"resource\": {\r\n                \"resourceType\": \"FamilyMemberHistory\",\r\n                \"id\": \"{{familyhist_consanunion}}\",\r\n                \"extension\":  [\r\n                    {\r\n                        \"url\": \"http://hl7.org/fhir/StructureDefinition/family-member-history-genetics-observation\",\r\n                        \"valueReference\": {\r\n                            \"reference\": \"urn:uuid:{{obs_consanunion}}\"\r\n                        }\r\n                    }\r\n                ],\r\n                \"status\": \"completed\",\r\n                \"patient\": {\r\n                    \"reference\": \"Patient/{{Patient_Logical_Id}}\",\r\n                    \"identifier\": {\r\n                        \"system\": \"https://fhir.nhs.uk/Id/nhs-number\",\r\n                        \"value\": \"{{patient_nhs_no}}\"\r\n                    }\r\n                },\r\n                \"relationship\": {\r\n                    \"coding\":  [\r\n                        {\r\n                            \"system\": \"http://terminology.hl7.org/CodeSystem/v3-RoleCode\",\r\n                            \"code\": \"PRN\",\r\n                            \"display\": \"parent\"\r\n                        }\r\n                    ]\r\n                }\r\n            },\r\n            \"request\": {\r\n                \"method\": \"POST\",\r\n                \"url\": \"FamilyMemberHistory\"\r\n            }\r\n        },\r\n        {\r\n            \"fullUrl\": \"urn:uuid:{{obs_consanunion}}\",\r\n            \"resource\": {\r\n                \"resourceType\": \"Observation\",\r\n                \"id\": \"{{obs_consanunion}}\",\r\n                \"status\": \"final\",\r\n                \"code\": {\r\n                    \"coding\":  [\r\n                        {\r\n                            \"system\": \"http://snomed.info/sct\",\r\n                            \"code\": \"842009\",\r\n                            \"display\": \"Consanguinity\"\r\n                        }\r\n                    ]\r\n                },\r\n                \"subject\": {\r\n                    \"reference\": \"Patient/{{Patient_Logical_Id}}\",\r\n                    \"identifier\": {\r\n                        \"system\": \"https://fhir.nhs.uk/Id/nhs-number\",\r\n                        \"value\": \"{{patient_nhs_no}}\"\r\n                    }\r\n                },\r\n                \"effectiveDateTime\": \"2023-08-05\",\r\n                \"valueBoolean\": false\r\n            },\r\n            \"request\": {\r\n                \"method\": \"POST\",\r\n                \"url\": \"Observation\"\r\n            }\r\n        },\r\n        {\r\n            \"fullUrl\": \"urn:uuid:{{obs_nobonemarrowtrans}}\",\r\n            \"resource\": {\r\n                \"resourceType\": \"Observation\",\r\n                \"id\": \"{{obs_nobonemarrowtrans}}\",\r\n                \"status\": \"final\",\r\n                \"code\": {\r\n                    \"coding\":  [\r\n                        {\r\n                            \"system\": \"http://snomed.info/sct\",\r\n                            \"code\": \"23719005\",\r\n                            \"display\": \"Transplantation of bone marrow\"\r\n                        }\r\n                    ]\r\n                },\r\n                \"subject\": {\r\n                    \"reference\": \"Patient/{{Patient_Logical_Id}}\",\r\n                    \"identifier\": {\r\n                        \"system\": \"https://fhir.nhs.uk/Id/nhs-number\",\r\n                        \"value\": \"{{patient_nhs_no}}\"\r\n                    }\r\n                },\r\n                \"effectiveDateTime\": \"2023-08-05\",\r\n                \"valueBoolean\": false\r\n            },\r\n            \"request\": {\r\n                \"method\": \"POST\",\r\n                \"url\": \"Observation\"\r\n            }\r\n        },\r\n        {\r\n            \"fullUrl\": \"urn:uuid:{{obs_trans}}\",\r\n            \"resource\": {\r\n                \"resourceType\": \"Observation\",\r\n                \"id\": \"{{obs_trans}}\",\r\n                \"status\": \"final\",\r\n                \"code\": {\r\n                    \"coding\":  [\r\n                        {\r\n                            \"system\": \"http://snomed.info/sct\",\r\n                            \"code\": \"5447007\",\r\n                            \"display\": \"Transfusion\"\r\n                        }\r\n                    ]\r\n                },\r\n                \"subject\": {\r\n                    \"reference\": \"Patient/{{Patient_Logical_Id}}\",\r\n                    \"identifier\": {\r\n                        \"system\": \"https://fhir.nhs.uk/Id/nhs-number\",\r\n                        \"value\": \"{{patient_nhs_no}}\"\r\n                    }\r\n                },\r\n                \"effectiveDateTime\": \"2023-08-05\",\r\n                \"valueBoolean\": false\r\n            },\r\n            \"request\": {\r\n                \"method\": \"POST\",\r\n                \"url\": \"Observation\"\r\n            }\r\n        },\r\n        {\r\n            \"fullUrl\": \"urn:uuid:{{obs_multiplerenalcyst}}\",\r\n            \"resource\": {\r\n                \"resourceType\": \"Observation\",\r\n                \"id\": \"{{obs_multiplerenalcyst}}\",\r\n                \"status\": \"final\",\r\n                \"code\": {\r\n                    \"coding\":  [\r\n                        {\r\n                            \"system\": \"https://hpo.jax.org/app/\",\r\n                            \"code\": \"HP:0005562\",\r\n                            \"display\": \"Multiple renal cysts\"\r\n                        }\r\n                    ]\r\n                },\r\n                \"subject\": {\r\n                    \"reference\": \"Patient/{{Patient_Logical_Id}}\",\r\n                    \"identifier\": {\r\n                        \"system\": \"https://fhir.nhs.uk/Id/nhs-number\",\r\n                        \"value\": \"{{patient_nhs_no}}\"\r\n                    }\r\n                },\r\n                \"effectiveDateTime\": \"2023-08-05\",\r\n                \"valueBoolean\": false\r\n            },\r\n            \"request\": {\r\n                \"method\": \"POST\",\r\n                \"url\": \"Observation\"\r\n            }\r\n        },\r\n        {\r\n            \"fullUrl\": \"urn:uuid:{{obs_nephronophthisis}}\",\r\n            \"resource\": {\r\n                \"resourceType\": \"Observation\",\r\n                \"id\": \"{{obs_nephronophthisis}}\",\r\n                \"status\": \"final\",\r\n                \"code\": {\r\n                    \"coding\":  [\r\n                        {\r\n                            \"system\": \"https://hpo.jax.org/app/\",\r\n                            \"code\": \"HP:0000090\",\r\n                            \"display\": \"Nephronophthisis\"\r\n                        }\r\n                    ]\r\n                },\r\n                \"subject\": {\r\n                    \"reference\": \"Patient/{{Patient_Logical_Id}}\",\r\n                    \"identifier\": {\r\n                        \"system\": \"https://fhir.nhs.uk/Id/nhs-number\",\r\n                        \"value\": \"{{patient_nhs_no}}\"\r\n                    }\r\n                },\r\n                \"effectiveDateTime\": \"2023-08-05\",\r\n                \"valueBoolean\": false\r\n            },\r\n            \"request\": {\r\n                \"method\": \"POST\",\r\n                \"url\": \"Observation\"\r\n            }\r\n        },\r\n        {\r\n            \"fullUrl\": \"urn:uuid:{{obs_hepaticcysts}}\",\r\n            \"resource\": {\r\n                \"resourceType\": \"Observation\",\r\n                \"id\": \"{{obs_hepaticcysts}}\",\r\n                \"status\": \"final\",\r\n                \"code\": {\r\n                    \"coding\":  [\r\n                        {\r\n                            \"system\": \"https://hpo.jax.org/app/\",\r\n                            \"code\": \"HP:0001407\",\r\n                            \"display\": \"Hepatic cysts\"\r\n                        }\r\n                    ]\r\n                },\r\n                \"subject\": {\r\n                    \"reference\": \"Patient/{{Patient_Logical_Id}}\",\r\n                    \"identifier\": {\r\n                        \"system\": \"https://fhir.nhs.uk/Id/nhs-number\",\r\n                        \"value\": \"{{patient_nhs_no}}\"\r\n                    }\r\n                },\r\n                \"effectiveDateTime\": \"2023-08-05\",\r\n                \"valueBoolean\": false\r\n            },\r\n            \"request\": {\r\n                \"method\": \"POST\",\r\n                \"url\": \"Observation\"\r\n            }\r\n        },\r\n        {\r\n            \"fullUrl\": \"urn:uuid:{{obs_enlargedkidney}}\",\r\n            \"resource\": {\r\n                \"resourceType\": \"Observation\",\r\n                \"id\": \"{{obs_enlargedkidney}}\",\r\n                \"status\": \"final\",\r\n                \"code\": {\r\n                    \"coding\":  [\r\n                        {\r\n                            \"system\": \"https://hpo.jax.org/app/\",\r\n                            \"code\": \"HP:0000105\",\r\n                            \"display\": \"Enlarged kidney\"\r\n                        }\r\n                    ]\r\n                },\r\n                \"subject\": {\r\n                    \"reference\": \"Patient/{{Patient_Logical_Id}}\",\r\n                    \"identifier\": {\r\n                        \"system\": \"https://fhir.nhs.uk/Id/nhs-number\",\r\n                        \"value\": \"{{patient_nhs_no}}\"\r\n                    }\r\n                },\r\n                \"effectiveDateTime\": \"2023-08-05\",\r\n                \"valueBoolean\": true\r\n            },\r\n            \"request\": {\r\n                \"method\": \"POST\",\r\n                \"url\": \"Observation\"\r\n            }\r\n        },\r\n        {\r\n            \"fullUrl\": \"urn:uuid:{{obs_renalinsuf}}\",\r\n            \"resource\": {\r\n                \"resourceType\": \"Observation\",\r\n                \"id\": \"{{obs_renalinsuf}}\",\r\n                \"status\": \"final\",\r\n                \"code\": {\r\n                    \"coding\":  [\r\n                        {\r\n                            \"system\": \"https://hpo.jax.org/app/\",\r\n                            \"code\": \"HP:0000083\",\r\n                            \"display\": \"Renal insufficiency\"\r\n                        }\r\n                    ]\r\n                },\r\n                \"subject\": {\r\n                    \"reference\": \"Patient/{{Patient_Logical_Id}}\",\r\n                    \"identifier\": {\r\n                        \"system\": \"https://fhir.nhs.uk/Id/nhs-number\",\r\n                        \"value\": \"{{patient_nhs_no}}\"\r\n                    }\r\n                },\r\n                \"effectiveDateTime\": \"2023-08-05\",\r\n                \"valueBoolean\": true\r\n            },\r\n            \"request\": {\r\n                \"method\": \"POST\",\r\n                \"url\": \"Observation\"\r\n            }\r\n        },\r\n        {\r\n            \"fullUrl\": \"urn:uuid:{{specimen_id}}\",\r\n            \"resource\": {\r\n                \"resourceType\": \"Specimen\",\r\n                \"id\": \"{{specimen_id}}\",\r\n                \"identifier\":  [\r\n                    {\r\n                        \"system\": \"https://fhir.add.nhs.uk/Id/specimenId\",\r\n                        \"value\": \"RGT{{test_specimen_id}}\"\r\n                    }\r\n                ],\r\n                \"status\": \"unavailable\",\r\n                \"type\": {\r\n                    \"coding\":  [\r\n                        {\r\n                            \"system\": \"http://snomed.info/sct\",\r\n                            \"code\": \"445295009\",\r\n                            \"display\": \"Blood specimen with EDTA\"\r\n                        }\r\n                    ]\r\n                },\r\n                \"subject\": {\r\n                    \"reference\": \"Patient/{{Patient_Logical_Id}}\",\r\n                    \"identifier\": {\r\n                        \"system\": \"https://fhir.nhs.uk/Id/nhs-number\",\r\n                        \"value\": \"{{patient_nhs_no}}\"\r\n                    }\r\n                },\r\n                \"request\":  [\r\n                    {\r\n                        \"reference\": \"urn:uuid:{{service_id}}\"\r\n                    }\r\n                ]\r\n            },\r\n            \"request\": {\r\n                \"method\": \"POST\",\r\n                \"url\": \"Specimen\"\r\n            }\r\n        }\r\n    ]\r\n}",
-											"options": {
-												"raw": {
-													"language": "json"
-												}
-											}
-										},
-										"url": {
-											"raw": "{{int.api.url}}FHIR/R4",
-											"host": [
-												"{{int.api.url}}FHIR"
-											],
-											"path": [
-												"R4"
-											]
-										}
-									},
-									"response": []
-								}
-							]
-						},
-						{
 							"name": "Duo / Trio",
 							"item": [
 								{
@@ -4761,8 +4761,8 @@
 															"    pm.expect(Patient_Logical_Id).to.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i);\r",
 															"});\r",
 															"\r",
-															"pm.test('No of operation outcomes matches the resources sent == 22', () => {\r",
-															"    pm.expect(responseJson.entry.length).to.eql(22);\r",
+															"pm.test('No of operation outcomes matches the resources sent == 30', () => {\r",
+															"    pm.expect(responseJson.entry.length).to.eql(30);\r",
 															"});\r",
 															""
 														],
@@ -5897,12 +5897,713 @@
 							]
 						},
 						{
-							"name": "ReAnalysis",
+							"name": "R387 Reanalysis of existing data",
+							"item": [
+								{
+									"name": "Rare Disease - Non-WGS-R132.1",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													"const bundle_id = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"const focus_id = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"const patient_id = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"const role_id = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"const specimen_id = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"const test_order_id = pm.variables.replaceIn(\"{{$randomBankAccount}}\");\r",
+													"const test_specimen_id = pm.variables.replaceIn(\"{{$randomBankAccount}}\");\r",
+													"const bundle_time=pm.variables.replaceIn(\"{{$isoTimestamp}}\");\r",
+													"const message_time=pm.variables.replaceIn(\"{{$isoTimestamp}}\");\r",
+													"const service_request_time=pm.variables.replaceIn(\"{{$isoTimestamp}}\");\r",
+													"const specimen_collection_time=pm.variables.replaceIn(\"{{$isoTimestamp}}\");\r",
+													"const genomic_eth_id = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"const obs_nopregnancy = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"const obs_diseasestatus = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"const obs_consanunion = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"const familyhist_consanunion = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"const obs_nobonemarrowtrans = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"const obs_trans = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"const obs_multiplerenalcyst = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"const obs_nephronophthisis = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"const obs_hepaticcysts = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"const obs_enlargedkidney = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"const obs_renalinsuf = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"const consent_id = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"const nhsNo = _.random(1000000000,9999999999);\r",
+													"const patient_local_id = pm.variables.replaceIn(\"{{$randomBankAccount}}\");\r",
+													"const practionerId = _.random(1000000000,9999999999);\r",
+													"\r",
+													"pm.environment.set(\"bundle_id\",bundle_id);\r",
+													"pm.environment.set(\"service_id\",focus_id);\r",
+													"pm.environment.set(\"patient_id\",patient_id);\r",
+													"pm.environment.set(\"specimen_id\",specimen_id);\r",
+													"pm.environment.set(\"role_id\",role_id);\r",
+													"pm.environment.set(\"test_order_id\",test_order_id);\r",
+													"pm.environment.set(\"test_specimen_id\",test_specimen_id);\r",
+													"pm.environment.set(\"bundle_time\",bundle_time);\r",
+													"pm.environment.set(\"message_time\",message_time);\r",
+													"pm.environment.set(\"service_request_time\",service_request_time);\r",
+													"pm.environment.set(\"specimen_collection_time\",specimen_collection_time);\r",
+													"pm.environment.set(\"genomic_eth_id\",genomic_eth_id);\r",
+													"pm.environment.set(\"obs_nopregnancy\",obs_nopregnancy);\r",
+													"pm.environment.set(\"obs_diseasestatus\",obs_diseasestatus);\r",
+													"pm.environment.set(\"obs_consanunion\",obs_consanunion);\r",
+													"pm.environment.set(\"familyhist_consanunion\",familyhist_consanunion);\r",
+													"pm.environment.set(\"obs_nobonemarrowtrans\",obs_nobonemarrowtrans);\r",
+													"pm.environment.set(\"obs_trans\",obs_trans);\r",
+													"pm.environment.set(\"obs_multiplerenalcyst\",obs_multiplerenalcyst);\r",
+													"pm.environment.set(\"obs_nephronophthisis\",obs_nephronophthisis);\r",
+													"pm.environment.set(\"obs_hepaticcysts\",obs_hepaticcysts);\r",
+													"pm.environment.set(\"obs_enlargedkidney\",obs_enlargedkidney);\r",
+													"pm.environment.set(\"obs_renalinsuf\",obs_renalinsuf);\r",
+													"pm.environment.set(\"consent_id\",consent_id);\r",
+													"pm.environment.set(\"patient_nhs_no\",nhsNo);\r",
+													"pm.environment.set(\"patient_local_id\",patient_local_id);\r",
+													"pm.environment.set(\"practionerId\",practionerId);"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"const responseJson = pm.response.json();\r",
+													"\r",
+													"//console.log(responseJson.entry[3].fullUrl.split(\"/\")[1]);\r",
+													"//console.log(responseJson.entry.length);\r",
+													"\r",
+													"pm.test(\"HTTP Status code is 200\", function () {\r",
+													"  pm.response.to.have.status(200);\r",
+													"});\r",
+													"\r",
+													"pm.test(\"Content-Type header is present\", () => {\r",
+													"  pm.response.to.have.header(\"Content-Type\");\r",
+													"});\r",
+													"\r",
+													"pm.test(\"Response type = 'transaction-response'\", () => {\r",
+													"  pm.expect(responseJson.type).to.eql(\"transaction-response\");\r",
+													"});\r",
+													"\r",
+													"// Get the logical id assuming the outcome resources come in the same order as the request resources\r",
+													"const Service_Request_Logical_Id = responseJson.entry[3].fullUrl.split(\"/\")[1];\r",
+													"pm.environment.set(\"Service_Request_Logical_Id\",Service_Request_Logical_Id);\r",
+													"\r",
+													"const Patient_Logical_Id = responseJson.entry[1].fullUrl.split(\"/\")[1];\r",
+													"pm.environment.set(\"Patient_Logical_Id\",Patient_Logical_Id);\r",
+													"\r",
+													"// Get the logical id assuming the outcome resources come in the same order as the request resources\r",
+													"const PractitionerRole_Logical_Id = responseJson.entry[0].fullUrl.split(\"/\")[1];\r",
+													"pm.environment.set(\"PractitionerRole_Logical_Id\",PractitionerRole_Logical_Id);\r",
+													"\r",
+													"pm.test('Service_Request_Logical_Id is a valid UUID', () => {\r",
+													"    pm.expect(Service_Request_Logical_Id).to.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i);\r",
+													"});\r",
+													"\r",
+													"pm.test('Patient_Logical_Id is a valid UUID', () => {\r",
+													"    pm.expect(Patient_Logical_Id).to.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i);\r",
+													"});\r",
+													"\r",
+													"pm.test('No of operation outcomes matches the resources sent == 16', () => {\r",
+													"    pm.expect(responseJson.entry.length).to.eql(16);\r",
+													"});\r",
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"resourceType\": \"Bundle\",\r\n    \"id\": \"{{bundle_id}}\",\r\n    \"type\": \"transaction\",\r\n    \"entry\":  [\r\n        {\r\n            \"fullUrl\": \"urn:uuid:{{role_id}}\",\r\n            \"resource\": {\r\n                \"resourceType\": \"PractitionerRole\",\r\n                \"id\": \"{{role_id}}\",\r\n                \"practitioner\": {\r\n                    \"identifier\": {\r\n                        \"system\": \"https://fhir.nhs.uk/Id/sds-user-id\",\r\n                        \"value\": \"{{practionerId}}\"\r\n                    },\r\n                    \"display\": \"Dr. Hazel Smith\"\r\n                },\r\n                \"organization\": {\r\n                    \"identifier\": {\r\n                        \"system\": \"https://fhir.nhs.uk/Id/ods-organization-code\",\r\n                        \"value\": \"699W0\"\r\n                    },\r\n                    \"display\": \"Royal Brompton and Harefield\"\r\n                },\r\n                \"specialty\":  [\r\n                    {\r\n                        \"coding\":  [\r\n                            {\r\n                                \"system\": \"https://fhir.hl7.org.uk/CodeSystem/UKCore-PracticeSettingCode\",\r\n                                \"code\": \"361\",\r\n                                \"display\": \"Renal Medicine\"\r\n                            }\r\n                        ]\r\n                    }\r\n                ],\r\n                \"telecom\":  [\r\n                    {\r\n                        \"system\": \"phone\",\r\n                        \"value\": \"02085467711\"\r\n                    },\r\n                    {\r\n                        \"system\": \"email\",\r\n                        \"value\": \"Hazel.smith12@nhs.net\"\r\n                    },\r\n                    {\r\n                        \"system\": \"email\",\r\n                        \"value\": \"renalseckingston@nhs.net\",\r\n                        \"extension\":  [\r\n                            {\r\n                                \"url\": \"http://hl7.org/fhir/StructureDefinition/contactpoint-comment\",\r\n                                \"valueString\": \"reporting\"\r\n                            }\r\n                        ]\r\n                    }\r\n                ]\r\n            },\r\n            \"request\": {\r\n                \"method\": \"POST\",\r\n                \"url\": \"PractitionerRole\"\r\n            }\r\n        },\r\n        {\r\n            \"fullUrl\": \"urn:uuid:{{patient_id}}\",\r\n            \"resource\": {\r\n                \"resourceType\": \"Patient\",\r\n                \"id\": \"{{patient_id}}\",\r\n                \"extension\":  [\r\n                    {\r\n                        \"url\": \"https://fhir.hl7.org.uk/StructureDefinition/Extension-UKCore-BirthSex\",\r\n                        \"valueCodeableConcept\": {\r\n                            \"coding\":  [\r\n                                {\r\n                                    \"system\": \"http://terminology.hl7.org/CodeSystem/v3-AdministrativeGender\",\r\n                                    \"code\": \"M\",\r\n                                    \"display\": \"Male\"\r\n                                }\r\n                            ]\r\n                        }\r\n                    },\r\n                    {\r\n                        \"url\": \"https://fhir.hl7.org.uk/StructureDefinition/Extension-UKCore-EthnicCategory\",\r\n                        \"valueCodeableConcept\": {\r\n                            \"coding\":  [\r\n                                {\r\n                                    \"system\": \"https://fhir.hl7.org.uk/CodeSystem/UKCore-EthnicCategoryEngland\",\r\n                                    \"code\": \"A\",\r\n                                    \"display\": \"White - British\"\r\n                                }\r\n                            ]\r\n                        }\r\n                    }\r\n                ],\r\n                \"identifier\":  [\r\n                    {\r\n                        \"system\": \"https://fhir.nhs.uk/Id/nhs-number\",\r\n                        \"value\": \"{{patient_nhs_no}}\",\r\n                        \"extension\":  [\r\n                            {\r\n                                \"url\": \"https://fhir.hl7.org.uk/StructureDefinition/Extension-UKCore-NHSNumberVerificationStatus\",\r\n                                \"valueCodeableConcept\": {\r\n                                    \"coding\":  [\r\n                                        {\r\n                                            \"system\": \"https://fhir.hl7.org.uk/CodeSystem/UKCore-NHSNumberVerificationStatusEngland\",\r\n                                            \"version\": \"2.2.0\",\r\n                                            \"code\": \"01\",\r\n                                            \"display\": \"Number present and verified\"\r\n                                        }\r\n                                    ]\r\n                                }\r\n                            }\r\n                        ]\r\n                    },\r\n                    {\r\n                        \"system\": \"urn:oid:2.16.840.1.113883.2.1.3.2.4.18.24\",\r\n                        \"value\": \"{{patient_local_id}}\",\r\n                        \"assigner\": {\r\n                            \"identifier\": {\r\n                                \"system\": \"https://fhir.nhs.uk/Id/ods-organization-code\",\r\n                                \"value\": \"RAX01\"\r\n                            }\r\n                        }\r\n                    }\r\n                ],\r\n                \"name\":  [\r\n                    {\r\n                        \"given\":  [\r\n                            \"TEST\"\r\n                        ],\r\n                        \"family\": \"PATIENT\"\r\n                    }\r\n                ],\r\n                \"gender\": \"male\",\r\n                \"birthDate\": \"2009-04-12\",\r\n                \"deceasedBoolean\": false,\r\n                \"address\":  [\r\n                    {\r\n                        \"line\":  [\r\n                            \"32 THE AVENUE\",\r\n                            \"BERWICK COURT\"\r\n                        ],\r\n                        \"postalCode\": \"KT4 8HE\"\r\n                    }\r\n                ],\r\n                \"generalPractitioner\":  [\r\n                    {\r\n                        \"identifier\": {\r\n                            \"system\": \"https://fhir.hl7.org.uk/Id/gmp-number\",\r\n                            \"value\": \"G9999999\"\r\n                        },\r\n                        \"display\": \"Dr. Aero Smith\"\r\n                    },\r\n                    {\r\n                        \"identifier\": {\r\n                            \"system\": \"https://fhir.hl7.org.uk/Id/ODS-code\",\r\n                            \"value\": \"AP123\"\r\n                        },\r\n                        \"display\": \"anywhere place\"\r\n                    }\r\n                ]\r\n            },\r\n            \"request\": {\r\n                \"method\": \"POST\",\r\n                \"url\": \"Patient\",\r\n                \"ifNoneExist\": \"Patient?identifier=https://fhir.nhs.uk/Id/nhs-number|{{patient_nhs_no}}\"\r\n            }\r\n        },\r\n        {\r\n            \"fullUrl\": \"urn:uuid:{{genomic_eth_id}}\",\r\n            \"resource\": {\r\n                \"resourceType\": \"Observation\",\r\n                \"id\": \"{{genomic_eth_id}}\",\r\n                \"status\": \"preliminary\",\r\n                \"code\": {\r\n                    \"coding\":  [\r\n                        {\r\n                            \"system\": \"http://snomed.info/sct\",\r\n                            \"code\": \"723621000000103\",\r\n                            \"display\": \"Ethnicity\"\r\n                        }\r\n                    ]\r\n                },\r\n                \"subject\": {\r\n                    \"reference\": \"urn:uuid:{{patient_id}}\",\r\n                    \"identifier\": {\r\n                        \"system\": \"https://fhir.nhs.uk/Id/nhs-number\",\r\n                        \"value\": \"{{patient_nhs_no}}\"\r\n                    }\r\n                },\r\n                \"valueString\": \"unknown\"\r\n            },\r\n            \"request\": {\r\n                \"method\": \"POST\",\r\n                \"url\": \"Observation\"\r\n            }\r\n        },\r\n        {\r\n            \"fullUrl\": \"urn:uuid:{{service_id}}\",\r\n            \"resource\": {\r\n                \"resourceType\": \"ServiceRequest\",\r\n                \"id\": \"{{service_id}}\",\r\n                \"extension\":  [\r\n                    {\r\n                        \"url\": \"https://fhir.hl7.org.uk/StructureDefinition/Extension-UKCore-Coverage\",\r\n                        \"valueCodeableConcept\": {\r\n                            \"coding\":  [\r\n                                {\r\n                                    \"system\": \"https://fhir.hl7.org.uk/CodeSystem/UKCore-FundingCategory\",\r\n                                    \"code\": \"nhs\",\r\n                                    \"display\": \"NHS\"\r\n                                }\r\n                            ]\r\n                        }\r\n                    }\r\n                ],\r\n                \"identifier\":  [\r\n                    {\r\n                        \"system\": \"https://RBH.EPR.SYSTEM/EPIC\",\r\n                        \"value\": \"{{test_order_id}}\"\r\n                    }\r\n                ],\r\n                \"status\": \"active\",\r\n                \"intent\": \"order\",\r\n                \"category\":  [\r\n                    {\r\n                        \"coding\":  [\r\n                            {\r\n                                \"system\": \"https://fhir.hl7.org.uk/CodeSystem/UKCore-GenomeSequencingCategory\",\r\n                                \"code\": \"rare-disease-non-wgs\",\r\n                                \"display\": \"Rare Disease - Non-WGS\"\r\n                            }\r\n                        ]\r\n                    }\r\n                ],\r\n                \"priority\": \"routine\",\r\n                \"code\": {\r\n                    \"coding\":  [\r\n                        {\r\n                            \"system\": \"https://fhir.nhs.uk/CodeSystem/England-GenomicTestDirectory\",\r\n                            \"code\": \"R132.1\",\r\n                            \"display\": \"Dilated and Arrhythmogenic cardiomyopathy\"\r\n                        }\r\n                    ]\r\n                },\r\n                \"subject\": {\r\n                    \"reference\": \"urn:uuid:{{patient_id}}\",\r\n                    \"identifier\": {\r\n                        \"system\": \"https://fhir.nhs.uk/Id/nhs-number\",\r\n                        \"value\": \"{{patient_nhs_no}}\"\r\n                    }\r\n                },\r\n                \"authoredOn\": \"{{service_request_time}}\",\r\n                \"requester\": {\r\n                    \"reference\": \"urn:uuid:{{role_id}}\"\r\n                },\r\n                \"performer\": [{\r\n                        \"identifier\": {\r\n                            \"system\": \"https://fhir.nhs.uk/Id/ods-organization-code\",\r\n                            \"value\": \"697L0\"\r\n                        }\r\n                    }\r\n                ],\r\n                \"reasonCode\":  [\r\n                    {\r\n                        \"coding\":  [\r\n                            {\r\n                                \"system\": \"http://snomed.info/sct\",\r\n                                \"code\": \"103693007\",\r\n                                \"display\": \"Diagnostic procedure\"\r\n                            }\r\n                        ]\r\n                    }\r\n                ],\r\n                \"supportingInfo\":  [\r\n                    {\r\n                        \"reference\": \"urn:uuid:{{obs_diseasestatus}}\"\r\n                    },\r\n                    {\r\n                        \"reference\": \"urn:uuid:{{genomic_eth_id}}\"\r\n                    },\r\n                    {\r\n                        \"reference\": \"urn:uuid:{{obs_nopregnancy}}\"\r\n                    },\r\n                    {\r\n                        \"reference\": \"urn:uuid:{{familyhist_consanunion}}\"\r\n                    },\r\n                    {\r\n                        \"reference\": \"urn:uuid:{{obs_nobonemarrowtrans}}\"\r\n                    },\r\n                    {\r\n                        \"reference\": \"urn:uuid:{{obs_trans}}\"\r\n                    },\r\n                    {\r\n                        \"reference\": \"urn:uuid:{{obs_multiplerenalcyst}}\"\r\n                    },\r\n                    {\r\n                        \"reference\": \"urn:uuid:{{obs_nephronophthisis}}\"\r\n                    },\r\n                    {\r\n                        \"reference\": \"urn:uuid:{{obs_hepaticcysts}}\"\r\n                    },\r\n                    {\r\n                        \"reference\": \"urn:uuid:{{obs_enlargedkidney}}\"\r\n                    },\r\n                    {\r\n                        \"reference\": \"urn:uuid:{{obs_renalinsuf}}\"\r\n                    }\r\n                ],\r\n                \"note\":  [\r\n                    {\r\n                        \"text\": \"No family history of genomic testing\"\r\n                    },\r\n                    {\r\n                        \"text\": \"Free text for diagnosis/reason for referral, relevant information including family history, phenotypic details/ HPO Terms/ Patient diagnoses with ADPKD (example)\"\r\n                    }\r\n                ]\r\n            },\r\n            \"request\": {\r\n                \"method\": \"POST\",\r\n                \"url\": \"ServiceRequest\"\r\n            }\r\n        },\r\n        {\r\n            \"fullUrl\": \"urn:uuid:{{obs_nopregnancy}}\",\r\n            \"resource\": {\r\n                \"resourceType\": \"Observation\",\r\n                \"id\": \"{{obs_nopregnancy}}\",\r\n                \"status\": \"final\",\r\n                \"code\": {\r\n                    \"coding\":  [\r\n                        {\r\n                            \"system\": \"http://snomed.info/sct\",\r\n                            \"code\": \"77386006\",\r\n                            \"display\": \"Pregnancy\"\r\n                        }\r\n                    ]\r\n                },\r\n                \"subject\": {\r\n                    \"reference\": \"urn:uuid:{{patient_id}}\",\r\n                    \"identifier\": {\r\n                        \"system\": \"https://fhir.nhs.uk/Id/nhs-number\",\r\n                        \"value\": \"{{patient_nhs_no}}\"\r\n                    }\r\n                },\r\n                \"effectiveDateTime\": \"2023-08-05\",\r\n                \"valueBoolean\": false\r\n            },\r\n            \"request\": {\r\n                \"method\": \"POST\",\r\n                \"url\": \"Observation\"\r\n            }\r\n        },\r\n        {\r\n            \"fullUrl\": \"urn:uuid:{{obs_diseasestatus}}\",\r\n            \"resource\": {\r\n                \"resourceType\": \"Observation\",\r\n                \"id\": \"{{obs_diseasestatus}}\",\r\n                \"status\": \"final\",\r\n                \"code\": {\r\n                    \"coding\":  [\r\n                        {\r\n                            \"system\": \"https://fhir.nhs.uk/CodeSystem/England-GenomicTestDirectory\",\r\n                            \"code\": \"R193.4\",\r\n                            \"display\": \"Cystic renal disease\"\r\n                        }\r\n                    ]\r\n                },\r\n                \"subject\": {\r\n                    \"reference\": \"urn:uuid:{{patient_id}}\",\r\n                    \"identifier\": {\r\n                        \"system\": \"https://fhir.nhs.uk/Id/nhs-number\",\r\n                        \"value\": \"{{patient_nhs_no}}\"\r\n                    }\r\n                },\r\n                \"effectiveDateTime\": \"2023-08-05\",\r\n                \"valueCodeableConcept\": {\r\n                    \"coding\":  [\r\n                        {\r\n                            \"system\": \"http://snomed.info/sct\",\r\n                            \"code\": \"103310001\",\r\n                            \"display\": \"Patient not affected\"\r\n                        }\r\n                    ]\r\n                }\r\n            },\r\n            \"request\": {\r\n                \"method\": \"POST\",\r\n                \"url\": \"Observation\"\r\n            }\r\n        },\r\n        {\r\n            \"fullUrl\": \"urn:uuid:{{familyhist_consanunion}}\",\r\n            \"resource\": {\r\n                \"resourceType\": \"FamilyMemberHistory\",\r\n                \"id\": \"{{familyhist_consanunion}}\",\r\n                \"extension\":  [\r\n                    {\r\n                        \"url\": \"http://hl7.org/fhir/StructureDefinition/family-member-history-genetics-observation\",\r\n                        \"valueReference\": {\r\n                            \"reference\": \"urn:uuid:{{obs_consanunion}}\"\r\n                        }\r\n                    }\r\n                ],\r\n                \"status\": \"completed\",\r\n                \"patient\": {\r\n                    \"reference\": \"urn:uuid:{{patient_id}}\",\r\n                    \"identifier\": {\r\n                        \"system\": \"https://fhir.nhs.uk/Id/nhs-number\",\r\n                        \"value\": \"{{patient_nhs_no}}\"\r\n                    }\r\n                },\r\n                \"relationship\": {\r\n                    \"coding\":  [\r\n                        {\r\n                            \"system\": \"http://terminology.hl7.org/CodeSystem/v3-RoleCode\",\r\n                            \"code\": \"PRN\",\r\n                            \"display\": \"parent\"\r\n                        }\r\n                    ]\r\n                }\r\n            },\r\n            \"request\": {\r\n                \"method\": \"POST\",\r\n                \"url\": \"FamilyMemberHistory\"\r\n            }\r\n        },\r\n        {\r\n            \"fullUrl\": \"urn:uuid:{{obs_consanunion}}\",\r\n            \"resource\": {\r\n                \"resourceType\": \"Observation\",\r\n                \"id\": \"{{obs_consanunion}}\",\r\n                \"status\": \"final\",\r\n                \"code\": {\r\n                    \"coding\":  [\r\n                        {\r\n                            \"system\": \"http://snomed.info/sct\",\r\n                            \"code\": \"842009\",\r\n                            \"display\": \"Consanguinity\"\r\n                        }\r\n                    ]\r\n                },\r\n                \"subject\": {\r\n                    \"reference\": \"urn:uuid:{{patient_id}}\",\r\n                    \"identifier\": {\r\n                        \"system\": \"https://fhir.nhs.uk/Id/nhs-number\",\r\n                        \"value\": \"{{patient_nhs_no}}\"\r\n                    }\r\n                },\r\n                \"effectiveDateTime\": \"2023-08-05\",\r\n                \"valueBoolean\": false\r\n            },\r\n            \"request\": {\r\n                \"method\": \"POST\",\r\n                \"url\": \"Observation\"\r\n            }\r\n        },\r\n        {\r\n            \"fullUrl\": \"urn:uuid:{{obs_nobonemarrowtrans}}\",\r\n            \"resource\": {\r\n                \"resourceType\": \"Observation\",\r\n                \"id\": \"{{obs_nobonemarrowtrans}}\",\r\n                \"status\": \"final\",\r\n                \"code\": {\r\n                    \"coding\":  [\r\n                        {\r\n                            \"system\": \"http://snomed.info/sct\",\r\n                            \"code\": \"23719005\",\r\n                            \"display\": \"Transplantation of bone marrow\"\r\n                        }\r\n                    ]\r\n                },\r\n                \"subject\": {\r\n                    \"reference\": \"urn:uuid:{{patient_id}}\",\r\n                    \"identifier\": {\r\n                        \"system\": \"https://fhir.nhs.uk/Id/nhs-number\",\r\n                        \"value\": \"{{patient_nhs_no}}\"\r\n                    }\r\n                },\r\n                \"effectiveDateTime\": \"2023-08-05\",\r\n                \"valueBoolean\": false\r\n            },\r\n            \"request\": {\r\n                \"method\": \"POST\",\r\n                \"url\": \"Observation\"\r\n            }\r\n        },\r\n        {\r\n            \"fullUrl\": \"urn:uuid:{{obs_trans}}\",\r\n            \"resource\": {\r\n                \"resourceType\": \"Observation\",\r\n                \"id\": \"{{obs_trans}}\",\r\n                \"status\": \"final\",\r\n                \"code\": {\r\n                    \"coding\":  [\r\n                        {\r\n                            \"system\": \"http://snomed.info/sct\",\r\n                            \"code\": \"5447007\",\r\n                            \"display\": \"Transfusion\"\r\n                        }\r\n                    ]\r\n                },\r\n                \"subject\": {\r\n                    \"reference\": \"urn:uuid:{{patient_id}}\",\r\n                    \"identifier\": {\r\n                        \"system\": \"https://fhir.nhs.uk/Id/nhs-number\",\r\n                        \"value\": \"{{patient_nhs_no}}\"\r\n                    }\r\n                },\r\n                \"effectiveDateTime\": \"2023-08-05\",\r\n                \"valueBoolean\": false\r\n            },\r\n            \"request\": {\r\n                \"method\": \"POST\",\r\n                \"url\": \"Observation\"\r\n            }\r\n        },\r\n        {\r\n            \"fullUrl\": \"urn:uuid:{{obs_multiplerenalcyst}}\",\r\n            \"resource\": {\r\n                \"resourceType\": \"Observation\",\r\n                \"id\": \"{{obs_multiplerenalcyst}}\",\r\n                \"status\": \"final\",\r\n                \"code\": {\r\n                    \"coding\":  [\r\n                        {\r\n                            \"system\": \"https://hpo.jax.org/app/\",\r\n                            \"code\": \"HP:0005562\",\r\n                            \"display\": \"Multiple renal cysts\"\r\n                        }\r\n                    ]\r\n                },\r\n                \"subject\": {\r\n                    \"reference\": \"urn:uuid:{{patient_id}}\",\r\n                    \"identifier\": {\r\n                        \"system\": \"https://fhir.nhs.uk/Id/nhs-number\",\r\n                        \"value\": \"{{patient_nhs_no}}\"\r\n                    }\r\n                },\r\n                \"effectiveDateTime\": \"2023-08-05\",\r\n                \"valueBoolean\": false\r\n            },\r\n            \"request\": {\r\n                \"method\": \"POST\",\r\n                \"url\": \"Observation\"\r\n            }\r\n        },\r\n        {\r\n            \"fullUrl\": \"urn:uuid:{{obs_nephronophthisis}}\",\r\n            \"resource\": {\r\n                \"resourceType\": \"Observation\",\r\n                \"id\": \"{{obs_nephronophthisis}}\",\r\n                \"status\": \"final\",\r\n                \"code\": {\r\n                    \"coding\":  [\r\n                        {\r\n                            \"system\": \"https://hpo.jax.org/app/\",\r\n                            \"code\": \"HP:0000090\",\r\n                            \"display\": \"Nephronophthisis\"\r\n                        }\r\n                    ]\r\n                },\r\n                \"subject\": {\r\n                    \"reference\": \"urn:uuid:{{patient_id}}\",\r\n                    \"identifier\": {\r\n                        \"system\": \"https://fhir.nhs.uk/Id/nhs-number\",\r\n                        \"value\": \"{{patient_nhs_no}}\"\r\n                    }\r\n                },\r\n                \"effectiveDateTime\": \"2023-08-05\",\r\n                \"valueBoolean\": false\r\n            },\r\n            \"request\": {\r\n                \"method\": \"POST\",\r\n                \"url\": \"Observation\"\r\n            }\r\n        },\r\n        {\r\n            \"fullUrl\": \"urn:uuid:{{obs_hepaticcysts}}\",\r\n            \"resource\": {\r\n                \"resourceType\": \"Observation\",\r\n                \"id\": \"{{obs_hepaticcysts}}\",\r\n                \"status\": \"final\",\r\n                \"code\": {\r\n                    \"coding\":  [\r\n                        {\r\n                            \"system\": \"https://hpo.jax.org/app/\",\r\n                            \"code\": \"HP:0001407\",\r\n                            \"display\": \"Hepatic cysts\"\r\n                        }\r\n                    ]\r\n                },\r\n                \"subject\": {\r\n                    \"reference\": \"urn:uuid:{{patient_id}}\",\r\n                    \"identifier\": {\r\n                        \"system\": \"https://fhir.nhs.uk/Id/nhs-number\",\r\n                        \"value\": \"{{patient_nhs_no}}\"\r\n                    }\r\n                },\r\n                \"effectiveDateTime\": \"2023-08-05\",\r\n                \"valueBoolean\": false\r\n            },\r\n            \"request\": {\r\n                \"method\": \"POST\",\r\n                \"url\": \"Observation\"\r\n            }\r\n        },\r\n        {\r\n            \"fullUrl\": \"urn:uuid:{{obs_enlargedkidney}}\",\r\n            \"resource\": {\r\n                \"resourceType\": \"Observation\",\r\n                \"id\": \"{{obs_enlargedkidney}}\",\r\n                \"status\": \"final\",\r\n                \"code\": {\r\n                    \"coding\":  [\r\n                        {\r\n                            \"system\": \"https://hpo.jax.org/app/\",\r\n                            \"code\": \"HP:0000105\",\r\n                            \"display\": \"Enlarged kidney\"\r\n                        }\r\n                    ]\r\n                },\r\n                \"subject\": {\r\n                    \"reference\": \"urn:uuid:{{patient_id}}\",\r\n                    \"identifier\": {\r\n                        \"system\": \"https://fhir.nhs.uk/Id/nhs-number\",\r\n                        \"value\": \"{{patient_nhs_no}}\"\r\n                    }\r\n                },\r\n                \"effectiveDateTime\": \"2023-08-05\",\r\n                \"valueBoolean\": true\r\n            },\r\n            \"request\": {\r\n                \"method\": \"POST\",\r\n                \"url\": \"Observation\"\r\n            }\r\n        },\r\n        {\r\n            \"fullUrl\": \"urn:uuid:{{obs_renalinsuf}}\",\r\n            \"resource\": {\r\n                \"resourceType\": \"Observation\",\r\n                \"id\": \"{{obs_renalinsuf}}\",\r\n                \"status\": \"final\",\r\n                \"code\": {\r\n                    \"coding\":  [\r\n                        {\r\n                            \"system\": \"https://hpo.jax.org/app/\",\r\n                            \"code\": \"HP:0000083\",\r\n                            \"display\": \"Renal insufficiency\"\r\n                        }\r\n                    ]\r\n                },\r\n                \"subject\": {\r\n                    \"reference\": \"urn:uuid:{{patient_id}}\",\r\n                    \"identifier\": {\r\n                        \"system\": \"https://fhir.nhs.uk/Id/nhs-number\",\r\n                        \"value\": \"{{patient_nhs_no}}\"\r\n                    }\r\n                },\r\n                \"effectiveDateTime\": \"2023-08-05\",\r\n                \"valueBoolean\": true\r\n            },\r\n            \"request\": {\r\n                \"method\": \"POST\",\r\n                \"url\": \"Observation\"\r\n            }\r\n        },\r\n        {\r\n            \"fullUrl\": \"urn:uuid:{{specimen_id}}\",\r\n            \"resource\": {\r\n                \"resourceType\": \"Specimen\",\r\n                \"id\": \"{{specimen_id}}\",\r\n                \"identifier\":  [\r\n                    {\r\n                        \"system\": \"https://fhir.add.nhs.uk/Id/specimenId\",\r\n                        \"value\": \"RGT{{test_specimen_id}}\"\r\n                    }\r\n                ],\r\n                \"status\": \"unavailable\",\r\n                \"type\": {\r\n                    \"coding\":  [\r\n                        {\r\n                            \"system\": \"http://snomed.info/sct\",\r\n                            \"code\": \"445295009\",\r\n                            \"display\": \"Blood specimen with EDTA\"\r\n                        }\r\n                    ]\r\n                },\r\n                \"subject\": {\r\n                    \"reference\": \"urn:uuid:{{patient_id}}\",\r\n                    \"identifier\": {\r\n                        \"system\": \"https://fhir.nhs.uk/Id/nhs-number\",\r\n                        \"value\": \"{{patient_nhs_no}}\"\r\n                    }\r\n                },\r\n                \"request\":  [\r\n                    {\r\n                        \"reference\": \"urn:uuid:{{service_id}}\"\r\n                    }\r\n                ]\r\n            },\r\n            \"request\": {\r\n                \"method\": \"POST\",\r\n                \"url\": \"Specimen\"\r\n            }\r\n        }\r\n    ]\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{int.api.url}}FHIR/R4",
+											"host": [
+												"{{int.api.url}}FHIR"
+											],
+											"path": [
+												"R4"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Get Service Request - Logical Id",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"const responseJson = pm.response.json();\r",
+													"\r",
+													"pm.test(\"HTTP Status code is 200\", function () {\r",
+													"  pm.response.to.have.status(200);\r",
+													"});\r",
+													"\r",
+													"pm.test(\"Content-Type header is present\", () => {\r",
+													"  pm.response.to.have.header(\"Content-Type\");\r",
+													"});\r",
+													"\r",
+													"pm.test(\"resourceType type = 'ServiceRequest'\", () => {\r",
+													"  pm.expect(responseJson.resourceType).to.eql(\"ServiceRequest\");\r",
+													"});\r",
+													"\r",
+													"const Response_Service_Request_Logical_Id = responseJson.id\r",
+													"pm.test(\"Logical id of the resource matches\", () => {\r",
+													"  pm.expect(Response_Service_Request_Logical_Id).to.eql(pm.environment.get('Service_Request_Logical_Id'));\r",
+													"})"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{int.api.url}}FHIR/R4/ServiceRequest/{{Service_Request_Logical_Id}}",
+											"host": [
+												"{{int.api.url}}FHIR"
+											],
+											"path": [
+												"R4",
+												"ServiceRequest",
+												"{{Service_Request_Logical_Id}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Get Service Request - Requestor",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"const responseJson = pm.response.json();\r",
+													"\r",
+													"pm.test(\"HTTP Status code is 200\", function () {\r",
+													"  pm.response.to.have.status(200);\r",
+													"});\r",
+													"\r",
+													"pm.test(\"Content-Type header is present\", () => {\r",
+													"  pm.response.to.have.header(\"Content-Type\");\r",
+													"});\r",
+													"\r",
+													"pm.test(\"Response type = 'searchset'\", () => {\r",
+													"  pm.expect(responseJson.type).to.eql(\"searchset\");\r",
+													"});\r",
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{int.api.url}}FHIR/R4/ServiceRequest?_id={{Service_Request_Logical_Id}}&_include=ServiceRequest:patient",
+											"host": [
+												"{{int.api.url}}FHIR"
+											],
+											"path": [
+												"R4",
+												"ServiceRequest"
+											],
+											"query": [
+												{
+													"key": "requester",
+													"value": "699W0",
+													"disabled": true
+												},
+												{
+													"key": "category",
+													"value": "cancer-wgs",
+													"disabled": true
+												},
+												{
+													"key": "_id",
+													"value": "{{Service_Request_Logical_Id}}"
+												},
+												{
+													"key": "_include",
+													"value": "ServiceRequest:patient"
+												},
+												{
+													"key": "_include",
+													"value": "ServiceRequest:requester",
+													"disabled": true
+												},
+												{
+													"key": "identifier",
+													"value": "https://RBH.EPR.SYSTEM/EPIC|{{test_order_id}}",
+													"disabled": true
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Rare Disease - Non-WGS-R387-ReAnalysis",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													"const bundle_id = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"const focus_id = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"const patient_id = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"const role_id = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"const specimen_id = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"const test_order_id = pm.variables.replaceIn(\"{{$randomBankAccount}}\");\r",
+													"const test_specimen_id = pm.variables.replaceIn(\"{{$randomBankAccount}}\");\r",
+													"const bundle_time=pm.variables.replaceIn(\"{{$isoTimestamp}}\");\r",
+													"const message_time=pm.variables.replaceIn(\"{{$isoTimestamp}}\");\r",
+													"const service_request_time=pm.variables.replaceIn(\"{{$isoTimestamp}}\");\r",
+													"const specimen_collection_time=pm.variables.replaceIn(\"{{$isoTimestamp}}\");\r",
+													"const genomic_eth_id = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"const obs_nopregnancy = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"const obs_diseasestatus = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"const obs_consanunion = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"const familyhist_consanunion = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"const obs_nobonemarrowtrans = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"const obs_trans = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"const obs_multiplerenalcyst = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"const obs_nephronophthisis = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"const obs_hepaticcysts = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"const obs_enlargedkidney = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"const obs_renalinsuf = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"const consent_id = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"const nhsNo = _.random(1000000000,9999999999);\r",
+													"const patient_local_id = pm.variables.replaceIn(\"{{$randomBankAccount}}\");\r",
+													"const practionerId = _.random(1000000000,9999999999);\r",
+													"\r",
+													"pm.environment.set(\"bundle_id\",bundle_id);\r",
+													"pm.environment.set(\"service_id\",focus_id);\r",
+													"pm.environment.set(\"patient_id\",patient_id);\r",
+													"pm.environment.set(\"specimen_id\",specimen_id);\r",
+													"pm.environment.set(\"role_id\",role_id);\r",
+													"pm.environment.set(\"test_order_id\",test_order_id);\r",
+													"pm.environment.set(\"test_specimen_id\",test_specimen_id);\r",
+													"pm.environment.set(\"bundle_time\",bundle_time);\r",
+													"pm.environment.set(\"message_time\",message_time);\r",
+													"pm.environment.set(\"service_request_time\",service_request_time);\r",
+													"pm.environment.set(\"specimen_collection_time\",specimen_collection_time);\r",
+													"pm.environment.set(\"genomic_eth_id\",genomic_eth_id);\r",
+													"pm.environment.set(\"obs_nopregnancy\",obs_nopregnancy);\r",
+													"pm.environment.set(\"obs_diseasestatus\",obs_diseasestatus);\r",
+													"pm.environment.set(\"obs_consanunion\",obs_consanunion);\r",
+													"pm.environment.set(\"familyhist_consanunion\",familyhist_consanunion);\r",
+													"pm.environment.set(\"obs_nobonemarrowtrans\",obs_nobonemarrowtrans);\r",
+													"pm.environment.set(\"obs_trans\",obs_trans);\r",
+													"pm.environment.set(\"obs_multiplerenalcyst\",obs_multiplerenalcyst);\r",
+													"pm.environment.set(\"obs_nephronophthisis\",obs_nephronophthisis);\r",
+													"pm.environment.set(\"obs_hepaticcysts\",obs_hepaticcysts);\r",
+													"pm.environment.set(\"obs_enlargedkidney\",obs_enlargedkidney);\r",
+													"pm.environment.set(\"obs_renalinsuf\",obs_renalinsuf);\r",
+													"pm.environment.set(\"consent_id\",consent_id);\r",
+													"pm.environment.set(\"patient_nhs_no\",nhsNo);\r",
+													"pm.environment.set(\"patient_local_id\",patient_local_id);\r",
+													"pm.environment.set(\"practionerId\",practionerId);"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"const responseJson = pm.response.json();\r",
+													"\r",
+													"//console.log(responseJson.entry[3].fullUrl.split(\"/\")[1]);\r",
+													"//console.log(responseJson.entry.length);\r",
+													"\r",
+													"pm.test(\"HTTP Status code is 200\", function () {\r",
+													"  pm.response.to.have.status(200);\r",
+													"});\r",
+													"\r",
+													"pm.test(\"Content-Type header is present\", () => {\r",
+													"  pm.response.to.have.header(\"Content-Type\");\r",
+													"});\r",
+													"\r",
+													"pm.test(\"Response type = 'transaction-response'\", () => {\r",
+													"  pm.expect(responseJson.type).to.eql(\"transaction-response\");\r",
+													"});\r",
+													"\r",
+													"// Get the logical id assuming the outcome resources come in the same order as the request resources\r",
+													"const ReAnalysis_Service_Request_Logical_Id = responseJson.entry[1].fullUrl.split(\"/\")[1];\r",
+													"pm.environment.set(\"ReAnalysis_Service_Request_Logical_Id\",ReAnalysis_Service_Request_Logical_Id);\r",
+													"\r",
+													"//const Patient_Logical_Id = responseJson.entry[1].fullUrl.split(\"/\")[1];\r",
+													"//pm.environment.set(\"Patient_Logical_Id\",Patient_Logical_Id);\r",
+													"\r",
+													"// Get the logical id assuming the outcome resources come in the same order as the request resources\r",
+													"const ReAnalysis_PractitionerRole_Logical_Id = responseJson.entry[0].fullUrl.split(\"/\")[1];\r",
+													"pm.environment.set(\"ReAnalysis_PractitionerRole_Logical_Id\",ReAnalysis_PractitionerRole_Logical_Id);\r",
+													"\r",
+													"pm.test('ReAnalysis_PractitionerRole_Logical_Id is a valid UUID', () => {\r",
+													"    pm.expect(ReAnalysis_PractitionerRole_Logical_Id).to.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i);\r",
+													"});\r",
+													"\r",
+													"//pm.test('Patient_Logical_Id is a valid UUID', () => {\r",
+													"//    pm.expect(Patient_Logical_Id).to.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i);\r",
+													"//});\r",
+													"\r",
+													"pm.test('No of operation outcomes matches the resources sent == 2', () => {\r",
+													"    pm.expect(responseJson.entry.length).to.eql(2);\r",
+													"});\r",
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"resourceType\": \"Bundle\",\r\n    \"id\": \"{{bundle_id}}\",\r\n    \"type\": \"transaction\",\r\n    \"entry\":  [\r\n        {\r\n            \"fullUrl\": \"urn:uuid:{{role_id}}\",\r\n            \"resource\": {\r\n                \"resourceType\": \"PractitionerRole\",\r\n                \"id\": \"{{role_id}}\",\r\n                \"practitioner\": {\r\n                    \"identifier\": {\r\n                        \"system\": \"https://fhir.nhs.uk/Id/sds-user-id\",\r\n                        \"value\": \"{{practionerId}}\"\r\n                    },\r\n                    \"display\": \"Dr. Hazel Smith\"\r\n                },\r\n                \"organization\": {\r\n                    \"identifier\": {\r\n                        \"system\": \"https://fhir.nhs.uk/Id/ods-organization-code\",\r\n                        \"value\": \"699W0\"\r\n                    },\r\n                    \"display\": \"Royal Brompton and Harefield\"\r\n                },\r\n                \"specialty\":  [\r\n                    {\r\n                        \"coding\":  [\r\n                            {\r\n                                \"system\": \"https://fhir.hl7.org.uk/CodeSystem/UKCore-PracticeSettingCode\",\r\n                                \"code\": \"361\",\r\n                                \"display\": \"Renal Medicine\"\r\n                            }\r\n                        ]\r\n                    }\r\n                ],\r\n                \"telecom\":  [\r\n                    {\r\n                        \"system\": \"phone\",\r\n                        \"value\": \"02085467711\"\r\n                    },\r\n                    {\r\n                        \"system\": \"email\",\r\n                        \"value\": \"Hazel.smith12@nhs.net\"\r\n                    },\r\n                    {\r\n                        \"system\": \"email\",\r\n                        \"value\": \"renalseckingston@nhs.net\",\r\n                        \"extension\":  [\r\n                            {\r\n                                \"url\": \"http://hl7.org/fhir/StructureDefinition/contactpoint-comment\",\r\n                                \"valueString\": \"reporting\"\r\n                            }\r\n                        ]\r\n                    }\r\n                ]\r\n            },\r\n            \"request\": {\r\n                \"method\": \"POST\",\r\n                \"url\": \"PractitionerRole\"\r\n            }\r\n        },\r\n        {\r\n            \"fullUrl\": \"urn:uuid:{{service_id}}\",\r\n            \"resource\": {\r\n                \"resourceType\": \"ServiceRequest\",\r\n                \"id\": \"{{service_id}}\",\r\n                \"extension\":  [\r\n                    {\r\n                        \"url\": \"https://fhir.hl7.org.uk/StructureDefinition/Extension-UKCore-Coverage\",\r\n                        \"valueCodeableConcept\": {\r\n                            \"coding\":  [\r\n                                {\r\n                                    \"system\": \"https://fhir.hl7.org.uk/CodeSystem/UKCore-FundingCategory\",\r\n                                    \"code\": \"nhs\",\r\n                                    \"display\": \"NHS\"\r\n                                }\r\n                            ]\r\n                        }\r\n                    }\r\n                ],\r\n                \"identifier\":  [\r\n                    {\r\n                        \"system\": \"https://RBH.EPR.SYSTEM/EPIC\",\r\n                        \"value\": \"{{test_order_id}}\"\r\n                    }\r\n                ],\r\n                \"basedOn\" : [{\r\n                    \"reference\": \"ServiceRequest/{{Service_Request_Logical_Id}}\"\r\n                }],\r\n                \"status\": \"active\",\r\n                \"intent\": \"order\",\r\n                \"category\":  [\r\n                    {\r\n                        \"coding\":  [\r\n                            {\r\n                                \"system\": \"https://fhir.hl7.org.uk/CodeSystem/UKCore-GenomeSequencingCategory\",\r\n                                \"code\": \"rare-disease-non-wgs\",\r\n                                \"display\": \"Rare Disease - Non-WGS\"\r\n                            }\r\n                        ]\r\n                    }\r\n                ],\r\n                \"priority\": \"routine\",\r\n                \"code\": {\r\n                    \"coding\":  [\r\n                        {\r\n                            \"system\": \"https://fhir.nhs.uk/CodeSystem/England-GenomicTestDirectory\",\r\n                            \"code\": \"R387.1\",\r\n                            \"display\": \"Reanalysis of existing data\"\r\n                        }\r\n                    ]\r\n                },\r\n                \"subject\": {\r\n                    \"reference\": \"Patient/{{Patient_Logical_Id}}\",\r\n                    \"identifier\": {\r\n                        \"system\": \"https://fhir.nhs.uk/Id/nhs-number\",\r\n                        \"value\": \"{{patient_nhs_no}}\"\r\n                    }\r\n                },\r\n                \"authoredOn\": \"{{service_request_time}}\",\r\n                \"requester\": {\r\n                    \"reference\": \"urn:uuid:{{role_id}}\"\r\n                },\r\n                \"performer\": [{\r\n                        \"identifier\": {\r\n                            \"system\": \"https://fhir.nhs.uk/Id/ods-organization-code\",\r\n                            \"value\": \"697L0\"\r\n                        }\r\n                    }\r\n                ],\r\n                \"reasonCode\":  [\r\n                    {\r\n                        \"coding\":  [\r\n                            {\r\n                                \"system\": \"http://snomed.info/sct\",\r\n                                \"code\": \"103693007\",\r\n                                \"display\": \"Diagnostic procedure\"\r\n                            }\r\n                        ]\r\n                    }\r\n                ],\r\n                \"note\":  [\r\n                    {\r\n                        \"text\": \"REQUEST FOR REANALYSIS\"\r\n                    }\r\n                ]\r\n            },\r\n            \"request\": {\r\n                \"method\": \"POST\",\r\n                \"url\": \"ServiceRequest\"\r\n            }\r\n        }\r\n    ]\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{int.api.url}}FHIR/R4",
+											"host": [
+												"{{int.api.url}}FHIR"
+											],
+											"path": [
+												"R4"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "R442 Variant Re-interpretation",
 							"item": []
 						},
 						{
-							"name": "ReInterpretation",
-							"item": []
+							"name": "Specialist Lab R14",
+							"item": [
+								{
+									"name": "Rare Disease -WGS-R14.1",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													"const bundle_id = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"const focus_id = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"const patient_id = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"const role_id = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"const specimen_id = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"const test_order_id = pm.variables.replaceIn(\"{{$randomBankAccount}}\");\r",
+													"const test_specimen_id = pm.variables.replaceIn(\"{{$randomBankAccount}}\");\r",
+													"const bundle_time=pm.variables.replaceIn(\"{{$isoTimestamp}}\");\r",
+													"const message_time=pm.variables.replaceIn(\"{{$isoTimestamp}}\");\r",
+													"const service_request_time=pm.variables.replaceIn(\"{{$isoTimestamp}}\");\r",
+													"const specimen_collection_time=pm.variables.replaceIn(\"{{$isoTimestamp}}\");\r",
+													"const genomic_eth_id = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"const obs_nopregnancy = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"const obs_diseasestatus = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"const obs_consanunion = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"const familyhist_consanunion = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"const obs_nobonemarrowtrans = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"const obs_trans = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"const obs_multiplerenalcyst = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"const obs_nephronophthisis = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"const obs_hepaticcysts = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"const obs_enlargedkidney = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"const obs_renalinsuf = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"const consent_id = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"const nhsNo = _.random(1000000000,9999999999);\r",
+													"const patient_local_id = pm.variables.replaceIn(\"{{$randomBankAccount}}\");\r",
+													"const practionerId = _.random(1000000000,9999999999);\r",
+													"\r",
+													"pm.environment.set(\"bundle_id\",bundle_id);\r",
+													"pm.environment.set(\"service_id\",focus_id);\r",
+													"pm.environment.set(\"patient_id\",patient_id);\r",
+													"pm.environment.set(\"specimen_id\",specimen_id);\r",
+													"pm.environment.set(\"role_id\",role_id);\r",
+													"pm.environment.set(\"test_order_id\",test_order_id);\r",
+													"pm.environment.set(\"test_specimen_id\",test_specimen_id);\r",
+													"pm.environment.set(\"bundle_time\",bundle_time);\r",
+													"pm.environment.set(\"message_time\",message_time);\r",
+													"pm.environment.set(\"service_request_time\",service_request_time);\r",
+													"pm.environment.set(\"specimen_collection_time\",specimen_collection_time);\r",
+													"pm.environment.set(\"genomic_eth_id\",genomic_eth_id);\r",
+													"pm.environment.set(\"obs_nopregnancy\",obs_nopregnancy);\r",
+													"pm.environment.set(\"obs_diseasestatus\",obs_diseasestatus);\r",
+													"pm.environment.set(\"obs_consanunion\",obs_consanunion);\r",
+													"pm.environment.set(\"familyhist_consanunion\",familyhist_consanunion);\r",
+													"pm.environment.set(\"obs_nobonemarrowtrans\",obs_nobonemarrowtrans);\r",
+													"pm.environment.set(\"obs_trans\",obs_trans);\r",
+													"pm.environment.set(\"obs_multiplerenalcyst\",obs_multiplerenalcyst);\r",
+													"pm.environment.set(\"obs_nephronophthisis\",obs_nephronophthisis);\r",
+													"pm.environment.set(\"obs_hepaticcysts\",obs_hepaticcysts);\r",
+													"pm.environment.set(\"obs_enlargedkidney\",obs_enlargedkidney);\r",
+													"pm.environment.set(\"obs_renalinsuf\",obs_renalinsuf);\r",
+													"pm.environment.set(\"consent_id\",consent_id);\r",
+													"pm.environment.set(\"patient_nhs_no\",nhsNo);\r",
+													"pm.environment.set(\"patient_local_id\",patient_local_id);\r",
+													"pm.environment.set(\"practionerId\",practionerId);\r",
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"const responseJson = pm.response.json();\r",
+													"//console.log(responseJson.response.entry[3].fullUrl.split(\"/\")[1]);\r",
+													"//console.log(responseJson.response.entry.length);\r",
+													"\r",
+													"pm.test(\"HTTP Status code is 200\", function () {\r",
+													"  pm.response.to.have.status(200);\r",
+													"});\r",
+													"\r",
+													"pm.test(\"Content-Type header is present\", () => {\r",
+													"  pm.response.to.have.header(\"Content-Type\");\r",
+													"});\r",
+													"\r",
+													"pm.test(\"Response type = 'transaction-response'\", () => {\r",
+													"  pm.expect(responseJson.type).to.eql(\"transaction-response\");\r",
+													"});\r",
+													"\r",
+													"// Get the logical id assuming the outcome resources come in the same order as the request resources\r",
+													"const Service_Request_Logical_Id = responseJson.entry[3].fullUrl.split(\"/\")[1];\r",
+													"pm.environment.set(\"Service_Request_Logical_Id\",Service_Request_Logical_Id);\r",
+													"\r",
+													"const Patient_Logical_Id = responseJson.entry[1].fullUrl.split(\"/\")[1];\r",
+													"pm.environment.set(\"Patient_Logical_Id\",Patient_Logical_Id);\r",
+													"\r",
+													"pm.test('Service_Request_Logical_Id is a valid UUID', () => {\r",
+													"    pm.expect(Service_Request_Logical_Id).to.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i);\r",
+													"});\r",
+													"\r",
+													"pm.test('Patient_Logical_Id is a valid UUID', () => {\r",
+													"    pm.expect(Patient_Logical_Id).to.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i);\r",
+													"});\r",
+													"\r",
+													"pm.test('No of operation outcomes matches the resources sent == 17', () => {\r",
+													"    pm.expect(responseJson.entry.length).to.eql(17);\r",
+													"});"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"resourceType\": \"Bundle\",\r\n    \"id\": \"{{bundle_id}}\",\r\n    \"type\": \"transaction\",\r\n    \"entry\":  [\r\n        {\r\n            \"fullUrl\": \"urn:uuid:{{role_id}}\",\r\n            \"resource\": {\r\n                \"resourceType\": \"PractitionerRole\",\r\n                \"id\": \"{{role_id}}\",\r\n                \"practitioner\": {\r\n                    \"identifier\": {\r\n                        \"system\": \"https://fhir.nhs.uk/Id/sds-user-id\",\r\n                        \"value\": \"{{practionerId}}\"\r\n                    },\r\n                    \"display\": \"Dr. Hazel Smith\"\r\n                },\r\n                \"organization\": {\r\n                    \"identifier\": {\r\n                        \"system\": \"https://fhir.nhs.uk/Id/ods-organization-code\",\r\n                        \"value\": \"699W0\"\r\n                    },\r\n                    \"display\": \"Royal Brompton and Harefield\"\r\n                },\r\n                \"specialty\":  [\r\n                    {\r\n                        \"coding\":  [\r\n                            {\r\n                                \"system\": \"https://fhir.hl7.org.uk/CodeSystem/UKCore-PracticeSettingCode\",\r\n                                \"code\": \"361\",\r\n                                \"display\": \"Renal Medicine\"\r\n                            }\r\n                        ]\r\n                    }\r\n                ],\r\n                \"telecom\":  [\r\n                    {\r\n                        \"system\": \"phone\",\r\n                        \"value\": \"02085467711\"\r\n                    },\r\n                    {\r\n                        \"system\": \"email\",\r\n                        \"value\": \"Hazel.smith12@nhs.net\"\r\n                    },\r\n                    {\r\n                        \"system\": \"email\",\r\n                        \"value\": \"renalseckingston@nhs.net\",\r\n                        \"extension\":  [\r\n                            {\r\n                                \"url\": \"http://hl7.org/fhir/StructureDefinition/contactpoint-comment\",\r\n                                \"valueString\": \"reporting\"\r\n                            }\r\n                        ]\r\n                    }\r\n                ]\r\n            },\r\n            \"request\": {\r\n                \"method\": \"POST\",\r\n                \"url\": \"PractitionerRole\"\r\n            }\r\n        },\r\n        {\r\n            \"fullUrl\": \"urn:uuid:{{patient_id}}\",\r\n            \"resource\": {\r\n                \"resourceType\": \"Patient\",\r\n                \"id\": \"{{patient_id}}\",\r\n                \"extension\":  [\r\n                    {\r\n                        \"url\": \"https://fhir.hl7.org.uk/StructureDefinition/Extension-UKCore-BirthSex\",\r\n                        \"valueCodeableConcept\": {\r\n                            \"coding\":  [\r\n                                {\r\n                                    \"system\": \"http://terminology.hl7.org/CodeSystem/v3-AdministrativeGender\",\r\n                                    \"code\": \"M\",\r\n                                    \"display\": \"Male\"\r\n                                }\r\n                            ]\r\n                        }\r\n                    },\r\n                    {\r\n                        \"url\": \"https://fhir.hl7.org.uk/StructureDefinition/Extension-UKCore-EthnicCategory\",\r\n                        \"valueCodeableConcept\": {\r\n                            \"coding\":  [\r\n                                {\r\n                                    \"system\": \"https://fhir.hl7.org.uk/CodeSystem/UKCore-EthnicCategoryEngland\",\r\n                                    \"code\": \"A\",\r\n                                    \"display\": \"White - British\"\r\n                                }\r\n                            ]\r\n                        }\r\n                    }\r\n                ],\r\n                \"identifier\":  [\r\n                    {\r\n                        \"system\": \"https://fhir.nhs.uk/Id/nhs-number\",\r\n                        \"value\": \"{{patient_nhs_no}}\",\r\n                        \"extension\":  [\r\n                            {\r\n                                \"url\": \"https://fhir.hl7.org.uk/StructureDefinition/Extension-UKCore-NHSNumberVerificationStatus\",\r\n                                \"valueCodeableConcept\": {\r\n                                    \"coding\":  [\r\n                                        {\r\n                                            \"system\": \"https://fhir.hl7.org.uk/CodeSystem/UKCore-NHSNumberVerificationStatusEngland\",\r\n                                            \"version\": \"2.2.0\",\r\n                                            \"code\": \"01\",\r\n                                            \"display\": \"Number present and verified\"\r\n                                        }\r\n                                    ]\r\n                                }\r\n                            }\r\n                        ]\r\n                    },\r\n                    {\r\n                        \"system\": \"urn:oid:2.16.840.1.113883.2.1.3.2.4.18.24\",\r\n                        \"value\": \"{{patient_local_id}}\",\r\n                        \"assigner\": {\r\n                            \"identifier\": {\r\n                                \"system\": \"https://fhir.nhs.uk/Id/ods-organization-code\",\r\n                                \"value\": \"RAX01\"\r\n                            }\r\n                        }\r\n                    }\r\n                ],\r\n                \"name\":  [\r\n                    {\r\n                        \"given\":  [\r\n                            \"BEAUREGARD\"\r\n                        ],\r\n                        \"family\": \"Sorrell\"\r\n                    }\r\n                ],\r\n                \"gender\": \"male\",\r\n                \"birthDate\": \"2011-04-12\",\r\n                \"deceasedBoolean\": false,\r\n                \"address\":  [\r\n                    {\r\n                        \"line\":  [\r\n                            \"31 THE AVENUE\",\r\n                            \"BERWICK COURT\"\r\n                        ],\r\n                        \"postalCode\": \"KT4 7HE\"\r\n                    }\r\n                ],\r\n                \"generalPractitioner\":  [\r\n                    {\r\n                        \"identifier\": {\r\n                            \"system\": \"https://fhir.hl7.org.uk/Id/gmp-number\",\r\n                            \"value\": \"G9999999\"\r\n                        },\r\n                        \"display\": \"Dr. Aero Smith\"\r\n                    },\r\n                    {\r\n                        \"identifier\": {\r\n                            \"system\": \"https://fhir.hl7.org.uk/Id/ODS-code\",\r\n                            \"value\": \"AP123\"\r\n                        },\r\n                        \"display\": \"anywhere place\"\r\n                    }\r\n                ]\r\n            },\r\n            \"request\": {\r\n                \"method\": \"POST\",\r\n                \"url\": \"Patient\",\r\n                \"ifNoneExist\": \"Patient?identifier=https://fhir.nhs.uk/Id/nhs-number|{{patient_nhs_no}}\"\r\n            }\r\n        },\r\n        {\r\n            \"fullUrl\": \"urn:uuid:{{genomic_eth_id}}\",\r\n            \"resource\": {\r\n                \"resourceType\": \"Observation\",\r\n                \"id\": \"{{genomic_eth_id}}\",\r\n                \"status\": \"preliminary\",\r\n                \"code\": {\r\n                    \"coding\":  [\r\n                        {\r\n                            \"system\": \"http://snomed.info/sct\",\r\n                            \"code\": \"723621000000103\",\r\n                            \"display\": \"Ethnicity\"\r\n                        }\r\n                    ]\r\n                },\r\n                \"subject\": {\r\n                    \"reference\": \"urn:uuid:{{patient_id}}\",\r\n                    \"identifier\": {\r\n                        \"system\": \"https://fhir.nhs.uk/Id/nhs-number\",\r\n                        \"value\": \"{{patient_nhs_no}}\"\r\n                    }\r\n                },\r\n                \"valueString\": \"unknown\"\r\n            },\r\n            \"request\": {\r\n                \"method\": \"POST\",\r\n                \"url\": \"Observation\"\r\n            }\r\n        },\r\n        {\r\n            \"fullUrl\": \"urn:uuid:{{service_id}}\",\r\n            \"resource\": {\r\n                \"resourceType\": \"ServiceRequest\",\r\n                \"id\": \"{{service_id}}\",\r\n                \"extension\":  [\r\n                    {\r\n                        \"url\": \"https://fhir.hl7.org.uk/StructureDefinition/Extension-UKCore-Coverage\",\r\n                        \"valueCodeableConcept\": {\r\n                            \"coding\":  [\r\n                                {\r\n                                    \"system\": \"https://fhir.hl7.org.uk/CodeSystem/UKCore-FundingCategory\",\r\n                                    \"code\": \"nhs\",\r\n                                    \"display\": \"NHS\"\r\n                                }\r\n                            ]\r\n                        }\r\n                    }\r\n                ],\r\n                \"status\": \"active\",\r\n                \"intent\": \"order\",\r\n                \"category\":  [\r\n                    {\r\n                        \"coding\":  [\r\n                            {\r\n                                \"system\": \"https://fhir.hl7.org.uk/CodeSystem/UKCore-GenomeSequencingCategory\",\r\n                                \"code\": \"rare-disease-wgs\",\r\n                                \"display\": \"Rare Disease - WGS\"\r\n                            }\r\n                        ]\r\n                    }\r\n                ],\r\n                \"priority\": \"routine\",\r\n                \"code\": {\r\n                    \"coding\":  [\r\n                        {\r\n                            \"system\": \"https://fhir.nhs.uk/CodeSystem/England-GenomicTestDirectory\",\r\n                            \"code\": \"R14.1\",\r\n                            \"display\": \"Acutely unwell children with a likely monogenic disorder\"\r\n                        }\r\n                    ]\r\n                },\r\n                \"subject\": {\r\n                    \"reference\": \"urn:uuid:{{patient_id}}\",\r\n                    \"identifier\": {\r\n                        \"system\": \"https://fhir.nhs.uk/Id/nhs-number\",\r\n                        \"value\": \"{{patient_nhs_no}}\"\r\n                    }\r\n                },\r\n                \"authoredOn\": \"2023-08-08\",\r\n                \"requester\": {\r\n                    \"reference\": \"urn:uuid:{{role_id}}\"\r\n                },\r\n                \"performer\": [{\r\n                        \"identifier\": {\r\n                            \"system\": \"https://fhir.nhs.uk/Id/ods-organization-code\",\r\n                            \"value\": \"69A50\"\r\n                        }\r\n                    }\r\n                ],\r\n                \"reasonCode\":  [\r\n                    {\r\n                        \"coding\":  [\r\n                            {\r\n                                \"system\": \"http://snomed.info/sct\",\r\n                                \"code\": \"103693007\",\r\n                                \"display\": \"Diagnostic procedure\"\r\n                            }\r\n                        ]\r\n                    }\r\n                ],\r\n                \"supportingInfo\":  [\r\n                    {\r\n                        \"reference\": \"urn:uuid:{{obs_diseasestatus}}\"\r\n                    },\r\n                    {\r\n                        \"reference\": \"urn:uuid:{{genomic_eth_id}}\"\r\n                    },\r\n                    {\r\n                        \"reference\": \"urn:uuid:{{obs_nopregnancy}}\"\r\n                    },\r\n                    {\r\n                        \"reference\": \"urn:uuid:{{familyhist_consanunion}}\"\r\n                    },\r\n                    {\r\n                        \"reference\": \"urn:uuid:{{obs_nobonemarrowtrans}}\"\r\n                    },\r\n                    {\r\n                        \"reference\": \"urn:uuid:{{obs_trans}}\"\r\n                    },\r\n                    {\r\n                        \"reference\": \"urn:uuid:{{obs_multiplerenalcyst}}\"\r\n                    },\r\n                    {\r\n                        \"reference\": \"urn:uuid:{{obs_nephronophthisis}}\"\r\n                    },\r\n                    {\r\n                        \"reference\": \"urn:uuid:{{obs_hepaticcysts}}\"\r\n                    },\r\n                    {\r\n                        \"reference\": \"urn:uuid:{{obs_enlargedkidney}}\"\r\n                    },\r\n                    {\r\n                        \"reference\": \"urn:uuid:{{obs_renalinsuf}}\"\r\n                    },\r\n                    {\r\n                        \"reference\": \"urn:uuid:{{consent_id}}\"\r\n                    }\r\n                ],\r\n                \"note\":  [\r\n                    {\r\n                        \"text\": \"No family history of genomic testing\"\r\n                    },\r\n                    {\r\n                        \"text\": \"Free text for diagnosis/reason for referral, relevant information including family history, phenotypic details/ HPO Terms/ Patient diagnoses with ADPKD (example)\"\r\n                    }\r\n                ]\r\n            },\r\n            \"request\": {\r\n                \"method\": \"POST\",\r\n                \"url\": \"ServiceRequest\"\r\n            }\r\n        },\r\n        {\r\n            \"fullUrl\": \"urn:uuid:{{obs_nopregnancy}}\",\r\n            \"resource\": {\r\n                \"resourceType\": \"Observation\",\r\n                \"id\": \"{{obs_nopregnancy}}\",\r\n                \"status\": \"final\",\r\n                \"code\": {\r\n                    \"coding\":  [\r\n                        {\r\n                            \"system\": \"http://snomed.info/sct\",\r\n                            \"code\": \"77386006\",\r\n                            \"display\": \"Pregnancy\"\r\n                        }\r\n                    ]\r\n                },\r\n                \"subject\": {\r\n                    \"reference\": \"urn:uuid:{{patient_id}}\",\r\n                    \"identifier\": {\r\n                        \"system\": \"https://fhir.nhs.uk/Id/nhs-number\",\r\n                        \"value\": \"{{patient_nhs_no}}\"\r\n                    }\r\n                },\r\n                \"effectiveDateTime\": \"2023-08-05\",\r\n                \"valueBoolean\": false\r\n            },\r\n            \"request\": {\r\n                \"method\": \"POST\",\r\n                \"url\": \"Observation\"\r\n            }\r\n        },\r\n        {\r\n            \"fullUrl\": \"urn:uuid:{{obs_diseasestatus}}\",\r\n            \"resource\": {\r\n                \"resourceType\": \"Observation\",\r\n                \"id\": \"{{obs_diseasestatus}}\",\r\n                \"status\": \"final\",\r\n                \"code\": {\r\n                    \"coding\":  [\r\n                        {\r\n                            \"system\": \"https://fhir.nhs.uk/CodeSystem/England-GenomicTestDirectory\",\r\n                            \"code\": \"R193.4\",\r\n                            \"display\": \"Cystic renal disease\"\r\n                        }\r\n                    ]\r\n                },\r\n                \"subject\": {\r\n                    \"reference\": \"urn:uuid:{{patient_id}}\",\r\n                    \"identifier\": {\r\n                        \"system\": \"https://fhir.nhs.uk/Id/nhs-number\",\r\n                        \"value\": \"{{patient_nhs_no}}\"\r\n                    }\r\n                },\r\n                \"effectiveDateTime\": \"2023-08-05\",\r\n                \"valueCodeableConcept\": {\r\n                    \"coding\":  [\r\n                        {\r\n                            \"system\": \"http://snomed.info/sct\",\r\n                            \"code\": \"103310001\",\r\n                            \"display\": \"Patient not affected\"\r\n                        }\r\n                    ]\r\n                }\r\n            },\r\n            \"request\": {\r\n                \"method\": \"POST\",\r\n                \"url\": \"Observation\"\r\n            }\r\n        },\r\n        {\r\n            \"fullUrl\": \"urn:uuid:{{familyhist_consanunion}}\",\r\n            \"resource\": {\r\n                \"resourceType\": \"FamilyMemberHistory\",\r\n                \"id\": \"{{familyhist_consanunion}}\",\r\n                \"extension\":  [\r\n                    {\r\n                        \"url\": \"http://hl7.org/fhir/StructureDefinition/family-member-history-genetics-observation\",\r\n                        \"valueReference\": {\r\n                            \"reference\": \"urn:uuid:{{obs_consanunion}}\"\r\n                        }\r\n                    }\r\n                ],\r\n                \"status\": \"completed\",\r\n                \"patient\": {\r\n                    \"reference\": \"urn:uuid:{{patient_id}}\",\r\n                    \"identifier\": {\r\n                        \"system\": \"https://fhir.nhs.uk/Id/nhs-number\",\r\n                        \"value\": \"{{patient_nhs_no}}\"\r\n                    }\r\n                },\r\n                \"relationship\": {\r\n                    \"coding\":  [\r\n                        {\r\n                            \"system\": \"http://terminology.hl7.org/CodeSystem/v3-RoleCode\",\r\n                            \"code\": \"PRN\",\r\n                            \"display\": \"parent\"\r\n                        }\r\n                    ]\r\n                }\r\n            },\r\n            \"request\": {\r\n                \"method\": \"POST\",\r\n                \"url\": \"FamilyMemberHistory\"\r\n            }\r\n        },\r\n        {\r\n            \"fullUrl\": \"urn:uuid:{{obs_consanunion}}\",\r\n            \"resource\": {\r\n                \"resourceType\": \"Observation\",\r\n                \"id\": \"{{obs_consanunion}}\",\r\n                \"status\": \"final\",\r\n                \"code\": {\r\n                    \"coding\":  [\r\n                        {\r\n                            \"system\": \"http://snomed.info/sct\",\r\n                            \"code\": \"842009\",\r\n                            \"display\": \"Consanguinity\"\r\n                        }\r\n                    ]\r\n                },\r\n                \"subject\": {\r\n                    \"reference\": \"urn:uuid:{{patient_id}}\",\r\n                    \"identifier\": {\r\n                        \"system\": \"https://fhir.nhs.uk/Id/nhs-number\",\r\n                        \"value\": \"{{patient_nhs_no}}\"\r\n                    }\r\n                },\r\n                \"effectiveDateTime\": \"2023-08-05\",\r\n                \"valueBoolean\": false\r\n            },\r\n            \"request\": {\r\n                \"method\": \"POST\",\r\n                \"url\": \"Observation\"\r\n            }\r\n        },\r\n        {\r\n            \"fullUrl\": \"urn:uuid:{{obs_nobonemarrowtrans}}\",\r\n            \"resource\": {\r\n                \"resourceType\": \"Observation\",\r\n                \"id\": \"{{obs_nobonemarrowtrans}}\",\r\n                \"status\": \"final\",\r\n                \"code\": {\r\n                    \"coding\":  [\r\n                        {\r\n                            \"system\": \"http://snomed.info/sct\",\r\n                            \"code\": \"23719005\",\r\n                            \"display\": \"Transplantation of bone marrow\"\r\n                        }\r\n                    ]\r\n                },\r\n                \"subject\": {\r\n                    \"reference\": \"urn:uuid:{{patient_id}}\",\r\n                    \"identifier\": {\r\n                        \"system\": \"https://fhir.nhs.uk/Id/nhs-number\",\r\n                        \"value\": \"{{patient_nhs_no}}\"\r\n                    }\r\n                },\r\n                \"effectiveDateTime\": \"2023-08-05\",\r\n                \"valueBoolean\": false\r\n            },\r\n            \"request\": {\r\n                \"method\": \"POST\",\r\n                \"url\": \"Observation\"\r\n            }\r\n        },\r\n        {\r\n            \"fullUrl\": \"urn:uuid:{{obs_trans}}\",\r\n            \"resource\": {\r\n                \"resourceType\": \"Observation\",\r\n                \"id\": \"{{obs_trans}}\",\r\n                \"status\": \"final\",\r\n                \"code\": {\r\n                    \"coding\":  [\r\n                        {\r\n                            \"system\": \"http://snomed.info/sct\",\r\n                            \"code\": \"5447007\",\r\n                            \"display\": \"Transfusion\"\r\n                        }\r\n                    ]\r\n                },\r\n                \"subject\": {\r\n                    \"reference\": \"urn:uuid:{{patient_id}}\",\r\n                    \"identifier\": {\r\n                        \"system\": \"https://fhir.nhs.uk/Id/nhs-number\",\r\n                        \"value\": \"{{patient_nhs_no}}\"\r\n                    }\r\n                },\r\n                \"effectiveDateTime\": \"2023-08-05\",\r\n                \"valueBoolean\": false\r\n            },\r\n            \"request\": {\r\n                \"method\": \"POST\",\r\n                \"url\": \"Observation\"\r\n            }\r\n        },\r\n        {\r\n            \"fullUrl\": \"urn:uuid:{{obs_multiplerenalcyst}}\",\r\n            \"resource\": {\r\n                \"resourceType\": \"Observation\",\r\n                \"id\": \"{{obs_multiplerenalcyst}}\",\r\n                \"status\": \"final\",\r\n                \"code\": {\r\n                    \"coding\":  [\r\n                        {\r\n                            \"system\": \"https://hpo.jax.org/app/\",\r\n                            \"code\": \"HP:0005562\",\r\n                            \"display\": \"Multiple renal cysts\"\r\n                        }\r\n                    ]\r\n                },\r\n                \"subject\": {\r\n                    \"reference\": \"urn:uuid:{{patient_id}}\",\r\n                    \"identifier\": {\r\n                        \"system\": \"https://fhir.nhs.uk/Id/nhs-number\",\r\n                        \"value\": \"{{patient_nhs_no}}\"\r\n                    }\r\n                },\r\n                \"effectiveDateTime\": \"2023-08-05\",\r\n                \"valueBoolean\": false\r\n            },\r\n            \"request\": {\r\n                \"method\": \"POST\",\r\n                \"url\": \"Observation\"\r\n            }\r\n        },\r\n        {\r\n            \"fullUrl\": \"urn:uuid:{{obs_nephronophthisis}}\",\r\n            \"resource\": {\r\n                \"resourceType\": \"Observation\",\r\n                \"id\": \"{{obs_nephronophthisis}}\",\r\n                \"status\": \"final\",\r\n                \"code\": {\r\n                    \"coding\":  [\r\n                        {\r\n                            \"system\": \"https://hpo.jax.org/app/\",\r\n                            \"code\": \"HP:0000090\",\r\n                            \"display\": \"Nephronophthisis\"\r\n                        }\r\n                    ]\r\n                },\r\n                \"subject\": {\r\n                    \"reference\": \"urn:uuid:{{patient_id}}\",\r\n                    \"identifier\": {\r\n                        \"system\": \"https://fhir.nhs.uk/Id/nhs-number\",\r\n                        \"value\": \"{{patient_nhs_no}}\"\r\n                    }\r\n                },\r\n                \"effectiveDateTime\": \"2023-08-05\",\r\n                \"valueBoolean\": false\r\n            },\r\n            \"request\": {\r\n                \"method\": \"POST\",\r\n                \"url\": \"Observation\"\r\n            }\r\n        },\r\n        {\r\n            \"fullUrl\": \"urn:uuid:{{obs_hepaticcysts}}\",\r\n            \"resource\": {\r\n                \"resourceType\": \"Observation\",\r\n                \"id\": \"{{obs_hepaticcysts}}\",\r\n                \"status\": \"final\",\r\n                \"code\": {\r\n                    \"coding\":  [\r\n                        {\r\n                            \"system\": \"https://hpo.jax.org/app/\",\r\n                            \"code\": \"HP:0001407\",\r\n                            \"display\": \"Hepatic cysts\"\r\n                        }\r\n                    ]\r\n                },\r\n                \"subject\": {\r\n                    \"reference\": \"urn:uuid:{{patient_id}}\",\r\n                    \"identifier\": {\r\n                        \"system\": \"https://fhir.nhs.uk/Id/nhs-number\",\r\n                        \"value\": \"{{patient_nhs_no}}\"\r\n                    }\r\n                },\r\n                \"effectiveDateTime\": \"2023-08-05\",\r\n                \"valueBoolean\": false\r\n            },\r\n            \"request\": {\r\n                \"method\": \"POST\",\r\n                \"url\": \"Observation\"\r\n            }\r\n        },\r\n        {\r\n            \"fullUrl\": \"urn:uuid:{{obs_enlargedkidney}}\",\r\n            \"resource\": {\r\n                \"resourceType\": \"Observation\",\r\n                \"id\": \"{{obs_enlargedkidney}}\",\r\n                \"status\": \"final\",\r\n                \"code\": {\r\n                    \"coding\":  [\r\n                        {\r\n                            \"system\": \"https://hpo.jax.org/app/\",\r\n                            \"code\": \"HP:0000105\",\r\n                            \"display\": \"Enlarged kidney\"\r\n                        }\r\n                    ]\r\n                },\r\n                \"subject\": {\r\n                    \"reference\": \"urn:uuid:{{patient_id}}\",\r\n                    \"identifier\": {\r\n                        \"system\": \"https://fhir.nhs.uk/Id/nhs-number\",\r\n                        \"value\": \"{{patient_nhs_no}}\"\r\n                    }\r\n                },\r\n                \"effectiveDateTime\": \"2023-08-05\",\r\n                \"valueBoolean\": true\r\n            },\r\n            \"request\": {\r\n                \"method\": \"POST\",\r\n                \"url\": \"Observation\"\r\n            }\r\n        },\r\n        {\r\n            \"fullUrl\": \"urn:uuid:{{obs_renalinsuf}}\",\r\n            \"resource\": {\r\n                \"resourceType\": \"Observation\",\r\n                \"id\": \"{{obs_renalinsuf}}\",\r\n                \"status\": \"final\",\r\n                \"code\": {\r\n                    \"coding\":  [\r\n                        {\r\n                            \"system\": \"https://hpo.jax.org/app/\",\r\n                            \"code\": \"HP:0000083\",\r\n                            \"display\": \"Renal insufficiency\"\r\n                        }\r\n                    ]\r\n                },\r\n                \"subject\": {\r\n                    \"reference\": \"urn:uuid:{{patient_id}}\",\r\n                    \"identifier\": {\r\n                        \"system\": \"https://fhir.nhs.uk/Id/nhs-number\",\r\n                        \"value\": \"{{patient_nhs_no}}\"\r\n                    }\r\n                },\r\n                \"effectiveDateTime\": \"2023-08-05\",\r\n                \"valueBoolean\": true\r\n            },\r\n            \"request\": {\r\n                \"method\": \"POST\",\r\n                \"url\": \"Observation\"\r\n            }\r\n        },\r\n        {\r\n            \"fullUrl\": \"urn:uuid:{{specimen_id}}\",\r\n            \"resource\": {\r\n                \"resourceType\": \"Specimen\",\r\n                \"id\": \"{{specimen_id}}\",\r\n                \"identifier\":  [\r\n                    {\r\n                        \"system\": \"https://fhir.add.nhs.uk/Id/specimenId\",\r\n                        \"value\": \"RGT{{test_specimen_id}}\"\r\n                    }\r\n                ],\r\n                \"status\": \"unavailable\",\r\n                \"type\": {\r\n                    \"coding\":  [\r\n                        {\r\n                            \"system\": \"http://snomed.info/sct\",\r\n                            \"code\": \"445295009\",\r\n                            \"display\": \"Blood specimen with EDTA\"\r\n                        }\r\n                    ]\r\n                },\r\n                \"subject\": {\r\n                    \"reference\": \"urn:uuid:{{patient_id}}\",\r\n                    \"identifier\": {\r\n                        \"system\": \"https://fhir.nhs.uk/Id/nhs-number\",\r\n                        \"value\": \"{{patient_nhs_no}}\"\r\n                    }\r\n                },\r\n                \"request\":  [\r\n                    {\r\n                        \"reference\": \"urn:uuid:{{service_id}}\"\r\n                    }\r\n                ]\r\n            },\r\n            \"request\": {\r\n                \"method\": \"POST\",\r\n                \"url\": \"Specimen\"\r\n            }\r\n        },\r\n        {\r\n            \"fullUrl\": \"urn:uuid:{{consent_id}}\",\r\n            \"resource\": {\r\n                \"resourceType\": \"Consent\",\r\n                \"id\": \"{{consent_id}}\",\r\n                \"status\": \"proposed\",\r\n                \"scope\": {\r\n                    \"coding\":  [\r\n                        {\r\n                            \"system\": \"http://terminology.hl7.org/CodeSystem/consentscope\",\r\n                            \"code\": \"research\",\r\n                            \"display\": \"Research\"\r\n                        }\r\n                    ]\r\n                },\r\n                \"category\":  [\r\n                    {\r\n                        \"coding\":  [\r\n                            {\r\n                                \"system\": \"http://terminology.hl7.org/CodeSystem/consentcategorycodes\",\r\n                                \"code\": \"research\",\r\n                                \"display\": \"Research Information Access\"\r\n                            }\r\n                        ]\r\n                    }\r\n                ],\r\n                \"policy\":  [\r\n                    {\r\n                        \"authority\": \"https://www.england.nhs.uk\",\r\n                        \"uri\": \"https://www.england.nhs.uk/publication/nhs-genomic-medicine-service-record-of-discussion-form\"\r\n                    }\r\n                ]\r\n            },\r\n            \"request\": {\r\n                \"method\": \"POST\",\r\n                \"url\": \"Consent\"\r\n            }\r\n        }\r\n    ]\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{int.api.url}}FHIR/R4",
+											"host": [
+												"{{int.api.url}}FHIR"
+											],
+											"path": [
+												"R4"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "R346 DNA Storage",
+							"item": [
+								{
+									"name": "Rare Disease - Non-WGS-R346",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													"const bundle_id = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"const focus_id = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"const patient_id = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"const role_id = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"const specimen_id = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"const test_order_id = pm.variables.replaceIn(\"{{$randomBankAccount}}\");\r",
+													"const test_specimen_id = pm.variables.replaceIn(\"{{$randomBankAccount}}\");\r",
+													"const bundle_time=pm.variables.replaceIn(\"{{$isoTimestamp}}\");\r",
+													"const message_time=pm.variables.replaceIn(\"{{$isoTimestamp}}\");\r",
+													"const service_request_time=pm.variables.replaceIn(\"{{$isoTimestamp}}\");\r",
+													"const specimen_collection_time=pm.variables.replaceIn(\"{{$isoTimestamp}}\");\r",
+													"const genomic_eth_id = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"const obs_nopregnancy = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"const obs_diseasestatus = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"const obs_consanunion = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"const familyhist_consanunion = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"const obs_nobonemarrowtrans = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"const obs_trans = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"const obs_multiplerenalcyst = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"const obs_nephronophthisis = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"const obs_hepaticcysts = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"const obs_enlargedkidney = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"const obs_renalinsuf = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"const consent_id = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"const nhsNo = _.random(1000000000,9999999999);\r",
+													"const patient_local_id = pm.variables.replaceIn(\"{{$randomBankAccount}}\");\r",
+													"const practionerId = _.random(1000000000,9999999999);\r",
+													"\r",
+													"pm.environment.set(\"bundle_id\",bundle_id);\r",
+													"pm.environment.set(\"service_id\",focus_id);\r",
+													"pm.environment.set(\"patient_id\",patient_id);\r",
+													"pm.environment.set(\"specimen_id\",specimen_id);\r",
+													"pm.environment.set(\"role_id\",role_id);\r",
+													"pm.environment.set(\"test_order_id\",test_order_id);\r",
+													"pm.environment.set(\"test_specimen_id\",test_specimen_id);\r",
+													"pm.environment.set(\"bundle_time\",bundle_time);\r",
+													"pm.environment.set(\"message_time\",message_time);\r",
+													"pm.environment.set(\"service_request_time\",service_request_time);\r",
+													"pm.environment.set(\"specimen_collection_time\",specimen_collection_time);\r",
+													"pm.environment.set(\"genomic_eth_id\",genomic_eth_id);\r",
+													"pm.environment.set(\"obs_nopregnancy\",obs_nopregnancy);\r",
+													"pm.environment.set(\"obs_diseasestatus\",obs_diseasestatus);\r",
+													"pm.environment.set(\"obs_consanunion\",obs_consanunion);\r",
+													"pm.environment.set(\"familyhist_consanunion\",familyhist_consanunion);\r",
+													"pm.environment.set(\"obs_nobonemarrowtrans\",obs_nobonemarrowtrans);\r",
+													"pm.environment.set(\"obs_trans\",obs_trans);\r",
+													"pm.environment.set(\"obs_multiplerenalcyst\",obs_multiplerenalcyst);\r",
+													"pm.environment.set(\"obs_nephronophthisis\",obs_nephronophthisis);\r",
+													"pm.environment.set(\"obs_hepaticcysts\",obs_hepaticcysts);\r",
+													"pm.environment.set(\"obs_enlargedkidney\",obs_enlargedkidney);\r",
+													"pm.environment.set(\"obs_renalinsuf\",obs_renalinsuf);\r",
+													"pm.environment.set(\"consent_id\",consent_id);\r",
+													"pm.environment.set(\"patient_nhs_no\",nhsNo);\r",
+													"pm.environment.set(\"patient_local_id\",patient_local_id);\r",
+													"pm.environment.set(\"practionerId\",practionerId);"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"const responseJson = pm.response.json();\r",
+													"\r",
+													"//console.log(responseJson.entry[3].fullUrl.split(\"/\")[1]);\r",
+													"//console.log(responseJson.entry.length);\r",
+													"\r",
+													"pm.test(\"HTTP Status code is 200\", function () {\r",
+													"  pm.response.to.have.status(200);\r",
+													"});\r",
+													"\r",
+													"pm.test(\"Content-Type header is present\", () => {\r",
+													"  pm.response.to.have.header(\"Content-Type\");\r",
+													"});\r",
+													"\r",
+													"pm.test(\"Response type = 'transaction-response'\", () => {\r",
+													"  pm.expect(responseJson.type).to.eql(\"transaction-response\");\r",
+													"});\r",
+													"\r",
+													"// Get the logical id assuming the outcome resources come in the same order as the request resources\r",
+													"const Service_Request_Logical_Id = responseJson.entry[3].fullUrl.split(\"/\")[1];\r",
+													"pm.environment.set(\"Service_Request_Logical_Id\",Service_Request_Logical_Id);\r",
+													"\r",
+													"const Patient_Logical_Id = responseJson.entry[1].fullUrl.split(\"/\")[1];\r",
+													"pm.environment.set(\"Patient_Logical_Id\",Patient_Logical_Id);\r",
+													"\r",
+													"// Get the logical id assuming the outcome resources come in the same order as the request resources\r",
+													"const PractitionerRole_Logical_Id = responseJson.entry[0].fullUrl.split(\"/\")[1];\r",
+													"pm.environment.set(\"PractitionerRole_Logical_Id\",PractitionerRole_Logical_Id);\r",
+													"\r",
+													"pm.test('Service_Request_Logical_Id is a valid UUID', () => {\r",
+													"    pm.expect(Service_Request_Logical_Id).to.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i);\r",
+													"});\r",
+													"\r",
+													"pm.test('Patient_Logical_Id is a valid UUID', () => {\r",
+													"    pm.expect(Patient_Logical_Id).to.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i);\r",
+													"});\r",
+													"\r",
+													"pm.test('No of operation outcomes matches the resources sent == 4', () => {\r",
+													"    pm.expect(responseJson.entry.length).to.eql(4);\r",
+													"});\r",
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"resourceType\": \"Bundle\",\r\n    \"id\": \"{{bundle_id}}\",\r\n    \"type\": \"transaction\",\r\n    \"entry\":  [\r\n        {\r\n            \"fullUrl\": \"urn:uuid:{{role_id}}\",\r\n            \"resource\": {\r\n                \"resourceType\": \"PractitionerRole\",\r\n                \"id\": \"{{role_id}}\",\r\n                \"practitioner\": {\r\n                    \"identifier\": {\r\n                        \"system\": \"https://fhir.nhs.uk/Id/sds-user-id\",\r\n                        \"value\": \"{{practionerId}}\"\r\n                    },\r\n                    \"display\": \"Dr. Hazel Smith\"\r\n                },\r\n                \"organization\": {\r\n                    \"identifier\": {\r\n                        \"system\": \"https://fhir.nhs.uk/Id/ods-organization-code\",\r\n                        \"value\": \"699W0\"\r\n                    },\r\n                    \"display\": \"Royal Brompton and Harefield\"\r\n                },\r\n                \"specialty\":  [\r\n                    {\r\n                        \"coding\":  [\r\n                            {\r\n                                \"system\": \"https://fhir.hl7.org.uk/CodeSystem/UKCore-PracticeSettingCode\",\r\n                                \"code\": \"361\",\r\n                                \"display\": \"Renal Medicine\"\r\n                            }\r\n                        ]\r\n                    }\r\n                ],\r\n                \"telecom\":  [\r\n                    {\r\n                        \"system\": \"phone\",\r\n                        \"value\": \"02085467711\"\r\n                    },\r\n                    {\r\n                        \"system\": \"email\",\r\n                        \"value\": \"Hazel.smith12@nhs.net\"\r\n                    },\r\n                    {\r\n                        \"system\": \"email\",\r\n                        \"value\": \"renalseckingston@nhs.net\",\r\n                        \"extension\":  [\r\n                            {\r\n                                \"url\": \"http://hl7.org/fhir/StructureDefinition/contactpoint-comment\",\r\n                                \"valueString\": \"reporting\"\r\n                            }\r\n                        ]\r\n                    }\r\n                ]\r\n            },\r\n            \"request\": {\r\n                \"method\": \"POST\",\r\n                \"url\": \"PractitionerRole\"\r\n            }\r\n        },\r\n        {\r\n            \"fullUrl\": \"urn:uuid:{{patient_id}}\",\r\n            \"resource\": {\r\n                \"resourceType\": \"Patient\",\r\n                \"id\": \"{{patient_id}}\",\r\n                \"extension\":  [\r\n                    {\r\n                        \"url\": \"https://fhir.hl7.org.uk/StructureDefinition/Extension-UKCore-BirthSex\",\r\n                        \"valueCodeableConcept\": {\r\n                            \"coding\":  [\r\n                                {\r\n                                    \"system\": \"http://terminology.hl7.org/CodeSystem/v3-AdministrativeGender\",\r\n                                    \"code\": \"M\",\r\n                                    \"display\": \"Male\"\r\n                                }\r\n                            ]\r\n                        }\r\n                    },\r\n                    {\r\n                        \"url\": \"https://fhir.hl7.org.uk/StructureDefinition/Extension-UKCore-EthnicCategory\",\r\n                        \"valueCodeableConcept\": {\r\n                            \"coding\":  [\r\n                                {\r\n                                    \"system\": \"https://fhir.hl7.org.uk/CodeSystem/UKCore-EthnicCategoryEngland\",\r\n                                    \"code\": \"A\",\r\n                                    \"display\": \"White - British\"\r\n                                }\r\n                            ]\r\n                        }\r\n                    }\r\n                ],\r\n                \"identifier\":  [\r\n                    {\r\n                        \"system\": \"https://fhir.nhs.uk/Id/nhs-number\",\r\n                        \"value\": \"{{patient_nhs_no}}\",\r\n                        \"extension\":  [\r\n                            {\r\n                                \"url\": \"https://fhir.hl7.org.uk/StructureDefinition/Extension-UKCore-NHSNumberVerificationStatus\",\r\n                                \"valueCodeableConcept\": {\r\n                                    \"coding\":  [\r\n                                        {\r\n                                            \"system\": \"https://fhir.hl7.org.uk/CodeSystem/UKCore-NHSNumberVerificationStatusEngland\",\r\n                                            \"version\": \"2.2.0\",\r\n                                            \"code\": \"01\",\r\n                                            \"display\": \"Number present and verified\"\r\n                                        }\r\n                                    ]\r\n                                }\r\n                            }\r\n                        ]\r\n                    },\r\n                    {\r\n                        \"system\": \"urn:oid:2.16.840.1.113883.2.1.3.2.4.18.24\",\r\n                        \"value\": \"{{patient_local_id}}\",\r\n                        \"assigner\": {\r\n                            \"identifier\": {\r\n                                \"system\": \"https://fhir.nhs.uk/Id/ods-organization-code\",\r\n                                \"value\": \"RAX01\"\r\n                            }\r\n                        }\r\n                    }\r\n                ],\r\n                \"name\":  [\r\n                    {\r\n                        \"given\":  [\r\n                            \"TEST\"\r\n                        ],\r\n                        \"family\": \"PATIENT\"\r\n                    }\r\n                ],\r\n                \"gender\": \"male\",\r\n                \"birthDate\": \"2009-04-12\",\r\n                \"deceasedBoolean\": false,\r\n                \"address\":  [\r\n                    {\r\n                        \"line\":  [\r\n                            \"32 THE AVENUE\",\r\n                            \"BERWICK COURT\"\r\n                        ],\r\n                        \"postalCode\": \"KT4 8HE\"\r\n                    }\r\n                ],\r\n                \"generalPractitioner\":  [\r\n                    {\r\n                        \"identifier\": {\r\n                            \"system\": \"https://fhir.hl7.org.uk/Id/gmp-number\",\r\n                            \"value\": \"G9999999\"\r\n                        },\r\n                        \"display\": \"Dr. Aero Smith\"\r\n                    },\r\n                    {\r\n                        \"identifier\": {\r\n                            \"system\": \"https://fhir.hl7.org.uk/Id/ODS-code\",\r\n                            \"value\": \"AP123\"\r\n                        },\r\n                        \"display\": \"anywhere place\"\r\n                    }\r\n                ]\r\n            },\r\n            \"request\": {\r\n                \"method\": \"POST\",\r\n                \"url\": \"Patient\",\r\n                \"ifNoneExist\": \"Patient?identifier=https://fhir.nhs.uk/Id/nhs-number|{{patient_nhs_no}}\"\r\n            }\r\n        },\r\n        {\r\n            \"fullUrl\": \"urn:uuid:{{service_id}}\",\r\n            \"resource\": {\r\n                \"resourceType\": \"ServiceRequest\",\r\n                \"id\": \"{{service_id}}\",\r\n                \"extension\":  [\r\n                    {\r\n                        \"url\": \"https://fhir.hl7.org.uk/StructureDefinition/Extension-UKCore-Coverage\",\r\n                        \"valueCodeableConcept\": {\r\n                            \"coding\":  [\r\n                                {\r\n                                    \"system\": \"https://fhir.hl7.org.uk/CodeSystem/UKCore-FundingCategory\",\r\n                                    \"code\": \"nhs\",\r\n                                    \"display\": \"NHS\"\r\n                                }\r\n                            ]\r\n                        }\r\n                    }\r\n                ],\r\n                \"identifier\":  [\r\n                    {\r\n                        \"system\": \"https://RBH.EPR.SYSTEM/EPIC\",\r\n                        \"value\": \"{{test_order_id}}\"\r\n                    }\r\n                ],\r\n                \"status\": \"active\",\r\n                \"intent\": \"order\",\r\n                \"category\":  [\r\n                    {\r\n                        \"coding\":  [\r\n                            {\r\n                                \"system\": \"https://fhir.hl7.org.uk/CodeSystem/UKCore-GenomeSequencingCategory\",\r\n                                \"code\": \"rare-disease-non-wgs\",\r\n                                \"display\": \"Rare Disease - Non-WGS\"\r\n                            }\r\n                        ]\r\n                    }\r\n                ],\r\n                \"priority\": \"routine\",\r\n                \"code\": {\r\n                    \"coding\":  [\r\n                        {\r\n                            \"system\": \"https://fhir.nhs.uk/CodeSystem/England-GenomicTestDirectory\",\r\n                            \"code\": \"R346.1\",\r\n                            \"display\": \"DNA to be stored\"\r\n                        }\r\n                    ]\r\n                },\r\n                \"subject\": {\r\n                    \"reference\": \"urn:uuid:{{patient_id}}\",\r\n                    \"identifier\": {\r\n                        \"system\": \"https://fhir.nhs.uk/Id/nhs-number\",\r\n                        \"value\": \"{{patient_nhs_no}}\"\r\n                    }\r\n                },\r\n                \"authoredOn\": \"{{service_request_time}}\",\r\n                \"requester\": {\r\n                    \"reference\": \"urn:uuid:{{role_id}}\"\r\n                },\r\n                \"performer\": [{\r\n                        \"identifier\": {\r\n                            \"system\": \"https://fhir.nhs.uk/Id/ods-organization-code\",\r\n                            \"value\": \"697L0\"\r\n                        }\r\n                    }\r\n                ],\r\n                \"reasonCode\":  [\r\n                    {\r\n                        \"coding\":  [\r\n                            {\r\n                                \"system\": \"http://snomed.info/sct\",\r\n                                \"code\": \"103693007\",\r\n                                \"display\": \"Diagnostic procedure\"\r\n                            }\r\n                        ]\r\n                    }\r\n                ],\r\n                \"note\":  [\r\n                    {\r\n                        \"text\": \"STORE DNA\"\r\n                    }\r\n                ]\r\n            },\r\n            \"request\": {\r\n                \"method\": \"POST\",\r\n                \"url\": \"ServiceRequest\"\r\n            }\r\n        },\r\n        {\r\n            \"fullUrl\": \"urn:uuid:{{specimen_id}}\",\r\n            \"resource\": {\r\n                \"resourceType\": \"Specimen\",\r\n                \"id\": \"{{specimen_id}}\",\r\n                \"identifier\":  [\r\n                    {\r\n                        \"system\": \"https://fhir.add.nhs.uk/Id/specimenId\",\r\n                        \"value\": \"RGT{{test_specimen_id}}\"\r\n                    }\r\n                ],\r\n                \"status\": \"unavailable\",\r\n                \"type\": {\r\n                    \"coding\":  [\r\n                        {\r\n                            \"system\": \"http://snomed.info/sct\",\r\n                            \"code\": \"445295009\",\r\n                            \"display\": \"Blood specimen with EDTA\"\r\n                        }\r\n                    ]\r\n                },\r\n                \"subject\": {\r\n                    \"reference\": \"urn:uuid:{{patient_id}}\",\r\n                    \"identifier\": {\r\n                        \"system\": \"https://fhir.nhs.uk/Id/nhs-number\",\r\n                        \"value\": \"{{patient_nhs_no}}\"\r\n                    }\r\n                },\r\n                \"request\":  [\r\n                    {\r\n                        \"reference\": \"urn:uuid:{{service_id}}\"\r\n                    }\r\n                ]\r\n            },\r\n            \"request\": {\r\n                \"method\": \"POST\",\r\n                \"url\": \"Specimen\"\r\n            }\r\n        }\r\n    ]\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{int.api.url}}FHIR/R4",
+											"host": [
+												"{{int.api.url}}FHIR"
+											],
+											"path": [
+												"R4"
+											]
+										}
+									},
+									"response": []
+								}
+							]
 						}
 					]
 				},
