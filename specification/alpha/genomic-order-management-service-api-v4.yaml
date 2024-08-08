@@ -103,6 +103,11 @@ info:
     * upload interpretation reports
 
 
+
+    The API's provide the core capabilities around the patient Unified Genomic
+    Record (**UGR**). 
+
+
     ## Who can use this API
       This API can only be used where there is a legal basis to do so. Make sure you have a valid use case before you go too far with your development.
 
@@ -446,9 +451,14 @@ servers:
   - url: https://int.api.service.nhs.uk/genomic-order-management-service
     description: Integration test
 tags:
-  - name: Process Requests
-  - name: Query Record
-  - name: Query History
+  - name: process
+  - name: order
+  - name: task
+  - name: report
+  - name: specimen
+  - name: patient
+  - name: practitionerrole
+  - name: history
 paths:
   /FHIR/R4:
     post:
@@ -457,10 +467,9 @@ paths:
       description: |
         ## Overview
         [FHIR Restful](https://hl7.org/fhir/R4/http.html) endpoint to 
-         register a **new test or update tests or attache samples, rod or reports etc**. 
-         This end point uses FHIR [bundle](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-Bundle?version=0.3.0) of type **transaction** and the list of resources that forms the payload are listed [here](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/Build/How-to-construct-Message-Bundles?version=0.3.0). 
+         register a **new test or update tests or add reports etc**. This end point uses FHIR [bundle](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-Bundle?version=0.3.0) of type **transaction** and the list of resources that forms the payload are listed [here](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/Build/How-to-construct-Message-Bundles?version=0.3.0). 
       tags:
-        - Process Requests
+        - process
       parameters:
         - $ref: '#/components/parameters/apikey'
         - $ref: '#/components/parameters/NHSDSessionURID'
@@ -1749,7 +1758,7 @@ paths:
         This endpoint allows you to retrieve the records of ServiceRequests
         using various query parameters.
       tags:
-        - Query Record
+        - order
       parameters:
         - $ref: '#/components/parameters/apikey'
         - $ref: '#/components/parameters/NHSDSessionURID'
@@ -1772,6 +1781,30 @@ paths:
           $ref: '#/components/responses/200-goms-bundle-servicerequests-get'
         4XX:
           $ref: '#/components/responses/4XX-goms-error'
+  /FHIR/R4/ServiceRequest/{id}/$graph:
+    get:
+      operationId: getservicerequestinformation
+      summary: Get detailed information around a service request.
+      description: >
+        This endpoint allows to retrieve all related records of a ServiceRequest
+
+        using logical identifier and [graph
+        definition](https://simplifier.net/guide/FHIR-Genomics-Implementation-Guide/Home/FHIRAssets/GraphDefinitions?version=current)
+        on the server. 
+      tags:
+        - order
+      parameters:
+        - $ref: '#/components/parameters/apikey'
+        - $ref: '#/components/parameters/NHSDSessionURID'
+        - $ref: '#/components/parameters/RequestID'
+        - $ref: '#/components/parameters/CorrelationID'
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/Graph'
+      responses:
+        '200':
+          $ref: '#/components/responses/200-goms-bundle-servicerequests-get'
+        4XX:
+          $ref: '#/components/responses/4XX-goms-error'
   /FHIR/R4/Task:
     get:
       operationId: getTasks
@@ -1782,7 +1815,7 @@ paths:
         This endpoint allows you to retrieve the records of Tasks using various
         query parameters.
       tags:
-        - Query Record
+        - task
       parameters:
         - $ref: '#/components/parameters/apikey'
         - $ref: '#/components/parameters/NHSDSessionURID'
@@ -1802,6 +1835,152 @@ paths:
           $ref: '#/components/responses/200-goms-bundle-tasks-get'
         4XX:
           $ref: '#/components/responses/4XX-goms-error'
+    post:
+      operationId: addtask
+      summary: Create a new Task
+      description: |
+        ## Overview
+        [FHIR Restful](https://hl7.org/fhir/R4/http.html) endpoint to 
+         register a **[new task](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-Task?version=0.3.0)**. 
+      tags:
+        - task
+      parameters:
+        - $ref: '#/components/parameters/apikey'
+        - $ref: '#/components/parameters/NHSDSessionURID'
+        - $ref: '#/components/parameters/RequestID'
+        - $ref: '#/components/parameters/CorrelationID'
+      requestBody:
+        required: true
+        content:
+          application/fhir+json:
+            schema:
+              type: object
+              required:
+                - resourceType
+                - identifier
+                - type
+                - entry
+              description: >
+                A FHIR
+                [Task](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-Task?version=0.3.0)
+            examples:
+              single-item:
+                description: Task for creation
+                value:
+                  resourceType: Task
+                  id: Task-NonWGSRareDiseaseTestOrder-Cancellation-Example
+                  status: cancelled
+                  statusReason:
+                    coding:
+                      - system: >-
+                          https://fhir.nhs.uk/CodeSystem/task-statusReason-genomics
+                        code: TestNoLongerRequired
+                        display: Test No Longer Required
+                  intent: order
+                  priority: routine
+                  code:
+                    coding:
+                      - system: https://fhir.nhs.uk/CodeSystem/task-code-genomics
+                        code: ProcessGenomicTestRequest
+                        display: Process Genomic Test Request
+                  focus:
+                    reference: >-
+                      ServiceRequest/ServiceRequest-NonWGSTestOrderForm-Cancellation-Example
+                  for:
+                    reference: Patient/Patient-MeirLieberman-Example
+                    identifier:
+                      system: https://fhir.nhs.uk/Id/nhs-number
+                      value: '9449307873'
+                  authoredOn: '2023-08-08T15:43:00Z'
+                  lastModified: '2023-08-08T15:43:00Z'
+                  requester:
+                    reference: PractitionerRole/PractitionerRole-GeneSmithENT-Example
+                  owner:
+                    identifier:
+                      system: https://fhir.nhs.uk/Id/ods-organization-code
+                      value: RGT01
+                    display: ADDENBROOKE'S HOSPITAL
+                  note:
+                    - text: Test no longer required.
+      responses:
+        '201':
+          $ref: '#/components/responses/20X-goms-bundle-task-create-update'
+        4XX:
+          $ref: '#/components/responses/4XX-goms-error'
+  /FHIR/R4/Task/{id}:
+    put:
+      operationId: updatetask
+      summary: Update an existing Task
+      description: |
+        ## Overview
+        [FHIR Restful](https://hl7.org/fhir/R4/http.html) endpoint to 
+         update an existing **[task](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-Task?version=0.3.0)**. 
+      tags:
+        - task
+      parameters:
+        - $ref: '#/components/parameters/apikey'
+        - $ref: '#/components/parameters/NHSDSessionURID'
+        - $ref: '#/components/parameters/RequestID'
+        - $ref: '#/components/parameters/CorrelationID'
+        - $ref: '#/components/parameters/Id'
+      requestBody:
+        required: true
+        content:
+          application/fhir+json:
+            schema:
+              type: object
+              required:
+                - resourceType
+                - identifier
+                - type
+                - entry
+              description: >
+                A FHIR
+                [Task](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-Task?version=0.3.0)
+            examples:
+              single-item:
+                description: Task for update
+                value:
+                  resourceType: Task
+                  id: 8322cbf4-8fd0-46ab-bffe-abf39ee7a3f6
+                  status: cancelled
+                  statusReason:
+                    coding:
+                      - system: >-
+                          https://fhir.nhs.uk/CodeSystem/task-statusReason-genomics
+                        code: TestNoLongerRequired
+                        display: Test No Longer Required
+                  intent: order
+                  priority: routine
+                  code:
+                    coding:
+                      - system: https://fhir.nhs.uk/CodeSystem/task-code-genomics
+                        code: ProcessGenomicTestRequest
+                        display: Process Genomic Test Request
+                  focus:
+                    reference: >-
+                      ServiceRequest/ServiceRequest-NonWGSTestOrderForm-Cancellation-Example
+                  for:
+                    reference: Patient/Patient-MeirLieberman-Example
+                    identifier:
+                      system: https://fhir.nhs.uk/Id/nhs-number
+                      value: '9449307873'
+                  authoredOn: '2023-08-08T15:43:00Z'
+                  lastModified: '2023-08-08T15:43:00Z'
+                  requester:
+                    reference: PractitionerRole/PractitionerRole-GeneSmithENT-Example
+                  owner:
+                    identifier:
+                      system: https://fhir.nhs.uk/Id/ods-organization-code
+                      value: RGT01
+                    display: ADDENBROOKE'S HOSPITAL
+                  note:
+                    - text: Test no longer required.
+      responses:
+        '200':
+          $ref: '#/components/responses/20X-goms-bundle-task-create-update'
+        4XX:
+          $ref: '#/components/responses/4XX-goms-error'
   /FHIR/R4/DiagnosticReport:
     get:
       operationId: getDiagnosticReports
@@ -1810,9 +1989,9 @@ paths:
         ## Overview
 
         This endpoint allows you to retrieve the records of DiagnosticReport
-        using various query parameters.
+        using various query parameters. [**UGR**]
       tags:
-        - Query Record
+        - report
       parameters:
         - $ref: '#/components/parameters/apikey'
         - $ref: '#/components/parameters/NHSDSessionURID'
@@ -1831,6 +2010,83 @@ paths:
           $ref: '#/components/responses/200-goms-bundle-diagnosticreports-get'
         4XX:
           $ref: '#/components/responses/4XX-goms-error'
+    post:
+      operationId: adddiagnosticreport
+      summary: Create a new DiagnosticReport
+      description: |
+        ## Overview
+        [FHIR Restful](https://hl7.org/fhir/R4/http.html) endpoint to 
+         register a **[new DiagnosticReport](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-DiagnosticReport?version=0.3.0)**. 
+      tags:
+        - report
+      parameters:
+        - $ref: '#/components/parameters/apikey'
+        - $ref: '#/components/parameters/NHSDSessionURID'
+        - $ref: '#/components/parameters/RequestID'
+        - $ref: '#/components/parameters/CorrelationID'
+      requestBody:
+        required: true
+        content:
+          application/fhir+json:
+            schema:
+              type: object
+              required:
+                - resourceType
+                - identifier
+                - type
+                - entry
+              description: >
+                A FHIR
+                [DiagnosticReport](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-DiagnosticReport?version=0.3.0)
+            examples:
+              single-item:
+                description: DiagnosticReport for creation
+                value:
+                  resourceType: DiagnosticReport
+                  id: DiagnosticReport-AnitaLamberts-Example
+                  identifier:
+                    - system: https://www.guysandstthomas.nhs.uk/SEGLH/lims
+                      value: FHGenomicReport
+                      assigner:
+                        identifier:
+                          system: https://fhir.nhs.uk/Id/ods-organization-code
+                          value: RJ1
+                  basedOn:
+                    - reference: >-
+                        ServiceRequest/ServiceRequest-NonWGSTestOrderForm-NewFollowupTest-Example
+                  status: final
+                  category:
+                    - coding:
+                        - system: http://terminology.hl7.org/CodeSystem/v2-0074
+                          code: GE
+                          display: Genetics
+                  code:
+                    coding:
+                      - system: http://snomed.info/sct
+                        code: '1054161000000101'
+                        display: Genetic report
+                  subject:
+                    reference: Patient/Patient-AnitaLamberts-Example
+                  issued: '2023-11-24T09:45:00Z'
+                  performer:
+                    - identifier:
+                        system: https://fhir.nhs.uk/Id/ods-organization-code
+                        value: RJ1
+                  specimen:
+                    - reference: Specimen/Specimen-BloodEDTA-Example
+                  presentedForm:
+                    - contentType: application/pdf
+                      language: en-GB
+                      url: https://o719on.axshare.com/?id=8aol33&p=introduction&g=1
+                      size: 43272
+                      title: Genomic Report for Anita Lamberts
+                      creation: '2023-11-24'
+      responses:
+        '201':
+          $ref: >-
+            #/components/responses/20X-goms-bundle-diagnostic-report-create-update
+        4XX:
+          $ref: '#/components/responses/4XX-goms-error'
   /FHIR/R4/Specimen:
     get:
       operationId: getSpecimens
@@ -1841,7 +2097,7 @@ paths:
         This endpoint allows you to retrieve the records of Specimens using
         various query parameters.
       tags:
-        - Query Record
+        - specimen
       parameters:
         - $ref: '#/components/parameters/apikey'
         - $ref: '#/components/parameters/NHSDSessionURID'
@@ -1850,13 +2106,136 @@ paths:
         - $ref: '#/components/parameters/PatientIdentifier'
         - $ref: '#/components/parameters/LogicalIdentifier'
         - $ref: '#/components/parameters/Identifier'
+        - $ref: '#/components/parameters/SpecimenRequest'
         - $ref: '#/components/parameters/SpecimenCollected'
         - $ref: '#/components/parameters/ContainerIdentifier'
         - $ref: '#/components/parameters/Status'
         - $ref: '#/components/parameters/SpecimenInclude'
+        - $ref: '#/components/parameters/SpecimenRevInclude'
       responses:
         '200':
           $ref: '#/components/responses/200-goms-bundle-specimens-get'
+        4XX:
+          $ref: '#/components/responses/4XX-goms-error'
+    post:
+      operationId: addSpecimen
+      summary: Create a new Specimen
+      description: |
+        ## Overview
+        [FHIR Restful](https://hl7.org/fhir/R4/http.html) endpoint to 
+         register a **[new specimen](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-Specimen?version=0.3.0)**. 
+      tags:
+        - specimen
+      parameters:
+        - $ref: '#/components/parameters/apikey'
+        - $ref: '#/components/parameters/NHSDSessionURID'
+        - $ref: '#/components/parameters/RequestID'
+        - $ref: '#/components/parameters/CorrelationID'
+      requestBody:
+        required: true
+        content:
+          application/fhir+json:
+            schema:
+              type: object
+              required:
+                - resourceType
+                - identifier
+                - type
+                - entry
+              description: >
+                A FHIR
+                [Specimen](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-Specimen?version=0.3.0)
+            examples:
+              single-item:
+                description: Specimen for creation
+                value:
+                  resourceType: Specimen
+                  id: Specimen-BloodEDTA-Example
+                  identifier:
+                    - system: https://fhir.add.nhs.uk/Id/specimenId
+                      value: RGT03135
+                  status: unavailable
+                  type:
+                    coding:
+                      - system: http://snomed.info/sct
+                        code: '445295009'
+                        display: Blood specimen with EDTA
+                  subject:
+                    reference: Patient/Patient-MeirLieberman-Example
+                    identifier:
+                      system: https://fhir.nhs.uk/Id/nhs-number
+                      value: '9449307873'
+                  request:
+                    - reference: >-
+                        ServiceRequest/ServiceRequest-NonWGSTestOrderForm-Example
+      responses:
+        '201':
+          $ref: '#/components/responses/20X-goms-bundle-specimen-create-update'
+        4XX:
+          $ref: '#/components/responses/4XX-goms-error'
+  /FHIR/R4/Specimen/{id}:
+    put:
+      operationId: updateSpecimen
+      summary: Update an existing Specimen
+      description: |
+        ## Overview
+        [FHIR Restful](https://hl7.org/fhir/R4/http.html) endpoint to 
+         update an existing **[specimen](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-Specimen?version=0.3.0)**. 
+      tags:
+        - specimen
+      parameters:
+        - $ref: '#/components/parameters/apikey'
+        - $ref: '#/components/parameters/NHSDSessionURID'
+        - $ref: '#/components/parameters/RequestID'
+        - $ref: '#/components/parameters/CorrelationID'
+        - $ref: '#/components/parameters/Id'
+      requestBody:
+        required: true
+        content:
+          application/fhir+json:
+            schema:
+              type: object
+              required:
+                - resourceType
+                - identifier
+                - type
+                - entry
+              description: >
+                A FHIR
+                [Specimen](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-Specimen?version=0.3.0)
+            examples:
+              single-item:
+                description: Specimen for update
+                value:
+                  resourceType: Specimen
+                  id: 9e2e2b25-1d24-460d-965e-6b86727eb3b4
+                  identifier:
+                    - system: https://fhir.leedsth.nhs.uk//Id/specimenId
+                      value: RR8-696B0-17843
+                  status: available
+                  type:
+                    coding:
+                      - system: http://snomed.info/sct
+                        code: '445295009'
+                        display: Blood specimen with EDTA
+                  subject:
+                    reference: Patient/Patient-FayMutlow-Example
+                    identifier:
+                      system: https://fhir.nhs.uk/Id/nhs-number
+                      value: '9449307806'
+                  collection:
+                    collector:
+                      identifier:
+                        system: https://fhir.nhs.uk/Id/sds-user-id
+                        value: '9999999998'
+                      display: Phletobomist-Lois Lane
+                    collectedDateTime: '2023-10-05T15:30:00Z'
+                  request:
+                    - reference: >-
+                        ServiceRequest/ServiceRequest-SavedTestOrderUpdated-CascadeTesting-Example
+      responses:
+        '200':
+          $ref: '#/components/responses/20X-goms-bundle-specimen-create-update'
         4XX:
           $ref: '#/components/responses/4XX-goms-error'
   /FHIR/R4/Patient:
@@ -1867,9 +2246,9 @@ paths:
         ## Overview
 
         This endpoint allows you to retrieve the record of a patient held
-        within  genomic order management service using various query parameters.
+        within  genomic order management service using various query parameters. [**UGR**]
       tags:
-        - Query Record
+        - patient
       parameters:
         - $ref: '#/components/parameters/apikey'
         - $ref: '#/components/parameters/NHSDSessionURID'
@@ -1886,6 +2265,113 @@ paths:
           $ref: '#/components/responses/200-goms-bundle-patient-get'
         4XX:
           $ref: '#/components/responses/4XX-goms-error'
+  /FHIR/R4/Patient/{id}:
+    put:
+      operationId: updatePatient
+      summary: Update an existing Patient
+      description: |
+        ## Overview
+        [FHIR Restful](https://hl7.org/fhir/R4/http.html) endpoint to 
+         update an existing **[patient](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-Patient?version=0.3.0)**. 
+      tags:
+        - patient
+      parameters:
+        - $ref: '#/components/parameters/apikey'
+        - $ref: '#/components/parameters/NHSDSessionURID'
+        - $ref: '#/components/parameters/RequestID'
+        - $ref: '#/components/parameters/CorrelationID'
+        - $ref: '#/components/parameters/Id'
+      requestBody:
+        required: true
+        content:
+          application/fhir+json:
+            schema:
+              type: object
+              required:
+                - resourceType
+                - identifier
+                - type
+                - entry
+              description: >
+                A FHIR
+                [Patient](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-Patient?version=0.3.0)
+            examples:
+              single-item:
+                description: Patient for update
+                value:
+                  resourceType: Patient
+                  id: Patient-MeirLieberman-Example
+                  extension:
+                    - url: >-
+                        https://fhir.hl7.org.uk/StructureDefinition/Extension-UKCore-BirthSex
+                      valueCodeableConcept:
+                        coding:
+                          - system: >-
+                              http://terminology.hl7.org/CodeSystem/v3-AdministrativeGender
+                            code: M
+                            display: Male
+                    - url: >-
+                        https://fhir.hl7.org.uk/StructureDefinition/Extension-UKCore-EthnicCategory
+                      valueCodeableConcept:
+                        coding:
+                          - system: >-
+                              https://fhir.hl7.org.uk/CodeSystem/UKCore-EthnicCategoryEngland
+                            code: A
+                            display: White - British
+                  identifier:
+                    - system: https://fhir.nhs.uk/Id/nhs-number
+                      value: '9449307873'
+                      extension:
+                        - url: >-
+                            https://fhir.hl7.org.uk/StructureDefinition/Extension-UKCore-NHSNumberVerificationStatus
+                          valueCodeableConcept:
+                            coding:
+                              - system: >-
+                                  https://fhir.hl7.org.uk/CodeSystem/UKCore-NHSNumberVerificationStatusEngland
+                                version: 2.2.0
+                                code: '01'
+                                display: Number present and verified
+                    - system: urn:oid:2.16.840.1.113883.2.1.3.2.4.18.24
+                      value: RGT012423
+                      assigner:
+                        identifier:
+                          system: https://fhir.nhs.uk/Id/ods-organization-code
+                          value: RGT01
+                    - system: https://fhir.nhs.uk/Id/genomics-pedigree-number
+                      value: P12345
+                  name:
+                    - given:
+                        - Meir
+                        - Anah
+                      family: Lieberman
+                  gender: male
+                  birthDate: '2005-12-19'
+                  deceasedBoolean: false
+                  address:
+                    - line:
+                        - 1 Spinney Close
+                        - Worcester Park
+                      city: Surrey
+                      postalCode: KT4 7BS
+                  generalPractitioner:
+                    - identifier:
+                        system: https://fhir.hl7.org.uk/Id/gmp-number
+                        value: G9999999
+                      display: Dr. Aero Smith
+                    - identifier:
+                        system: https://fhir.hl7.org.uk/Id/ODS-code
+                        value: TP123
+                      display: 123 Test Practice
+                  link:
+                    - other:
+                        reference: >-
+                          https://api.service.nhs.uk/personal-demographics/FHIR/R4/Patient/9449307873
+                      type: seealso
+      responses:
+        '200':
+          $ref: '#/components/responses/200-goms-bundle-patient-get-logical-id'
+        4XX:
+          $ref: '#/components/responses/4XX-goms-error'
   /FHIR/R4/PractitionerRole:
     get:
       operationId: getPractitionerRole
@@ -1897,7 +2383,7 @@ paths:
         held within  genomic order management service using various query
         parameters.
       tags:
-        - Query Record
+        - practitionerrole
       parameters:
         - $ref: '#/components/parameters/apikey'
         - $ref: '#/components/parameters/NHSDSessionURID'
@@ -1911,6 +2397,79 @@ paths:
           $ref: '#/components/responses/200-goms-bundle-practitionerrole-get'
         4XX:
           $ref: '#/components/responses/4XX-goms-error'
+    put:
+      operationId: updatePractitionerRole
+      summary: Update an existing PractitionerRole
+      description: |
+        ## Overview
+        [FHIR Restful](https://hl7.org/fhir/R4/http.html) endpoint to 
+         update an existing **[PractitionerRole](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-PractitionerRole?version=0.3.0)**. 
+      tags:
+        - practitionerrole
+      parameters:
+        - $ref: '#/components/parameters/apikey'
+        - $ref: '#/components/parameters/NHSDSessionURID'
+        - $ref: '#/components/parameters/RequestID'
+        - $ref: '#/components/parameters/CorrelationID'
+        - $ref: '#/components/parameters/Id'
+      requestBody:
+        required: true
+        content:
+          application/fhir+json:
+            schema:
+              type: object
+              required:
+                - resourceType
+                - identifier
+                - type
+                - entry
+              description: >
+                A FHIR
+                [PractitionerRole](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-PractitionerRole?version=0.3.0)
+            examples:
+              single-item:
+                description: PractitionerRole for update
+                value:
+                  resourceType: PractitionerRole
+                  id: PractitionerRole-EugeneSmith-Example
+                  practitioner:
+                    identifier:
+                      system: https://fhir.nhs.uk/Id/sds-user-id
+                      value: '9999999998'
+                    display: Dr. Eugene Smith
+                  organization:
+                    identifier:
+                      system: https://fhir.nhs.uk/Id/ods-organization-code
+                      value: RPA02
+                    display: MEDWAY MARITIME HOSPITAL
+                  specialty:
+                    - coding:
+                        - system: >-
+                            https://fhir.hl7.org.uk/CodeSystem/UKCore-PracticeSettingCode
+                          code: '820'
+                          display: General Pathology
+                  telecom:
+                    - system: phone
+                      value: '01634976477'
+                    - system: email
+                      value: medwaypath@nhs.net
+                    - system: email
+                      value: clinicalgeneticsmedway@nhs.net
+                      extension:
+                        - url: >-
+                            http://hl7.org/fhir/StructureDefinition/contactpoint-comment
+                          valueString: reporting
+                    - system: email
+                      value: asmithgppracticeg@nhs.net
+                      extension:
+                        - url: >-
+                            http://hl7.org/fhir/StructureDefinition/contactpoint-comment
+                          valueString: reporting
+      responses:
+        '200':
+          $ref: '#/components/responses/200-goms-bundle-practitionerrole-get-logical-id'
+        4XX:
+          $ref: '#/components/responses/4XX-goms-error'
   /FHIR/R4/{resourceName}/{id}:
     get:
       operationId: readResource
@@ -1921,7 +2480,7 @@ paths:
         This endpoint allows you to retrieve the record of a single FHIR
         resource latest version by its logical id.
       tags:
-        - Query History
+        - history
       parameters:
         - $ref: '#/components/parameters/apikey'
         - $ref: '#/components/parameters/NHSDSessionURID'
@@ -1966,7 +2525,7 @@ paths:
         |                                                                        
         |
       tags:
-        - Query History
+        - history
       parameters:
         - $ref: '#/components/parameters/apikey'
         - $ref: '#/components/parameters/NHSDSessionURID'
@@ -2010,7 +2569,7 @@ paths:
         |                                                                        
         |
       tags:
-        - Query History
+        - history
       parameters:
         - $ref: '#/components/parameters/apikey'
         - $ref: '#/components/parameters/NHSDSessionURID'
@@ -2369,6 +2928,78 @@ components:
                     value: RGT01
                   display: ADDENBROOKE'S HOSPITAL
                 note: null
+    20X-goms-bundle-servicerequest-create-update:
+      description: A response from the /FHIR/R4/Task create update action.
+      content:
+        application/fhir+json:
+          schema:
+            type: object
+            required:
+              - resourceType
+              - identifier
+              - type
+              - entry
+            description: >
+              A FHIR
+              [Task](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-Task?version=0.3.0)
+          examples:
+            single-item:
+              description: Task for creation
+              value:
+                resourceType: ServiceRequest
+                id: ServiceRequest-NonWGSTestOrderForm-Example
+                extension:
+                  - url: >-
+                      https://fhir.hl7.org.uk/StructureDefinition/Extension-UKCore-Coverage
+                    valueCodeableConcept:
+                      coding:
+                        - system: >-
+                            https://fhir.hl7.org.uk/CodeSystem/UKCore-FundingCategory
+                          code: nhs
+                          display: NHS
+                status: active
+                intent: order
+                category:
+                  - coding:
+                      - system: >-
+                          https://fhir.hl7.org.uk/CodeSystem/UKCore-GenomeSequencingCategory
+                        code: rare-disease-non-wgs
+                        display: Rare Disease - Non-WGS
+                priority: routine
+                code:
+                  coding:
+                    - system: >-
+                        https://fhir.nhs.uk/CodeSystem/England-GenomicTestDirectory
+                      code: R67.2
+                      display: Monogenic hearing loss
+                subject:
+                  reference: Patient/Patient-MeirLieberman-Example
+                  identifier:
+                    system: https://fhir.nhs.uk/Id/nhs-number
+                    value: '9449307873'
+                authoredOn: '2023-08-05'
+                requester:
+                  reference: PractitionerRole/PractitionerRole-GeneSmithENT-Example
+                reasonCode:
+                  - coding:
+                      - system: http://snomed.info/sct
+                        code: '103693007'
+                        display: Diagnostic procedure
+                supportingInfo:
+                  - reference: Observation/Observation-DiseaseStatus-Example
+                  - reference: Observation/Observation-GenomicEthnicity-Example
+                  - reference: Observation/Observation-NoPregnancy-Example
+                  - reference: >-
+                      FamilyMemberHistory/FamilyMemberHistory-NonConsanguinousUnion-Example
+                  - reference: Observation/Observation-NoTransplant-Example
+                  - reference: Observation/Observation-NoTransfusion-Example
+                  - reference: Condition/Condition-HearingLoss-Example
+                note:
+                  - text: No family history of genomic testing
+                  - text: >-
+                      Free text for diagnosis/reason for referral, relevant
+                      information including family history, phenotypic details/
+                      HPO Terms/Patient in need of test...example
     200-goms-bundle-task-post:
       description: A response from the /FHIR/R4/Task endpoint.
       content:
@@ -4015,6 +4646,17 @@ components:
       schema:
         type: string
         default: null
+    Graph:
+      in: query
+      name: graph
+      description: >-
+        The parameter to get all information related to a service request based
+        on  it logical identifier and associated [graph
+        definition](https://simplifier.net/guide/FHIR-Genomics-Implementation-Guide/Home/FHIRAssets/GraphDefinitions?version=current)
+        on server.
+      schema:
+        type: string
+        default: genomics-test-order
     TaskInclude:
       in: query
       name: _include
@@ -4031,6 +4673,22 @@ components:
         The parameter _include is used to follow links 'forward'. For example,
         `Specimen:request`, will include ServiceRequest details managing the
         Specimen.
+      schema:
+        type: string
+        default: null
+    SpecimenRevInclude:
+      in: query
+      name: _revinclude
+      description: >-
+        The parameter _revinclude is used to follow reverse links. For example.
+        'Task:input' will include all tasks managing the specimen workflows.
+      schema:
+        type: string
+        default: null
+    SpecimenRequest:
+      in: query
+      name: request
+      description: The parameter search specimen based on service request logical id.
       schema:
         type: string
         default: null
