@@ -446,10 +446,7 @@ x-spec-publication:
         - method: GET
           path: /FHIR/R4/PractitionerRole
 servers:
-  - url: https://sandbox.api.service.nhs.uk/genomic-order-management-service
-    description: Sandbox
   - url: https://int.api.service.nhs.uk/genomic-order-management-service
-    description: Integration test
 tags:
   - name: process
   - name: order
@@ -464,6 +461,8 @@ paths:
   /FHIR/R4:
     post:
       operationId: processgenomicrequests
+      security:
+        - app-level0: []
       summary: Process genomic test request
       description: |
         ## Overview
@@ -1785,6 +1784,8 @@ paths:
   /FHIR/R4/ServiceRequest/{id}/$graph:
     get:
       operationId: getservicerequestinformation
+      security:
+        - app-level0: []
       summary: Get detailed information around a service request.
       description: >
         This endpoint allows to retrieve all related records of a ServiceRequest
@@ -1838,6 +1839,8 @@ paths:
           $ref: '#/components/responses/4XX-goms-error'
     post:
       operationId: addtask
+      security:
+        - app-level0: []
       summary: Create a new Task
       description: |
         ## Overview
@@ -1911,6 +1914,8 @@ paths:
   /FHIR/R4/Task/{id}:
     put:
       operationId: updatetask
+      security:
+        - app-level0: []
       summary: Update an existing Task
       description: |
         ## Overview
@@ -1985,6 +1990,8 @@ paths:
   /FHIR/R4/DiagnosticReport:
     get:
       operationId: getDiagnosticReports
+      security:
+        - app-level0: []
       summary: Search for DiagnosticReports
       description: >
         ## Overview
@@ -2014,6 +2021,8 @@ paths:
           $ref: '#/components/responses/4XX-goms-error'
     post:
       operationId: adddiagnosticreport
+      security:
+        - app-level0: []
       summary: Create a new DiagnosticReport
       description: |
         ## Overview
@@ -2092,6 +2101,8 @@ paths:
   /FHIR/R4/Specimen:
     get:
       operationId: getSpecimens
+      security:
+        - app-level0: []
       summary: Search for Specimens
       description: >
         ## Overview
@@ -2121,6 +2132,8 @@ paths:
           $ref: '#/components/responses/4XX-goms-error'
     post:
       operationId: addSpecimen
+      security:
+        - app-level0: []
       summary: Create a new Specimen
       description: |
         ## Overview
@@ -2178,6 +2191,8 @@ paths:
   /FHIR/R4/Specimen/{id}:
     put:
       operationId: updateSpecimen
+      security:
+        - app-level0: []
       summary: Update an existing Specimen
       description: |
         ## Overview
@@ -2243,6 +2258,8 @@ paths:
   /FHIR/R4/Patient:
     get:
       operationId: getPatient
+      security:
+        - app-level0: []
       summary: Search for Patient
       description: >
         ## Overview
@@ -2270,6 +2287,8 @@ paths:
   /FHIR/R4/Patient/{id}:
     put:
       operationId: updatePatient
+      security:
+        - app-level0: []
       summary: Update an existing Patient
       description: |
         ## Overview
@@ -2377,6 +2396,8 @@ paths:
   /FHIR/R4/PractitionerRole:
     get:
       operationId: getPractitionerRole
+      security:
+        - app-level0: []
       summary: Search for PractitionerRole
       description: >
         ## Overview
@@ -2401,6 +2422,8 @@ paths:
           $ref: '#/components/responses/4XX-goms-error'
     put:
       operationId: updatePractitionerRole
+      security:
+        - app-level0: []
       summary: Update an existing PractitionerRole
       description: |
         ## Overview
@@ -2475,6 +2498,8 @@ paths:
   /FHIR/R4/{resourceName}/{id}:
     get:
       operationId: readResource
+      security:
+        - app-level0: []
       summary: Search for resource by its logical id
       description: >
         ## Overview
@@ -2500,6 +2525,8 @@ paths:
     get:
       summary: Retrieve resource history by its logical id
       operationId: readResourceHistory
+      security:
+        - app-level0: []
       description: >
         ## Overview
 
@@ -2544,6 +2571,8 @@ paths:
     get:
       summary: Retrieve Resource version by its logical id
       operationId: readResourceHistoryVersion
+      security:
+        - app-level0: []
       description: >
         ## Overview
 
@@ -2588,6 +2617,8 @@ paths:
   /FHIR/R4/metadata:
     get:
       operationId: readMetadata
+      security:
+        - app-level0: []
       summary: Get the capability statement from server
       description: >
         ## Overview
@@ -2601,6 +2632,10 @@ paths:
         '200':
           description : 'Successful retrieval of metadata.'
 components:
+  securitySchemes:
+    app-level0:
+      $ref: >-
+        https://proxygen.prod.api.platform.nhs.uk/components/securitySchemes/app-level0
   responses:
     4XX-goms-error:
       description: >
@@ -4945,3 +4980,25 @@ components:
         type: string
         example: 29dc4e84-7e72-11ee-b962-0242ac120002
       description: The location of the resource.
+x-nhsd-apim:
+  monitoring: true
+  temporary: false
+  target:
+    type: external
+    healthcheck: /_status
+    url: https://mgq002nolc.execute-api.eu-west-2.amazonaws.com/stag
+    security:
+      type: apikey
+      header: X-Api-Key
+      secret: order-management-service-int-api-key
+  access:
+    - title: Application Restricted
+      grants:
+        app-level0: []
+  ratelimiting:
+    proxy:
+      limit: 50
+      timeunit: minute
+    app-default:
+      limit: 100
+      timeunit: minute
