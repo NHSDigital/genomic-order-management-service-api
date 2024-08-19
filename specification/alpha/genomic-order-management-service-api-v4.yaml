@@ -4936,6 +4936,7 @@ components:
           - Task
           - PractitionerRole
           - Patient
+          - DocumentReference
         example: ServiceRequest
   schemas: {}
   requestBodies: {}
