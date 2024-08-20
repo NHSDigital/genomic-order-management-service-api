@@ -383,12 +383,19 @@
 													"const PractitionerRole_Logical_Id = responseJson.entry[0].fullUrl.split(\"/\")[1];\r",
 													"pm.environment.set(\"PractitionerRole_Logical_Id\",PractitionerRole_Logical_Id);\r",
 													"\r",
+													"const Specimen_Logical_Id = responseJson.entry[15].fullUrl.split(\"/\")[1];\r",
+													"pm.environment.set(\"Specimen_Logical_Id\",Specimen_Logical_Id);\r",
+													"\r",
 													"pm.test('Service_Request_Logical_Id is a valid UUID', () => {\r",
 													"    pm.expect(Service_Request_Logical_Id).to.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i);\r",
 													"});\r",
 													"\r",
 													"pm.test('Patient_Logical_Id is a valid UUID', () => {\r",
 													"    pm.expect(Patient_Logical_Id).to.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i);\r",
+													"});\r",
+													"\r",
+													"pm.test('Specimen_Logical_Id is a valid UUID', () => {\r",
+													"    pm.expect(Specimen_Logical_Id).to.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i);\r",
 													"});\r",
 													"\r",
 													"pm.test('No of operation outcomes matches the resources sent == 16', () => {\r",
@@ -456,7 +463,7 @@
 										"method": "GET",
 										"header": [],
 										"url": {
-											"raw": "{{int.api.url}}FHIR/R4/ServiceRequest?_id={{Service_Request_Logical_Id}}&_include=ServiceRequest:patient",
+											"raw": "{{int.api.url}}FHIR/R4/ServiceRequest?_id={{Service_Request_Logical_Id}}&_revinclude=DocumentReference:context:related",
 											"host": [
 												"{{int.api.url}}FHIR"
 											],
@@ -481,7 +488,8 @@
 												},
 												{
 													"key": "_include",
-													"value": "ServiceRequest:patient"
+													"value": "ServiceRequest:patient",
+													"disabled": true
 												},
 												{
 													"key": "_include",
@@ -492,6 +500,10 @@
 													"key": "identifier",
 													"value": "https://RBH.EPR.SYSTEM/EPIC|{{test_order_id}}",
 													"disabled": true
+												},
+												{
+													"key": "_revinclude",
+													"value": "DocumentReference:context:related"
 												}
 											]
 										}
@@ -772,7 +784,8 @@
 									},
 									"response": []
 								}
-							]
+							],
+							"description": "1. Search for existing patient\n    \n2. Use the logical Id of the patient to create a new request"
 						},
 						{
 							"name": "Duo - RARE - NONWGS",
@@ -2644,6 +2657,216 @@
 									"response": []
 								},
 								{
+									"name": "Get Service Request - Logical Id",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"const responseJson = pm.response.json();\r",
+													"console.log(responseJson.supportingInfo);\r",
+													"\r",
+													"var test = {\r",
+													"            \"reference\": \"Consent/\"+pm.environment.get('Consent_Logical_Id_New'),\r",
+													"            \"type\": \"Consent\"\r",
+													"        };\r",
+													"responseJson.supportingInfo.push(test);\r",
+													"\r",
+													"console.log(responseJson.supportingInfo)\r",
+													"\r",
+													"pm.environment.set(\"ServiceRequest_Resource\",JSON.stringify(responseJson));\r",
+													"\r",
+													"pm.test(\"HTTP Status code is 200\", function () {\r",
+													"  pm.response.to.have.status(200);\r",
+													"});\r",
+													"\r",
+													"pm.test(\"Content-Type header is present\", () => {\r",
+													"  pm.response.to.have.header(\"Content-Type\");\r",
+													"});\r",
+													"\r",
+													"pm.test(\"resourceType type = 'ServiceRequest'\", () => {\r",
+													"  pm.expect(responseJson.resourceType).to.eql(\"ServiceRequest\");\r",
+													"});\r",
+													"\r",
+													"const Response_Service_Request_Logical_Id = responseJson.id\r",
+													"pm.test(\"Logical id of the resource matches\", () => {\r",
+													"  pm.expect(Response_Service_Request_Logical_Id).to.eql(pm.environment.get('Service_Request_Logical_Id'));\r",
+													"})"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{int.api.url}}FHIR/R4/ServiceRequest/{{Service_Request_Logical_Id}}",
+											"host": [
+												"{{int.api.url}}FHIR"
+											],
+											"path": [
+												"R4",
+												"ServiceRequest",
+												"{{Service_Request_Logical_Id}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Update ServiceRequest",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													"const bundle_id = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"const focus_id = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"const patient_id = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"const role_id = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"const specimen_id = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"const test_order_id = pm.variables.replaceIn(\"{{$randomBankAccount}}\");\r",
+													"const test_specimen_id = pm.variables.replaceIn(\"{{$randomBankAccount}}\");\r",
+													"const bundle_time=pm.variables.replaceIn(\"{{$isoTimestamp}}\");\r",
+													"const message_time=pm.variables.replaceIn(\"{{$isoTimestamp}}\");\r",
+													"const service_request_time=pm.variables.replaceIn(\"{{$isoTimestamp}}\");\r",
+													"const specimen_collection_time=pm.variables.replaceIn(\"{{$isoTimestamp}}\");\r",
+													"const genomic_eth_id = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"const obs_nopregnancy = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"const obs_diseasestatus = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"const obs_consanunion = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"const familyhist_consanunion = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"const obs_nobonemarrowtrans = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"const obs_trans = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"const obs_multiplerenalcyst = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"const obs_nephronophthisis = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"const obs_hepaticcysts = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"const obs_enlargedkidney = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"const obs_renalinsuf = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"const consent_id = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"const provenance_id = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"const provenance_time=pm.variables.replaceIn(\"{{$isoTimestamp}}\");\r",
+													"const signature_time=pm.variables.replaceIn(\"{{$isoTimestamp}}\");\r",
+													"const nhsNo = _.random(1000000000,9999999999);\r",
+													"const patient_local_id = pm.variables.replaceIn(\"{{$randomBankAccount}}\");\r",
+													"\r",
+													"pm.environment.set(\"bundle_id\",bundle_id);\r",
+													"pm.environment.set(\"service_id\",focus_id);\r",
+													"pm.environment.set(\"patient_id\",patient_id);\r",
+													"pm.environment.set(\"specimen_id\",specimen_id);\r",
+													"pm.environment.set(\"role_id\",role_id);\r",
+													"pm.environment.set(\"test_order_id\",test_order_id);\r",
+													"pm.environment.set(\"test_specimen_id\",test_specimen_id);\r",
+													"pm.environment.set(\"bundle_time\",bundle_time);\r",
+													"pm.environment.set(\"message_time\",message_time);\r",
+													"pm.environment.set(\"service_request_time\",service_request_time);\r",
+													"pm.environment.set(\"specimen_collection_time\",specimen_collection_time);\r",
+													"pm.environment.set(\"genomic_eth_id\",genomic_eth_id);\r",
+													"pm.environment.set(\"obs_nopregnancy\",obs_nopregnancy);\r",
+													"pm.environment.set(\"obs_diseasestatus\",obs_diseasestatus);\r",
+													"pm.environment.set(\"obs_consanunion\",obs_consanunion);\r",
+													"pm.environment.set(\"familyhist_consanunion\",familyhist_consanunion);\r",
+													"pm.environment.set(\"obs_nobonemarrowtrans\",obs_nobonemarrowtrans);\r",
+													"pm.environment.set(\"obs_trans\",obs_trans);\r",
+													"pm.environment.set(\"obs_multiplerenalcyst\",obs_multiplerenalcyst);\r",
+													"pm.environment.set(\"obs_nephronophthisis\",obs_nephronophthisis);\r",
+													"pm.environment.set(\"obs_hepaticcysts\",obs_hepaticcysts);\r",
+													"pm.environment.set(\"obs_enlargedkidney\",obs_enlargedkidney);\r",
+													"pm.environment.set(\"obs_renalinsuf\",obs_renalinsuf);\r",
+													"pm.environment.set(\"consent_id\",consent_id);\r",
+													"pm.environment.set(\"patient_nhs_no\",nhsNo);\r",
+													"pm.environment.set(\"patient_local_id\",patient_local_id);\r",
+													"pm.environment.set(\"provenance_id\",provenance_id);\r",
+													"pm.environment.set(\"provenance_time\",provenance_time);\r",
+													"pm.environment.set(\"signature_time\",signature_time);\r",
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"const responseJson = pm.response.json();\r",
+													"\r",
+													"//console.log(responseJson.entry[3].fullUrl.split(\"/\")[1]);\r",
+													"//console.log(responseJson.entry.length);\r",
+													"\r",
+													"console.log(responseJson.entry[0].resource.meta.versionId);\r",
+													"\r",
+													"pm.test(\"HTTP Status code is 200\", function () {\r",
+													"  pm.response.to.have.status(200);\r",
+													"});\r",
+													"\r",
+													"pm.test(\"Content-Type header is present\", () => {\r",
+													"  pm.response.to.have.header(\"Content-Type\");\r",
+													"});\r",
+													"\r",
+													"pm.test(\"Response type = 'transaction-response'\", () => {\r",
+													"  pm.expect(responseJson.type).to.eql(\"transaction-response\");\r",
+													"});\r",
+													"\r",
+													"// Get the logical id assuming the outcome resources come in the same order as the request resources\r",
+													"const Service_Request_Logical_Id = responseJson.entry[0].fullUrl.split(\"/\")[1];\r",
+													"pm.environment.set(\"Service_Request_Logical_Id\",Service_Request_Logical_Id);\r",
+													"\r",
+													"pm.test('Service_Request_Logical_Id is a valid UUID', () => {\r",
+													"    pm.expect(Service_Request_Logical_Id).to.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i);\r",
+													"});\r",
+													"\r",
+													"pm.test('No of operation outcomes matches the resources sent == 2', () => {\r",
+													"    pm.expect(responseJson.entry.length).to.eql(2);\r",
+													"});\r",
+													"\r",
+													"pm.test('Version Id == 2', () => {\r",
+													"    pm.expect(responseJson.entry[0].resource.meta.versionId).to.eql('2');\r",
+													"});\r",
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"resourceType\": \"Bundle\",\r\n    \"id\": \"{{bundle_id}}\",\r\n    \"type\": \"transaction\",\r\n    \"entry\": [{\r\n            \"fullUrl\": \"ServiceRequest/{{Service_Request_Logical_Id}}\",\r\n            \"resource\": {{ServiceRequest_Resource}},\r\n            \"request\": {\r\n                \"method\": \"PUT\",\r\n                \"url\": \"ServiceRequest/{{Service_Request_Logical_Id}}\"\r\n            }\r\n        }, {\r\n            \"fullUrl\": \"urn:uuid:{{provenance_id}}\",\r\n            \"resource\": {\r\n                \"resourceType\": \"Provenance\",\r\n                \"id\": \"{{provenance_id}}\",\r\n                \"target\": [{\r\n                        \"reference\": \"ServiceRequest/{{Service_Request_Logical_Id}}\"\r\n                    }\r\n                ],\r\n                \"recorded\": \"{{provenance_time}}\",\r\n                \"reason\": [{\r\n                        \"coding\": [{\r\n                                \"system\": \"http://terminology.hl7.org/CodeSystem/v3-ActReason\",\r\n                                \"code\": \"TREAT\",\r\n                                \"display\": \"treatment\"\r\n                            }\r\n                        ]\r\n                    }\r\n                ],\r\n                \"activity\": {\r\n                    \"coding\": [{\r\n                            \"system\": \"http://terminology.hl7.org/CodeSystem/v3-DataOperation\",\r\n                            \"code\": \"UPDATE\",\r\n                            \"display\": \"revise\"\r\n                        }\r\n                    ]\r\n                },\r\n                \"agent\": [{\r\n                        \"type\": {\r\n                            \"coding\": [{\r\n                                    \"system\": \"http://terminology.hl7.org/CodeSystem/provenance-participant-type\",\r\n                                    \"code\": \"author\",\r\n                                    \"display\": \"Author\"\r\n                                }\r\n                            ]\r\n                        },\r\n                        \"who\": {\r\n                            \"reference\": \"PractitionerRole/{{PractitionerRole_Logical_Id}}\"\r\n                        }\r\n                    }\r\n                ],\r\n                \"entity\": [{\r\n                        \"role\": \"source\",\r\n                        \"what\": {\r\n                            \"reference\": \"ServiceRequest/{{Service_Request_Logical_Id}}\"\r\n                        }\r\n                    }\r\n                ],\r\n                \"signature\": [{\r\n                        \"type\": [{\r\n                                \"system\": \"urn:iso-astm:E1762-95:2013\",\r\n                                \"code\": \"1.2.840.10065.1.12.1.15\",\r\n                                \"display\": \"Addendum Signature\"\r\n                            }\r\n                        ],\r\n                        \"when\": \"{{signature_time}}\",\r\n                        \"who\": {\r\n                            \"reference\": \"PractitionerRole/{{PractitionerRole_Logical_Id}}\"\r\n                        },\r\n                        \"data\": \"DQo8U2lnbmF0dXJlIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwLzA5L3htbGRzaWcjIj4NCiAgICA8U2lnbmVkSW5mbz48Q2Fub25pY2FsaXphdGlvbk1ldGhvZCBBbGdvcml0aG09Imh0dHA6Ly93d3cudzMub3JnLzIwMDEvMTAveG1sLWV4Yy1jMTRuIyI+PC9DYW5vbmljYWxpemF0aW9uTWV0aG9kPjxTaWduYXR1cmVNZXRob2QgQWxnb3JpdGhtPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwLzA5L3htbGRzaWcjcnNhLXNoYTEiPjwvU2lnbmF0dXJlTWV0aG9kPjxSZWZlcmVuY2U+PFRyYW5zZm9ybXM+PFRyYW5zZm9ybSBBbGdvcml0aG09Imh0dHA6Ly93d3cudzMub3JnLzIwMDEvMTAveG1sLWV4Yy1jMTRuIyI+PC9UcmFuc2Zvcm0+PC9UcmFuc2Zvcm1zPjxEaWdlc3RNZXRob2QgQWxnb3JpdGhtPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwLzA5L3htbGRzaWcjc2hhMSI+PC9EaWdlc3RNZXRob2Q+PERpZ2VzdFZhbHVlPjJ5cUJISDVLK05ibVA1WWY3bVE3WmVFYWN0Yz08L0RpZ2VzdFZhbHVlPjwvUmVmZXJlbmNlPjwvU2lnbmVkSW5mbz4NCiAgICA8U2lnbmF0dXJlVmFsdWU+aE9DaXVJOGIyTEFaRXoxUDdXcGFlRDBQUWQ2bVJKdzVSV2JNV2ZMcU1OUWtRMzIzbnpWTDk3a01XZUJycnJzNU5vTHhGb28vKzFPUjYxcmNXNTJEamlHdjRRcE53QmJOQkYvMi9hUWxqd3pUdm9tQm9tUlpnbUtRQWpyZU1iOTZNM0hjajVvVFNBZG9tUEc2TGw3RVRCS25wRTVJdW5EamducUIxelhEWllVPTwvU2lnbmF0dXJlVmFsdWU+DQogICAgPEtleUluZm8+DQogICAgICAgIDxYNTA5RGF0YT4NCiAgICAgICAgICAgIDxYNTA5Q2VydGlmaWNhdGU+TUlJRHVEQ0NBcUNnQXdJQkFnSUVYY210SHpBTkJna3Foa2lHOXcwQkFRc0ZBREEyTVF3d0NnWURWUVFLRXdOdWFITXhDekFKQmdOVkJBc1RBa05CTVJrd0Z3WURWUVFERXhCT1NGTWdTVTVVSUV4bGRtVnNJREZFTUI0WERUSXdNVEF5TWpFd01qRTFOVm9YRFRJeU1UQXlNakV3TlRFMU5Wb3dRekVNTUFvR0ExVUVDaE1EYm1oek1ROHdEUVlEVlFRTEV3WlFaVzl3YkdVeElqQWdCZ05WQkFNTUdUVTFOVEkxTXpVeU1URXdPRjlTUVU1RVQwMWZWVk5GVWxFd2daOHdEUVlKS29aSWh2Y05BUUVCQlFBRGdZMEFNSUdKQW9HQkFLdDRzek53N09BSDdBUVJyRGUveEJJbXNNbU1pUzlFc3JUM2EzcC9MaDNicmR6STlhYWpUVVoyYi9jdmJPYTdQZVlkN3UrSzRhMlpkMFhrKzBHRm1ZR3pTVlg2aVlqYmx3cjB2YWkzMXpWN0crbEd2SHhINnBTb0xDd0lDYVpBRndhYmVENU96OTQreUEzYVdOV3RHVjBEZmg5cXdIM1pGQ0lNUnN2ZXJOMXBBZ01CQUFHamdnRkRNSUlCUHpBT0JnTlZIUThCQWY4RUJBTUNCa0F3WlFZRFZSMGdBUUgvQkZzd1dUQlhCZ3NxaGpvQWlYdG1BQU1DQURCSU1FWUdDQ3NHQVFVRkJ3SUJGanBvZEhSd2N6b3ZMM0JyYVM1dWFITXVkV3N2WTJWeWRHbG1hV05oZEdWZmNHOXNhV05wWlhNdlkyOXVkR1Z1ZEY5amIyMXRhWFJ0Wlc1ME1ETUdBMVVkSHdRc01Db3dLS0Ftb0NTR0ltaDBkSEE2THk5amNtd3VibWh6TG5WckwybHVkQzh4WkM5amNteGpNeTVqY213d0t3WURWUjBRQkNRd0lvQVBNakF5TURFd01qSXhNREl4TlRWYWdROHlNREl5TURNeE56RXdOVEUxTlZvd0h3WURWUjBqQkJnd0ZvQVVvSllmZ1lUTlBkNkVVS0w2UUxJekh4WTVQRkl3SFFZRFZSME9CQllFRkx0eXZZU3lhcWc2MEFFVVpneGswd3JqUkpjK01Ba0dBMVVkRXdRQ01BQXdHUVlKS29aSWh2WjlCMEVBQkF3d0Noc0VWamd1TXdNQ0JMQXdEUVlKS29aSWh2Y05BUUVMQlFBRGdnRUJBQmN6eThCOGp1UHBJZmFUTkZjeHJDMjJhQ1gveFlabWhyTC9OdklCQWFYMUc1aGppd21rR0tFMmhSVElyNjdQeFp4bVhzSnhpZ1JCTUhQbEkrbFkvK29rekgwR2k3YjVicWx3N3B4R0lnSk8wMDB3OHBGc3ZvOXc0MklZaEhvZHN2bkRWU3hoTVQwSjQ2UWhrOXNvRTBMam9FVUxLUVBQbFlHa2UvR2wzbTE3SXRGWXdPYlFIMGZNRXdtaXFCeWVJZno3Z1NjY096TDVjSXA2UGNaVE9qbzJJcVFwZ0VtaGpPY1JJbkVxQU5pdFNkam9pSkFKenBhYVpqWVRSZEhVWDdpN2FqRWlING05MW5GVys0QXFrTnR0bGI0V2NHS3NTbVdnZktLaGVGNElvWktNRTgweGVyU2dNeTh2dGpMT0JKQ0dYejB3TEdtUXVSbXhNVHE4OHE0PTwvWDUwOUNlcnRpZmljYXRlPg0KICAgICAgICA8L1g1MDlEYXRhPg0KICAgIDwvS2V5SW5mbz4NCjwvU2lnbmF0dXJlPg0K\"\r\n                    }\r\n                ]\r\n            },\r\n            \"request\": {\r\n                \"method\": \"POST\",\r\n                \"url\": \"Provenance\"\r\n            }\r\n        }\r\n    ]\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{int.api.url}}FHIR/R4",
+											"host": [
+												"{{int.api.url}}FHIR"
+											],
+											"path": [
+												"R4"
+											]
+										}
+									},
+									"response": []
+								},
+								{
 									"name": "Attach ROD - FORM",
 									"event": [
 										{
@@ -3248,290 +3471,9 @@
 										}
 									},
 									"response": []
-								},
-								{
-									"name": "Rare Disease - Non-WGS-R132.1 - Attach Report",
-									"event": [
-										{
-											"listen": "prerequest",
-											"script": {
-												"exec": [
-													"const bundle_id = pm.variables.replaceIn(\"{{$guid}}\");\r",
-													"pm.environment.set(\"bundle_id\",bundle_id);\r",
-													"\r",
-													"const report_id = pm.variables.replaceIn(\"{{$guid}}\");\r",
-													"pm.environment.set(\"report_id\",report_id);\r",
-													"\r",
-													"const report_identifier = pm.variables.replaceIn(\"{{$guid}}\");\r",
-													"pm.environment.set(\"report_identifier\",report_identifier);\r",
-													"\r",
-													"const report_time=pm.variables.replaceIn(\"{{$isoTimestamp}}\");\r",
-													"pm.environment.set(\"report_time\",report_time);\r",
-													"\r",
-													"const specimen_collection_time=pm.variables.replaceIn(\"{{$isoTimestamp}}\");\r",
-													"pm.environment.set(\"specimen_collection_time\",specimen_collection_time);"
-												],
-												"type": "text/javascript",
-												"packages": {}
-											}
-										},
-										{
-											"listen": "test",
-											"script": {
-												"exec": [
-													"const responseJson = pm.response.json();\r",
-													"//console.log(responseJson.entry[3].fullUrl.split(\"/\")[1]);\r",
-													"\r",
-													"pm.test(\"HTTP Status code is 200\", function () {\r",
-													"  pm.response.to.have.status(200);\r",
-													"});\r",
-													"\r",
-													"pm.test(\"Content-Type header is present\", () => {\r",
-													"  pm.response.to.have.header(\"Content-Type\");\r",
-													"});\r",
-													"\r",
-													"pm.test(\"Response type = 'transaction-response'\", () => {\r",
-													"  pm.expect(responseJson.type).to.eql(\"transaction-response\");\r",
-													"});\r",
-													"\r",
-													"pm.test('No of operation outcomes matches the resources sent == 1', () => {\r",
-													"    pm.expect(responseJson.entry.length).to.eql(1);\r",
-													"});\r",
-													"\r",
-													"const Report_Logical_Id = responseJson.entry[0].fullUrl.split(\"/\")[1];\r",
-													"pm.environment.set(\"Report_Logical_Id\",Report_Logical_Id);\r",
-													"\r",
-													"pm.test('Report_Logical_Id is a valid UUID', () => {\r",
-													"    pm.expect(Report_Logical_Id).to.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i);\r",
-													"});"
-												],
-												"type": "text/javascript",
-												"packages": {}
-											}
-										}
-									],
-									"request": {
-										"method": "POST",
-										"header": [],
-										"body": {
-											"mode": "raw",
-											"raw": "{\r\n    \"resourceType\": \"Bundle\",\r\n    \"id\": \"{{bundle_id}}\",\r\n    \"type\": \"transaction\",\r\n    \"entry\":  [\r\n        {\r\n            \"fullUrl\": \"urn:uuid:{{report_id}}\",\r\n            \"resource\": {\r\n                \"resourceType\": \"DiagnosticReport\",\r\n                \"id\": \"{{report_id}}\",\r\n                \"identifier\":  [\r\n                    {\r\n                        \"system\": \"https://www.guysandstthomas.nhs.uk/SEGLH/lims\",\r\n                        \"value\": \"{{report_identifier}}\",\r\n                        \"assigner\": {\r\n                            \"identifier\": {\r\n                                \"system\": \"https://fhir.nhs.uk/Id/ods-organization-code\",\r\n                                \"value\": \"RP4\"\r\n                            }\r\n                        }\r\n                    }\r\n                ],\r\n                \"basedOn\":  [\r\n                    {\r\n                        \"reference\": \"ServiceRequest/{{Service_Request_Logical_Id}}\"\r\n                    }\r\n                ],\r\n                \"status\": \"partial\",\r\n                \"category\":  [\r\n                    {\r\n                        \"coding\":  [\r\n                            {\r\n                                \"system\": \"http://terminology.hl7.org/CodeSystem/v2-0074\",\r\n                                \"code\": \"GE\",\r\n                                \"display\": \"Genetics\"\r\n                            }\r\n                        ]\r\n                    }\r\n                ],\r\n                \"code\": {\r\n                    \"coding\":  [\r\n                        {\r\n                            \"system\": \"http://snomed.info/sct\",\r\n                            \"code\": \"1054161000000101\",\r\n                            \"display\": \"Genetic report\"\r\n                        }\r\n                    ]\r\n                },\r\n                \"subject\": {\r\n                    \"reference\": \"Patient/{{Patient_Logical_Id}}\"\r\n                },\r\n                \"issued\": \"{{report_time}}\",\r\n                \"performer\":  [\r\n                    {\r\n                        \"identifier\": {\r\n                            \"system\": \"https://fhir.nhs.uk/Id/ods-organization-code\",\r\n                            \"value\": \"69A70\"\r\n                        }\r\n                    }\r\n                ],\r\n                \"specimen\":  [\r\n                    {\r\n                        \"reference\": \"Specimen/{{Specimen_Logical_Id}}\"\r\n                    }\r\n                ],\r\n                \"presentedForm\":  [\r\n                    {\r\n                        \"contentType\": \"application/pdf\",\r\n                        \"language\": \"en-GB\",\r\n                        \"url\": \"https://o719on.axshare.com/?id=8aol33&p=introduction&g=1\",\r\n                        \"size\": 43272,\r\n                        \"title\": \"Genomic Report for Anita Lamberts\",\r\n                        \"creation\": \"{{report_time}}\"\r\n                    }\r\n                ]\r\n            },\r\n            \"request\": {\r\n                \"method\": \"POST\",\r\n                \"url\": \"DiagnosticReport\"\r\n            }\r\n        }\r\n    ]\r\n}",
-											"options": {
-												"raw": {
-													"language": "json"
-												}
-											}
-										},
-										"url": {
-											"raw": "{{int.api.url}}FHIR/R4",
-											"host": [
-												"{{int.api.url}}FHIR"
-											],
-											"path": [
-												"R4"
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "Get Report - id",
-									"event": [
-										{
-											"listen": "test",
-											"script": {
-												"exec": [
-													"const responseJson = pm.response.json();\r",
-													"\r",
-													"pm.test(\"HTTP Status code is 200\", function () {\r",
-													"  pm.response.to.have.status(200);\r",
-													"});\r",
-													"\r",
-													"pm.test(\"Content-Type header is present\", () => {\r",
-													"  pm.response.to.have.header(\"Content-Type\");\r",
-													"});\r",
-													"\r",
-													"pm.test(\"resourceType type = 'DiagnosticReport'\", () => {\r",
-													"  pm.expect(responseJson.resourceType).to.eql(\"DiagnosticReport\");\r",
-													"});\r",
-													"\r",
-													"const Response_DiagnosticReport_Logical_Id = responseJson.id\r",
-													"pm.test(\"Logical id of the resource matches\", () => {\r",
-													"  pm.expect(Response_DiagnosticReport_Logical_Id).to.eql(pm.environment.get('Report_Logical_Id'));\r",
-													"})\r",
-													"\r",
-													"pm.test('Response_DiagnosticReport_Logical_Id is a valid UUID', () => {\r",
-													"    pm.expect(Response_DiagnosticReport_Logical_Id).to.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i);\r",
-													"});\r",
-													""
-												],
-												"type": "text/javascript",
-												"packages": {}
-											}
-										}
-									],
-									"request": {
-										"method": "GET",
-										"header": [],
-										"url": {
-											"raw": "{{int.api.url}}FHIR/R4/DiagnosticReport/{{Report_Logical_Id}}",
-											"host": [
-												"{{int.api.url}}FHIR"
-											],
-											"path": [
-												"R4",
-												"DiagnosticReport",
-												"{{Report_Logical_Id}}"
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "Rare Disease - Non-WGS-R132.1 -Update Report",
-									"event": [
-										{
-											"listen": "prerequest",
-											"script": {
-												"exec": [
-													"const bundle_id = pm.variables.replaceIn(\"{{$guid}}\");\r",
-													"pm.environment.set(\"bundle_id\",bundle_id);\r",
-													"\r",
-													"const report_id = pm.variables.replaceIn(\"{{$guid}}\");\r",
-													"pm.environment.set(\"report_id\",report_id);\r",
-													"\r",
-													"const report_time=pm.variables.replaceIn(\"{{$isoTimestamp}}\");\r",
-													"pm.environment.set(\"report_time\",report_time);\r",
-													"\r",
-													"const specimen_collection_time=pm.variables.replaceIn(\"{{$isoTimestamp}}\");\r",
-													"pm.environment.set(\"specimen_collection_time\",specimen_collection_time);\r",
-													"\r",
-													"const provenance_id = pm.variables.replaceIn(\"{{$guid}}\");\r",
-													"const provenance_time=pm.variables.replaceIn(\"{{$isoTimestamp}}\");\r",
-													"const signature_time=pm.variables.replaceIn(\"{{$isoTimestamp}}\");\r",
-													"\r",
-													"pm.environment.set(\"provenance_id\",provenance_id);\r",
-													"pm.environment.set(\"provenance_time\",provenance_time);\r",
-													"pm.environment.set(\"signature_time\",signature_time);"
-												],
-												"type": "text/javascript",
-												"packages": {}
-											}
-										},
-										{
-											"listen": "test",
-											"script": {
-												"exec": [
-													"const responseJson = pm.response.json();\r",
-													"//console.log(responseJson.entry[3].fullUrl.split(\"/\")[1]);\r",
-													"\r",
-													"pm.test(\"HTTP Status code is 200\", function () {\r",
-													"  pm.response.to.have.status(200);\r",
-													"});\r",
-													"\r",
-													"pm.test(\"Content-Type header is present\", () => {\r",
-													"  pm.response.to.have.header(\"Content-Type\");\r",
-													"});\r",
-													"\r",
-													"pm.test(\"Response type = 'transaction-response'\", () => {\r",
-													"  pm.expect(responseJson.type).to.eql(\"transaction-response\");\r",
-													"});\r",
-													"\r",
-													"pm.test('No of operation outcomes matches the resources sent == 2', () => {\r",
-													"    pm.expect(responseJson.entry.length).to.eql(2);\r",
-													"});\r",
-													"\r",
-													"const Report_Logical_Id = responseJson.entry[0].fullUrl.split(\"/\")[1];\r",
-													"pm.environment.set(\"Report_Logical_Id\",Report_Logical_Id);\r",
-													"\r",
-													"pm.test('Report_Logical_Id is a valid UUID', () => {\r",
-													"    pm.expect(Report_Logical_Id).to.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i);\r",
-													"});"
-												],
-												"type": "text/javascript",
-												"packages": {}
-											}
-										}
-									],
-									"request": {
-										"method": "POST",
-										"header": [],
-										"body": {
-											"mode": "raw",
-											"raw": "{\r\n    \"resourceType\": \"Bundle\",\r\n    \"id\": \"{{bundle_id}}\",\r\n    \"type\": \"transaction\",\r\n    \"entry\":  [\r\n        {\r\n            \"fullUrl\": \"DiagnosticReport/{{Report_Logical_Id}}\",\r\n            \"resource\": {\r\n                \"resourceType\": \"DiagnosticReport\",\r\n                \"id\": \"{{Report_Logical_Id}}\",\r\n                \"identifier\":  [\r\n                    {\r\n                        \"system\": \"https://www.guysandstthomas.nhs.uk/SEGLH/lims\",\r\n                        \"value\": \"{{report_identifier}}\",\r\n                        \"assigner\": {\r\n                            \"identifier\": {\r\n                                \"system\": \"https://fhir.nhs.uk/Id/ods-organization-code\",\r\n                                \"value\": \"RP4\"\r\n                            }\r\n                        }\r\n                    }\r\n                ],\r\n                \"basedOn\":  [\r\n                    {\r\n                        \"reference\": \"ServiceRequest/{{Service_Request_Logical_Id}}\"\r\n                    }\r\n                ],\r\n                \"status\": \"final\",\r\n                \"category\":  [\r\n                    {\r\n                        \"coding\":  [\r\n                            {\r\n                                \"system\": \"http://terminology.hl7.org/CodeSystem/v2-0074\",\r\n                                \"code\": \"GE\",\r\n                                \"display\": \"Genetics\"\r\n                            }\r\n                        ]\r\n                    }\r\n                ],\r\n                \"code\": {\r\n                    \"coding\":  [\r\n                        {\r\n                            \"system\": \"http://snomed.info/sct\",\r\n                            \"code\": \"1054161000000101\",\r\n                            \"display\": \"Genetic report\"\r\n                        }\r\n                    ]\r\n                },\r\n                \"subject\": {\r\n                    \"reference\": \"Patient/{{Patient_Logical_Id}}\"\r\n                },\r\n                \"issued\": \"{{report_time}}\",\r\n                \"performer\":  [\r\n                    {\r\n                        \"identifier\": {\r\n                            \"system\": \"https://fhir.nhs.uk/Id/ods-organization-code\",\r\n                            \"value\": \"69A70\"\r\n                        }\r\n                    }\r\n                ],\r\n                \"specimen\":  [\r\n                    {\r\n                        \"reference\": \"Specimen/{{Specimen_Logical_Id}}\"\r\n                    }\r\n                ],\r\n                \"presentedForm\":  [\r\n                    {\r\n                        \"contentType\": \"application/pdf\",\r\n                        \"language\": \"en-GB\",\r\n                        \"url\": \"https://o719on.axshare.com/?id=8aol33&p=introduction&g=1\",\r\n                        \"size\": 43272,\r\n                        \"title\": \"Genomic Report for Anita Lamberts\",\r\n                        \"creation\": \"{{report_time}}\"\r\n                    }\r\n                ]\r\n            },\r\n            \"request\": {\r\n                \"method\": \"PUT\",\r\n                \"url\": \"DiagnosticReport/{{Report_Logical_Id}}\"\r\n            }\r\n        }, {\r\n            \"fullUrl\": \"urn:uuid:{{provenance_id}}\",\r\n            \"resource\": {\r\n                \"resourceType\": \"Provenance\",\r\n                \"id\": \"{{provenance_id}}\",\r\n                \"target\": [{\r\n                        \"reference\": \"DiagnosticReport/{{Report_Logical_Id}}\"\r\n                    }\r\n                ],\r\n                \"recorded\": \"{{provenance_time}}\",\r\n                \"reason\": [{\r\n                        \"coding\": [{\r\n                                \"system\": \"http://terminology.hl7.org/CodeSystem/v3-ActReason\",\r\n                                \"code\": \"TREAT\",\r\n                                \"display\": \"treatment\"\r\n                            }\r\n                        ]\r\n                    }\r\n                ],\r\n                \"activity\": {\r\n                    \"coding\": [{\r\n                            \"system\": \"http://terminology.hl7.org/CodeSystem/v3-DataOperation\",\r\n                            \"code\": \"UPDATE\",\r\n                            \"display\": \"revise\"\r\n                        }\r\n                    ]\r\n                },\r\n                \"agent\": [{\r\n                        \"type\": {\r\n                            \"coding\": [{\r\n                                    \"system\": \"http://terminology.hl7.org/CodeSystem/provenance-participant-type\",\r\n                                    \"code\": \"author\",\r\n                                    \"display\": \"Author\"\r\n                                }\r\n                            ]\r\n                        },\r\n                        \"who\": {\r\n                            \"reference\": \"PractitionerRole/{{PractitionerRole_Logical_Id}}\"\r\n                        }\r\n                    }\r\n                ],\r\n                \"entity\": [{\r\n                        \"role\": \"source\",\r\n                        \"what\": {\r\n                            \"reference\": \"DiagnosticReport/{{Report_Logical_Id}}\"\r\n                        }\r\n                    }\r\n                ],\r\n                \"signature\": [{\r\n                        \"type\": [{\r\n                                \"system\": \"urn:iso-astm:E1762-95:2013\",\r\n                                \"code\": \"1.2.840.10065.1.12.1.15\",\r\n                                \"display\": \"Addendum Signature\"\r\n                            }\r\n                        ],\r\n                        \"when\": \"{{signature_time}}\",\r\n                        \"who\": {\r\n                            \"reference\": \"PractitionerRole/{{PractitionerRole_Logical_Id}}\"\r\n                        },\r\n                        \"data\": \"DQo8U2lnbmF0dXJlIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwLzA5L3htbGRzaWcjIj4NCiAgICA8U2lnbmVkSW5mbz48Q2Fub25pY2FsaXphdGlvbk1ldGhvZCBBbGdvcml0aG09Imh0dHA6Ly93d3cudzMub3JnLzIwMDEvMTAveG1sLWV4Yy1jMTRuIyI+PC9DYW5vbmljYWxpemF0aW9uTWV0aG9kPjxTaWduYXR1cmVNZXRob2QgQWxnb3JpdGhtPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwLzA5L3htbGRzaWcjcnNhLXNoYTEiPjwvU2lnbmF0dXJlTWV0aG9kPjxSZWZlcmVuY2U+PFRyYW5zZm9ybXM+PFRyYW5zZm9ybSBBbGdvcml0aG09Imh0dHA6Ly93d3cudzMub3JnLzIwMDEvMTAveG1sLWV4Yy1jMTRuIyI+PC9UcmFuc2Zvcm0+PC9UcmFuc2Zvcm1zPjxEaWdlc3RNZXRob2QgQWxnb3JpdGhtPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwLzA5L3htbGRzaWcjc2hhMSI+PC9EaWdlc3RNZXRob2Q+PERpZ2VzdFZhbHVlPjJ5cUJISDVLK05ibVA1WWY3bVE3WmVFYWN0Yz08L0RpZ2VzdFZhbHVlPjwvUmVmZXJlbmNlPjwvU2lnbmVkSW5mbz4NCiAgICA8U2lnbmF0dXJlVmFsdWU+aE9DaXVJOGIyTEFaRXoxUDdXcGFlRDBQUWQ2bVJKdzVSV2JNV2ZMcU1OUWtRMzIzbnpWTDk3a01XZUJycnJzNU5vTHhGb28vKzFPUjYxcmNXNTJEamlHdjRRcE53QmJOQkYvMi9hUWxqd3pUdm9tQm9tUlpnbUtRQWpyZU1iOTZNM0hjajVvVFNBZG9tUEc2TGw3RVRCS25wRTVJdW5EamducUIxelhEWllVPTwvU2lnbmF0dXJlVmFsdWU+DQogICAgPEtleUluZm8+DQogICAgICAgIDxYNTA5RGF0YT4NCiAgICAgICAgICAgIDxYNTA5Q2VydGlmaWNhdGU+TUlJRHVEQ0NBcUNnQXdJQkFnSUVYY210SHpBTkJna3Foa2lHOXcwQkFRc0ZBREEyTVF3d0NnWURWUVFLRXdOdWFITXhDekFKQmdOVkJBc1RBa05CTVJrd0Z3WURWUVFERXhCT1NGTWdTVTVVSUV4bGRtVnNJREZFTUI0WERUSXdNVEF5TWpFd01qRTFOVm9YRFRJeU1UQXlNakV3TlRFMU5Wb3dRekVNTUFvR0ExVUVDaE1EYm1oek1ROHdEUVlEVlFRTEV3WlFaVzl3YkdVeElqQWdCZ05WQkFNTUdUVTFOVEkxTXpVeU1URXdPRjlTUVU1RVQwMWZWVk5GVWxFd2daOHdEUVlKS29aSWh2Y05BUUVCQlFBRGdZMEFNSUdKQW9HQkFLdDRzek53N09BSDdBUVJyRGUveEJJbXNNbU1pUzlFc3JUM2EzcC9MaDNicmR6STlhYWpUVVoyYi9jdmJPYTdQZVlkN3UrSzRhMlpkMFhrKzBHRm1ZR3pTVlg2aVlqYmx3cjB2YWkzMXpWN0crbEd2SHhINnBTb0xDd0lDYVpBRndhYmVENU96OTQreUEzYVdOV3RHVjBEZmg5cXdIM1pGQ0lNUnN2ZXJOMXBBZ01CQUFHamdnRkRNSUlCUHpBT0JnTlZIUThCQWY4RUJBTUNCa0F3WlFZRFZSMGdBUUgvQkZzd1dUQlhCZ3NxaGpvQWlYdG1BQU1DQURCSU1FWUdDQ3NHQVFVRkJ3SUJGanBvZEhSd2N6b3ZMM0JyYVM1dWFITXVkV3N2WTJWeWRHbG1hV05oZEdWZmNHOXNhV05wWlhNdlkyOXVkR1Z1ZEY5amIyMXRhWFJ0Wlc1ME1ETUdBMVVkSHdRc01Db3dLS0Ftb0NTR0ltaDBkSEE2THk5amNtd3VibWh6TG5WckwybHVkQzh4WkM5amNteGpNeTVqY213d0t3WURWUjBRQkNRd0lvQVBNakF5TURFd01qSXhNREl4TlRWYWdROHlNREl5TURNeE56RXdOVEUxTlZvd0h3WURWUjBqQkJnd0ZvQVVvSllmZ1lUTlBkNkVVS0w2UUxJekh4WTVQRkl3SFFZRFZSME9CQllFRkx0eXZZU3lhcWc2MEFFVVpneGswd3JqUkpjK01Ba0dBMVVkRXdRQ01BQXdHUVlKS29aSWh2WjlCMEVBQkF3d0Noc0VWamd1TXdNQ0JMQXdEUVlKS29aSWh2Y05BUUVMQlFBRGdnRUJBQmN6eThCOGp1UHBJZmFUTkZjeHJDMjJhQ1gveFlabWhyTC9OdklCQWFYMUc1aGppd21rR0tFMmhSVElyNjdQeFp4bVhzSnhpZ1JCTUhQbEkrbFkvK29rekgwR2k3YjVicWx3N3B4R0lnSk8wMDB3OHBGc3ZvOXc0MklZaEhvZHN2bkRWU3hoTVQwSjQ2UWhrOXNvRTBMam9FVUxLUVBQbFlHa2UvR2wzbTE3SXRGWXdPYlFIMGZNRXdtaXFCeWVJZno3Z1NjY096TDVjSXA2UGNaVE9qbzJJcVFwZ0VtaGpPY1JJbkVxQU5pdFNkam9pSkFKenBhYVpqWVRSZEhVWDdpN2FqRWlING05MW5GVys0QXFrTnR0bGI0V2NHS3NTbVdnZktLaGVGNElvWktNRTgweGVyU2dNeTh2dGpMT0JKQ0dYejB3TEdtUXVSbXhNVHE4OHE0PTwvWDUwOUNlcnRpZmljYXRlPg0KICAgICAgICA8L1g1MDlEYXRhPg0KICAgIDwvS2V5SW5mbz4NCjwvU2lnbmF0dXJlPg0K\"\r\n                    }\r\n                ]\r\n            },\r\n            \"request\": {\r\n                \"method\": \"POST\",\r\n                \"url\": \"Provenance\"\r\n            }\r\n        }\r\n    ]\r\n}",
-											"options": {
-												"raw": {
-													"language": "json"
-												}
-											}
-										},
-										"url": {
-											"raw": "{{int.api.url}}FHIR/R4",
-											"host": [
-												"{{int.api.url}}FHIR"
-											],
-											"path": [
-												"R4"
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "Get Report - id",
-									"event": [
-										{
-											"listen": "test",
-											"script": {
-												"exec": [
-													"const responseJson = pm.response.json();\r",
-													"\r",
-													"pm.test(\"HTTP Status code is 200\", function () {\r",
-													"  pm.response.to.have.status(200);\r",
-													"});\r",
-													"\r",
-													"pm.test(\"Content-Type header is present\", () => {\r",
-													"  pm.response.to.have.header(\"Content-Type\");\r",
-													"});\r",
-													"\r",
-													"pm.test(\"resourceType type = 'DiagnosticReport'\", () => {\r",
-													"  pm.expect(responseJson.resourceType).to.eql(\"DiagnosticReport\");\r",
-													"});\r",
-													"\r",
-													"const Response_DiagnosticReport_Logical_Id = responseJson.id\r",
-													"pm.test(\"Logical id of the resource matches\", () => {\r",
-													"  pm.expect(Response_DiagnosticReport_Logical_Id).to.eql(pm.environment.get('Report_Logical_Id'));\r",
-													"})\r",
-													"\r",
-													"pm.test('Response_DiagnosticReport_Logical_Id is a valid UUID', () => {\r",
-													"    pm.expect(Response_DiagnosticReport_Logical_Id).to.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i);\r",
-													"});\r",
-													""
-												],
-												"type": "text/javascript",
-												"packages": {}
-											}
-										}
-									],
-									"request": {
-										"method": "GET",
-										"header": [],
-										"url": {
-											"raw": "{{int.api.url}}FHIR/R4/DiagnosticReport/{{Report_Logical_Id}}",
-											"host": [
-												"{{int.api.url}}FHIR"
-											],
-											"path": [
-												"R4",
-												"DiagnosticReport",
-												"{{Report_Logical_Id}}"
-											]
-										}
-									},
-									"response": []
 								}
 							],
-							"description": "This collection test the following scenario\n\n1. Send a test request for Rare Disease R132.1 using requestor org \"699W0\" to /FHIR/R4 endpoint using transaction message. Capture the logical Id for Patient and Service Request. There is no specimen in the initial request\n    \n2. A generic /ServiceRequest GET using \"699W0\" as requester.\n    \n3. A ServiceRequest/LOGICAL_ID GET can confirming is the ID's match\n    \n4. Attach a specimen to the test request\n    \n5. Get the specimen and check Id\n    \n6. Update the specimen\n    \n7. Get the specimen and check Id\n    \n8. Attach a report to the specimen\n    \n9. Get report and check Id of the report\n    \n10. Update the final report\n    \n11. Get report and check Id of the report"
+							"description": "This collection test the following scenario\n\n1. Attach a DocumentReference resource that captures the Genomic Data used for final report"
 						},
 						{
 							"name": "Singleton - RARE - NONWGS Add & Update Sample & Report",
@@ -3706,7 +3648,7 @@
 										"method": "GET",
 										"header": [],
 										"url": {
-											"raw": "{{int.api.url}}FHIR/R4/ServiceRequest?_id={{Service_Request_Logical_Id}}&_revinclude=DiagnosticReport:basedOn",
+											"raw": "{{int.api.url}}FHIR/R4/ServiceRequest?_id={{Service_Request_Logical_Id}}&_revinclude=DiagnosticReport:basedOn&_include=ServiceRequest:subject",
 											"host": [
 												"{{int.api.url}}FHIR"
 											],
@@ -3727,6 +3669,10 @@
 												{
 													"key": "_revinclude",
 													"value": "DiagnosticReport:basedOn"
+												},
+												{
+													"key": "_include",
+													"value": "ServiceRequest:subject"
 												}
 											]
 										}
@@ -6570,7 +6516,7 @@
 							"name": "R442 Variant Re-interpretation",
 							"item": [
 								{
-									"name": "Rare Disease - Non-WGS-R132.1 Copy",
+									"name": "Rare Disease - Non-WGS-R132.1",
 									"event": [
 										{
 											"listen": "prerequest",
@@ -6711,7 +6657,7 @@
 									"response": []
 								},
 								{
-									"name": "Get Service Request - Requestor Copy",
+									"name": "Get Service Request - Requestor",
 									"event": [
 										{
 											"listen": "test",
@@ -6784,7 +6730,7 @@
 									"response": []
 								},
 								{
-									"name": "Get Service Request - Logical Id Copy",
+									"name": "Get Service Request - Logical Id",
 									"event": [
 										{
 											"listen": "test",
@@ -8509,1160 +8455,1630 @@
 					"name": "GLH",
 					"item": [
 						{
-							"name": "Get service request for my org",
-							"event": [
+							"name": "Query",
+							"item": [
 								{
-									"listen": "test",
-									"script": {
-										"exec": [
-											"var template = `\r",
-											"<style type=\"text/css\">\r",
-											"    .tftable {font-size:14px;color:#333333;width:100%;border-width: 1px;border-color: #87ceeb;border-collapse: collapse;}\r",
-											"    .tftable th {font-size:18px;background-color:#87ceeb;border-width: 1px;padding: 8px;border-style: solid;border-color: #87ceeb;text-align:left;}\r",
-											"    .tftable tr {background-color:#ffffff;}\r",
-											"    .tftable td {font-size:14px;border-width: 1px;padding: 8px;border-style: solid;border-color: #87ceeb;}\r",
-											"    .tftable tr:hover {background-color:#e0ffff;}\r",
-											"</style>\r",
-											"\r",
-											"<table class=\"tftable\" border=\"1\">\r",
-											"    <tr>\r",
-											"        <th>Type</th>\r",
-											"        <th>Logical Id</th>\r",
-											"        <th>Category</th>\r",
-											"        <th>Test</th>\r",
-											"        <th>Status</th>\r",
-											"        <th>Intent</th>\r",
-											"        <th>Priority</th>\r",
-											"        <th>Authored On</th>\r",
-											"        <th>Version Id</th>\r",
-											"    </tr>\r",
-											"    \r",
-											"    {{#each response.entry}}\r",
-											"        <tr>\r",
-											"            <td>{{resource.resourceType}}</td>\r",
-											"            <td>{{resource.id}}</td>\r",
-											"            <td>{{resource.category.[0].coding.[0].display}}</td>\r",
-											"            <td>{{resource.code.coding.[0].code}}-{{resource.code.coding.[0].display}}</td>\r",
-											"            <td>{{resource.status}}</td>\r",
-											"            <td>{{resource.intent}}</td>\r",
-											"            <td>{{resource.priority}}</td>\r",
-											"            <td>{{resource.authoredOn}}</td>\r",
-											"            <td>{{resource.meta.versionId}}</td>\r",
-											"        </tr>\r",
-											"    {{/each}}\r",
-											"</table>\r",
-											"`;\r",
-											"\r",
-											"function constructVisualizerPayload() {\r",
-											"    return {response: pm.response.json()}\r",
-											"}\r",
-											"\r",
-											"pm.visualizer.set(template, constructVisualizerPayload());"
-										],
-										"type": "text/javascript",
-										"packages": {}
-									}
-								}
-							],
-							"protocolProfileBehavior": {
-								"disableBodyPruning": true
-							},
-							"request": {
-								"method": "GET",
-								"header": [],
-								"body": {
-									"mode": "urlencoded",
-									"urlencoded": []
-								},
-								"url": {
-									"raw": "{{int.api.url}}FHIR/R4/ServiceRequest?performer=697L0",
-									"host": [
-										"{{int.api.url}}FHIR"
-									],
-									"path": [
-										"R4",
-										"ServiceRequest"
-									],
-									"query": [
+									"name": "Get service request for my org",
+									"event": [
 										{
-											"key": "performer",
-											"value": "697L0"
-										},
-										{
-											"key": "status",
-											"value": "active",
-											"disabled": true
-										},
-										{
-											"key": "-date.from",
-											"value": "2024-07-19",
-											"disabled": true
-										},
-										{
-											"key": "category",
-											"value": "rare-disease-wgs",
-											"disabled": true
+											"listen": "test",
+											"script": {
+												"exec": [
+													"var template = `\r",
+													"<style type=\"text/css\">\r",
+													"    .tftable {font-size:14px;color:#333333;width:100%;border-width: 1px;border-color: #87ceeb;border-collapse: collapse;}\r",
+													"    .tftable th {font-size:18px;background-color:#87ceeb;border-width: 1px;padding: 8px;border-style: solid;border-color: #87ceeb;text-align:left;}\r",
+													"    .tftable tr {background-color:#ffffff;}\r",
+													"    .tftable td {font-size:14px;border-width: 1px;padding: 8px;border-style: solid;border-color: #87ceeb;}\r",
+													"    .tftable tr:hover {background-color:#e0ffff;}\r",
+													"</style>\r",
+													"\r",
+													"<table class=\"tftable\" border=\"1\">\r",
+													"    <tr>\r",
+													"        <th>Type</th>\r",
+													"        <th>Logical Id</th>\r",
+													"        <th>Category</th>\r",
+													"        <th>Test</th>\r",
+													"        <th>Status</th>\r",
+													"        <th>Intent</th>\r",
+													"        <th>Priority</th>\r",
+													"        <th>Authored On</th>\r",
+													"        <th>Version Id</th>\r",
+													"    </tr>\r",
+													"    \r",
+													"    {{#each response.entry}}\r",
+													"        <tr>\r",
+													"            <td>{{resource.resourceType}}</td>\r",
+													"            <td>{{resource.id}}</td>\r",
+													"            <td>{{resource.category.[0].coding.[0].display}}</td>\r",
+													"            <td>{{resource.code.coding.[0].code}}-{{resource.code.coding.[0].display}}</td>\r",
+													"            <td>{{resource.status}}</td>\r",
+													"            <td>{{resource.intent}}</td>\r",
+													"            <td>{{resource.priority}}</td>\r",
+													"            <td>{{resource.authoredOn}}</td>\r",
+													"            <td>{{resource.meta.versionId}}</td>\r",
+													"        </tr>\r",
+													"    {{/each}}\r",
+													"</table>\r",
+													"`;\r",
+													"\r",
+													"function constructVisualizerPayload() {\r",
+													"    return {response: pm.response.json()}\r",
+													"}\r",
+													"\r",
+													"pm.visualizer.set(template, constructVisualizerPayload());"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
 										}
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Get tasks for service request",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"exec": [
-											"const responseJson = pm.response.json();\r",
-											"\r",
-											"const Task_Array = [];\r",
-											"responseJson.entry.forEach((entry) => {\r",
-											"    if (entry.resource.resourceType === \"Task\") {\r",
-											"        var code = entry.resource.code.coding[0].code;\r",
-											"        pm.environment.set(\"task_\" + code, entry.resource.id);\r",
-											"        Task_Array.push(entry.resource);\r",
-											"    }\r",
-											"});\r",
-											"\r",
-											"pm.environment.set(\"Task_Array\",Task_Array);\r",
-											"\r",
-											"console.log(Task_Array.toString());\r",
-											"\r",
-											"var template = `\r",
-											"<style type=\"text/css\">\r",
-											"    .tftable {font-size:14px;color:#333333;width:100%;border-width: 1px;border-color: #87ceeb;border-collapse: collapse;}\r",
-											"    .tftable th {font-size:18px;background-color:#87ceeb;border-width: 1px;padding: 8px;border-style: solid;border-color: #87ceeb;text-align:left;}\r",
-											"    .tftable tr {background-color:#ffffff;}\r",
-											"    .tftable td {font-size:14px;border-width: 1px;padding: 8px;border-style: solid;border-color: #87ceeb;}\r",
-											"    .tftable tr:hover {background-color:#e0ffff;}\r",
-											"</style>\r",
-											"\r",
-											"<table class=\"tftable\" border=\"1\">\r",
-											"    <tr>\r",
-											"        <th>Type</th>\r",
-											"        <th>Logical Id</th>\r",
-											"        <th>Category</th>\r",
-											"        <th>Test</th>\r",
-											"        <th>Status</th>\r",
-											"        <th>Intent</th>\r",
-											"        <th>Priority</th>\r",
-											"        <th>Authored On</th>\r",
-											"        <th>Version Id</th>\r",
-											"    </tr>\r",
-											"\r",
-											"    {{#each response.entry}}\r",
-											"        {{#if @first}} \r",
-											"        <tr>\r",
-											"            <td>{{resource.resourceType}}</td>\r",
-											"            <td>{{resource.id}}</td>\r",
-											"            <td>{{resource.category.[0].coding.[0].display}}</td>\r",
-											"            <td>{{resource.code.coding.[0].code}}-{{resource.code.coding.[0].display}}</td>\r",
-											"            <td>{{resource.status}}</td>\r",
-											"            <td>{{resource.intent}}</td>\r",
-											"            <td>{{resource.priority}}</td>\r",
-											"            <td>{{resource.authoredOn}}</td>\r",
-											"            <td>{{resource.meta.versionId}}</td>\r",
-											"        </tr>\r",
-											"        {{/if}}\r",
-											"    {{/each}}\r",
-											"</table>\r",
-											"<p></p>\r",
-											"<p>Task Count : </p>\r",
-											"<p></p>\r",
-											"<table class=\"tftable\" border=\"1\">\r",
-											"    <tr>\r",
-											"        <th>Type</th>\r",
-											"        <th>Logical Id</th>\r",
-											"        <th>Name</th>\r",
-											"        <th>Status</th>\r",
-											"        <th>Intent</th>\r",
-											"        <th>Priority</th>\r",
-											"        <th>Authored On</th>\r",
-											"        <th>Last Modified</th>\r",
-											"        <th>Specimen</th>\r",
-											"        <th>Version Id</th>\r",
-											"    </tr>\r",
-											"    \r",
-											"    {{#each response.entry}}\r",
-											"            {{#if @first}}\r",
-											"            {{else}}\r",
-											"            <tr>\r",
-											"                <td>{{resource.resourceType}}</td>\r",
-											"                <td>{{resource.id}}</td>\r",
-											"                <td>{{resource.code.coding.[0].display}}</td>\r",
-											"                <td>{{resource.status}}</td>\r",
-											"                <td>{{resource.intent}}</td>\r",
-											"                <td>{{resource.priority}}</td>\r",
-											"                <td>{{resource.authoredOn}}</td>\r",
-											"                <td>{{resource.lastModified}}</td>\r",
-											"                <td>{{resource.input.[0].valueReference.reference}}</td>\r",
-											"                <td>{{resource.meta.versionId}}</td>\r",
-											"            </tr>\r",
-											"            {{/if}}\r",
-											"    {{/each}}\r",
-											"</table>\r",
-											"`;\r",
-											"\r",
-											"function constructVisualizerPayload() {\r",
-											"    return {response: pm.response.json()}\r",
-											"}\r",
-											"\r",
-											"pm.visualizer.set(template, constructVisualizerPayload());"
-										],
-										"type": "text/javascript",
-										"packages": {}
-									}
+									],
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "urlencoded",
+											"urlencoded": []
+										},
+										"url": {
+											"raw": "{{int.api.url}}FHIR/R4/ServiceRequest?performer=697L0",
+											"host": [
+												"{{int.api.url}}FHIR"
+											],
+											"path": [
+												"R4",
+												"ServiceRequest"
+											],
+											"query": [
+												{
+													"key": "performer",
+													"value": "697L0"
+												},
+												{
+													"key": "status",
+													"value": "active",
+													"disabled": true
+												},
+												{
+													"key": "-date.from",
+													"value": "2024-07-19",
+													"disabled": true
+												},
+												{
+													"key": "category",
+													"value": "rare-disease-wgs",
+													"disabled": true
+												}
+											]
+										}
+									},
+									"response": []
 								},
 								{
-									"listen": "prerequest",
-									"script": {
-										"exec": [
-											""
-										],
-										"type": "text/javascript",
-										"packages": {}
-									}
-								}
-							],
-							"request": {
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "{{int.api.url}}FHIR/R4/ServiceRequest?_id={{Service_Request_Logical_Id}}&_revinclude=Task:focus",
-									"host": [
-										"{{int.api.url}}FHIR"
-									],
-									"path": [
-										"R4",
-										"ServiceRequest"
-									],
-									"query": [
+									"name": "Get tasks for service request",
+									"event": [
 										{
-											"key": "_id",
-											"value": "{{Service_Request_Logical_Id}}"
+											"listen": "test",
+											"script": {
+												"exec": [
+													"const responseJson = pm.response.json();\r",
+													"\r",
+													"const Task_Array = [];\r",
+													"responseJson.entry.forEach((entry) => {\r",
+													"    if (entry.resource.resourceType === \"Task\") {\r",
+													"        var code = entry.resource.code.coding[0].code;\r",
+													"        pm.environment.set(\"task_\" + code, entry.resource.id);\r",
+													"        Task_Array.push(entry.resource);\r",
+													"    }\r",
+													"});\r",
+													"\r",
+													"pm.environment.set(\"Task_Array\",Task_Array);\r",
+													"\r",
+													"console.log(Task_Array.toString());\r",
+													"\r",
+													"var template = `\r",
+													"<style type=\"text/css\">\r",
+													"    .tftable {font-size:14px;color:#333333;width:100%;border-width: 1px;border-color: #87ceeb;border-collapse: collapse;}\r",
+													"    .tftable th {font-size:18px;background-color:#87ceeb;border-width: 1px;padding: 8px;border-style: solid;border-color: #87ceeb;text-align:left;}\r",
+													"    .tftable tr {background-color:#ffffff;}\r",
+													"    .tftable td {font-size:14px;border-width: 1px;padding: 8px;border-style: solid;border-color: #87ceeb;}\r",
+													"    .tftable tr:hover {background-color:#e0ffff;}\r",
+													"</style>\r",
+													"\r",
+													"<table class=\"tftable\" border=\"1\">\r",
+													"    <tr>\r",
+													"        <th>Type</th>\r",
+													"        <th>Logical Id</th>\r",
+													"        <th>Category</th>\r",
+													"        <th>Test</th>\r",
+													"        <th>Status</th>\r",
+													"        <th>Intent</th>\r",
+													"        <th>Priority</th>\r",
+													"        <th>Authored On</th>\r",
+													"        <th>Version Id</th>\r",
+													"    </tr>\r",
+													"\r",
+													"    {{#each response.entry}}\r",
+													"        {{#if @first}} \r",
+													"        <tr>\r",
+													"            <td>{{resource.resourceType}}</td>\r",
+													"            <td>{{resource.id}}</td>\r",
+													"            <td>{{resource.category.[0].coding.[0].display}}</td>\r",
+													"            <td>{{resource.code.coding.[0].code}}-{{resource.code.coding.[0].display}}</td>\r",
+													"            <td>{{resource.status}}</td>\r",
+													"            <td>{{resource.intent}}</td>\r",
+													"            <td>{{resource.priority}}</td>\r",
+													"            <td>{{resource.authoredOn}}</td>\r",
+													"            <td>{{resource.meta.versionId}}</td>\r",
+													"        </tr>\r",
+													"        {{/if}}\r",
+													"    {{/each}}\r",
+													"</table>\r",
+													"<p></p>\r",
+													"<p>Task Count : </p>\r",
+													"<p></p>\r",
+													"<table class=\"tftable\" border=\"1\">\r",
+													"    <tr>\r",
+													"        <th>Type</th>\r",
+													"        <th>Logical Id</th>\r",
+													"        <th>Name</th>\r",
+													"        <th>Status</th>\r",
+													"        <th>Intent</th>\r",
+													"        <th>Priority</th>\r",
+													"        <th>Authored On</th>\r",
+													"        <th>Last Modified</th>\r",
+													"        <th>Specimen</th>\r",
+													"        <th>Version Id</th>\r",
+													"    </tr>\r",
+													"    \r",
+													"    {{#each response.entry}}\r",
+													"            {{#if @first}}\r",
+													"            {{else}}\r",
+													"            <tr>\r",
+													"                <td>{{resource.resourceType}}</td>\r",
+													"                <td>{{resource.id}}</td>\r",
+													"                <td>{{resource.code.coding.[0].display}}</td>\r",
+													"                <td>{{resource.status}}</td>\r",
+													"                <td>{{resource.intent}}</td>\r",
+													"                <td>{{resource.priority}}</td>\r",
+													"                <td>{{resource.authoredOn}}</td>\r",
+													"                <td>{{resource.lastModified}}</td>\r",
+													"                <td>{{resource.input.[0].valueReference.reference}}</td>\r",
+													"                <td>{{resource.meta.versionId}}</td>\r",
+													"            </tr>\r",
+													"            {{/if}}\r",
+													"    {{/each}}\r",
+													"</table>\r",
+													"`;\r",
+													"\r",
+													"function constructVisualizerPayload() {\r",
+													"    return {response: pm.response.json()}\r",
+													"}\r",
+													"\r",
+													"pm.visualizer.set(template, constructVisualizerPayload());"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
 										},
 										{
-											"key": "_revinclude",
-											"value": "Task:focus"
-										},
-										{
-											"key": "owner",
-											"value": "697L0",
-											"disabled": true
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
 										}
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Get tasks for service request ReAnalysis",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"exec": [
-											"const responseJson = pm.response.json();\r",
-											"\r",
-											"const Task_Array = [];\r",
-											"responseJson.entry.forEach((entry) => {\r",
-											"    if (entry.resource.resourceType === \"Task\") {\r",
-											"        var code = entry.resource.code.coding[0].code;\r",
-											"        pm.environment.set(\"task_\" + code, entry.resource.id);\r",
-											"        Task_Array.push(entry.resource);\r",
-											"    }\r",
-											"});\r",
-											"\r",
-											"pm.environment.set(\"Task_Array\",Task_Array);\r",
-											"\r",
-											"console.log(Task_Array.toString());\r",
-											"\r",
-											"var template = `\r",
-											"<style type=\"text/css\">\r",
-											"    .tftable {font-size:14px;color:#333333;width:100%;border-width: 1px;border-color: #87ceeb;border-collapse: collapse;}\r",
-											"    .tftable th {font-size:18px;background-color:#87ceeb;border-width: 1px;padding: 8px;border-style: solid;border-color: #87ceeb;text-align:left;}\r",
-											"    .tftable tr {background-color:#ffffff;}\r",
-											"    .tftable td {font-size:14px;border-width: 1px;padding: 8px;border-style: solid;border-color: #87ceeb;}\r",
-											"    .tftable tr:hover {background-color:#e0ffff;}\r",
-											"</style>\r",
-											"\r",
-											"<table class=\"tftable\" border=\"1\">\r",
-											"    <tr>\r",
-											"        <th>Type</th>\r",
-											"        <th>Logical Id</th>\r",
-											"        <th>Category</th>\r",
-											"        <th>Test</th>\r",
-											"        <th>Status</th>\r",
-											"        <th>Intent</th>\r",
-											"        <th>Priority</th>\r",
-											"        <th>Authored On</th>\r",
-											"        <th>Version Id</th>\r",
-											"    </tr>\r",
-											"    \r",
-											"    {{#each response.entry}}\r",
-											"        {{#if @first}} \r",
-											"        <tr>\r",
-											"            <td>{{resource.resourceType}}</td>\r",
-											"            <td>{{resource.id}}</td>\r",
-											"            <td>{{resource.category.[0].coding.[0].display}}</td>\r",
-											"            <td>{{resource.code.coding.[0].code}}-{{resource.code.coding.[0].display}}</td>\r",
-											"            <td>{{resource.status}}</td>\r",
-											"            <td>{{resource.intent}}</td>\r",
-											"            <td>{{resource.priority}}</td>\r",
-											"            <td>{{resource.authoredOn}}</td>\r",
-											"            <td>{{resource.meta.versionId}}</td>\r",
-											"        </tr>\r",
-											"        {{/if}}\r",
-											"    {{/each}}\r",
-											"</table>\r",
-											"<p></p>\r",
-											"<table class=\"tftable\" border=\"1\">\r",
-											"    <tr>\r",
-											"        <th>Type</th>\r",
-											"        <th>Logical Id</th>\r",
-											"        <th>Name</th>\r",
-											"        <th>Status</th>\r",
-											"        <th>Intent</th>\r",
-											"        <th>Priority</th>\r",
-											"        <th>Authored On</th>\r",
-											"        <th>Last Modified</th>\r",
-											"        <th>Specimen</th>\r",
-											"        <th>Version Id</th>\r",
-											"    </tr>\r",
-											"    \r",
-											"    {{#each response.entry}}\r",
-											"            {{#if @first}}\r",
-											"            {{else}}\r",
-											"            <tr>\r",
-											"                <td>{{resource.resourceType}}</td>\r",
-											"                <td>{{resource.id}}</td>\r",
-											"                <td>{{resource.code.coding.[0].display}}</td>\r",
-											"                <td>{{resource.status}}</td>\r",
-											"                <td>{{resource.intent}}</td>\r",
-											"                <td>{{resource.priority}}</td>\r",
-											"                <td>{{resource.authoredOn}}</td>\r",
-											"                <td>{{resource.lastModified}}</td>\r",
-											"                <td>{{resource.input.[0].valueReference.reference}}</td>\r",
-											"                <td>{{resource.meta.versionId}}</td>\r",
-											"            </tr>\r",
-											"            {{/if}}\r",
-											"    {{/each}}\r",
-											"</table>\r",
-											"`;\r",
-											"\r",
-											"function constructVisualizerPayload() {\r",
-											"    return {response: pm.response.json()}\r",
-											"}\r",
-											"\r",
-											"pm.visualizer.set(template, constructVisualizerPayload());"
-										],
-										"type": "text/javascript",
-										"packages": {}
-									}
-								}
-							],
-							"request": {
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "{{int.api.url}}FHIR/R4/ServiceRequest?_id={{ReAnalysis_Service_Request_Logical_Id}}&_revinclude=Task:focus",
-									"host": [
-										"{{int.api.url}}FHIR"
 									],
-									"path": [
-										"R4",
-										"ServiceRequest"
-									],
-									"query": [
-										{
-											"key": "_id",
-											"value": "{{ReAnalysis_Service_Request_Logical_Id}}"
-										},
-										{
-											"key": "_revinclude",
-											"value": "Task:focus"
-										},
-										{
-											"key": "owner",
-											"value": "697L0",
-											"disabled": true
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{int.api.url}}FHIR/R4/ServiceRequest?_id={{Service_Request_Logical_Id}}&_revinclude=Task:focus",
+											"host": [
+												"{{int.api.url}}FHIR"
+											],
+											"path": [
+												"R4",
+												"ServiceRequest"
+											],
+											"query": [
+												{
+													"key": "_id",
+													"value": "{{Service_Request_Logical_Id}}"
+												},
+												{
+													"key": "_revinclude",
+													"value": "Task:focus"
+												},
+												{
+													"key": "owner",
+													"value": "697L0",
+													"disabled": true
+												}
+											]
 										}
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Get tasks for service request ReInterpretation",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"exec": [
-											"const responseJson = pm.response.json();\r",
-											"\r",
-											"const Task_Array = [];\r",
-											"responseJson.entry.forEach((entry) => {\r",
-											"    if (entry.resource.resourceType === \"Task\") {\r",
-											"        var code = entry.resource.code.coding[0].code;\r",
-											"        pm.environment.set(\"task_\" + code, entry.resource.id);\r",
-											"        Task_Array.push(entry.resource);\r",
-											"    }\r",
-											"});\r",
-											"\r",
-											"pm.environment.set(\"Task_Array\",Task_Array);\r",
-											"\r",
-											"console.log(Task_Array.toString());\r",
-											"\r",
-											"var template = `\r",
-											"<style type=\"text/css\">\r",
-											"    .tftable {font-size:14px;color:#333333;width:100%;border-width: 1px;border-color: #87ceeb;border-collapse: collapse;}\r",
-											"    .tftable th {font-size:18px;background-color:#87ceeb;border-width: 1px;padding: 8px;border-style: solid;border-color: #87ceeb;text-align:left;}\r",
-											"    .tftable tr {background-color:#ffffff;}\r",
-											"    .tftable td {font-size:14px;border-width: 1px;padding: 8px;border-style: solid;border-color: #87ceeb;}\r",
-											"    .tftable tr:hover {background-color:#e0ffff;}\r",
-											"</style>\r",
-											"\r",
-											"<table class=\"tftable\" border=\"1\">\r",
-											"    <tr>\r",
-											"        <th>Type</th>\r",
-											"        <th>Logical Id</th>\r",
-											"        <th>Category</th>\r",
-											"        <th>Test</th>\r",
-											"        <th>Status</th>\r",
-											"        <th>Intent</th>\r",
-											"        <th>Priority</th>\r",
-											"        <th>Authored On</th>\r",
-											"        <th>Version Id</th>\r",
-											"    </tr>\r",
-											"    \r",
-											"    {{#each response.entry}}\r",
-											"        {{#if @first}} \r",
-											"        <tr>\r",
-											"            <td>{{resource.resourceType}}</td>\r",
-											"            <td>{{resource.id}}</td>\r",
-											"            <td>{{resource.category.[0].coding.[0].display}}</td>\r",
-											"            <td>{{resource.code.coding.[0].code}}-{{resource.code.coding.[0].display}}</td>\r",
-											"            <td>{{resource.status}}</td>\r",
-											"            <td>{{resource.intent}}</td>\r",
-											"            <td>{{resource.priority}}</td>\r",
-											"            <td>{{resource.authoredOn}}</td>\r",
-											"            <td>{{resource.meta.versionId}}</td>\r",
-											"        </tr>\r",
-											"        {{/if}}\r",
-											"    {{/each}}\r",
-											"</table>\r",
-											"<p></p>\r",
-											"<table class=\"tftable\" border=\"1\">\r",
-											"    <tr>\r",
-											"        <th>Type</th>\r",
-											"        <th>Logical Id</th>\r",
-											"        <th>Name</th>\r",
-											"        <th>Status</th>\r",
-											"        <th>Intent</th>\r",
-											"        <th>Priority</th>\r",
-											"        <th>Authored On</th>\r",
-											"        <th>Last Modified</th>\r",
-											"        <th>Specimen</th>\r",
-											"        <th>Version Id</th>\r",
-											"    </tr>\r",
-											"    \r",
-											"    {{#each response.entry}}\r",
-											"            {{#if @first}}\r",
-											"            {{else}}\r",
-											"            <tr>\r",
-											"                <td>{{resource.resourceType}}</td>\r",
-											"                <td>{{resource.id}}</td>\r",
-											"                <td>{{resource.code.coding.[0].display}}</td>\r",
-											"                <td>{{resource.status}}</td>\r",
-											"                <td>{{resource.intent}}</td>\r",
-											"                <td>{{resource.priority}}</td>\r",
-											"                <td>{{resource.authoredOn}}</td>\r",
-											"                <td>{{resource.lastModified}}</td>\r",
-											"                <td>{{resource.input.[0].valueReference.reference}}</td>\r",
-											"                <td>{{resource.meta.versionId}}</td>\r",
-											"            </tr>\r",
-											"            {{/if}}\r",
-											"    {{/each}}\r",
-											"</table>\r",
-											"`;\r",
-											"\r",
-											"function constructVisualizerPayload() {\r",
-											"    return {response: pm.response.json()}\r",
-											"}\r",
-											"\r",
-											"pm.visualizer.set(template, constructVisualizerPayload());"
-										],
-										"type": "text/javascript",
-										"packages": {}
-									}
-								}
-							],
-							"request": {
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "{{int.api.url}}FHIR/R4/ServiceRequest?_id={{ReInterpretation_Service_Request_Logical_Id}}&_revinclude=Task:focus",
-									"host": [
-										"{{int.api.url}}FHIR"
-									],
-									"path": [
-										"R4",
-										"ServiceRequest"
-									],
-									"query": [
-										{
-											"key": "_id",
-											"value": "{{ReInterpretation_Service_Request_Logical_Id}}"
-										},
-										{
-											"key": "_revinclude",
-											"value": "Task:focus"
-										},
-										{
-											"key": "owner",
-											"value": "697L0",
-											"disabled": true
-										}
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Get tasks for service request - Rendering All Items",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"exec": [
-											"const responseJson = pm.response.json();\r",
-											"\r",
-											"const Task_Array = [];\r",
-											"responseJson.entry.forEach((entry) => {\r",
-											"    if (entry.resource.resourceType === \"Task\") {\r",
-											"        var code = entry.resource.code.coding[0].code;\r",
-											"        pm.environment.set(\"task_\" + code, entry.resource.id);\r",
-											"        Task_Array.push(entry.resource);\r",
-											"    }\r",
-											"});\r",
-											"\r",
-											"pm.environment.set(\"Task_Array\",Task_Array);\r",
-											"\r",
-											"console.log(Task_Array.toString());\r",
-											"\r",
-											"// GO TO THE END OF THE TEST SCRIPT.\r",
-											"var template = `\r",
-											"<style>\r",
-											"        .fill,\r",
-											"body,\r",
-											"html {\r",
-											"  height: 100%\r",
-											"}\r",
-											"\r",
-											"#json_vl,\r",
-											".td_head,\r",
-											".td_row_even,\r",
-											".td_row_odd {\r",
-											"  font-size: small\r",
-											"}\r",
-											"\r",
-											"#json_pnl,\r",
-											"#xxa,\r",
-											".navbar-header,\r",
-											".navbar-nav,\r",
-											".navbar-nav>li,\r",
-											".td_head {\r",
-											"  float: left\r",
-											"}\r",
-											"\r",
-											".fill {\r",
-											"  min-height: 100%\r",
-											"}\r",
-											"\r",
-											"#json_vl {\r",
-											"  font-family: Consolas, Monaco, Lucida Console, Liberation Mono, DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace\r",
-											"}\r",
-											"\r",
-											"#widget {\r",
-											"  width: 100%\r",
-											"}\r",
-											"\r",
-											".top_size {\r",
-											"  height: 51px\r",
-											"}\r",
-											"\r",
-											"#all_panels {\r",
-											"  height: 100%;\r",
-											"  min-height: 100%\r",
-											"}\r",
-											"\r",
-											"#aboutLnk {\r",
-											"  position: fixed;\r",
-											"  right: 10px;\r",
-											"  top: 15px\r",
-											"}\r",
-											"\r",
-											"#inner_text {\r",
-											"  display: block;\r",
-											"  position: absolute;\r",
-											"  height: auto;\r",
-											"  bottom: 0;\r",
-											"  top: 0;\r",
-											"  left: 0;\r",
-											"  right: 0;\r",
-											"  margin-top: 51px;\r",
-											"  margin-bottom: 0\r",
-											"}\r",
-											"\r",
-											"#json_pnl {\r",
-											"  background-color: #ccc;\r",
-											"  width: 33.3%\r",
-											"}\r",
-											"\r",
-											"#xxa {\r",
-											"  background-color: #E8E8E8;\r",
-											"  width: 66.7%\r",
-											"}\r",
-											"\r",
-											"#table_pnl,\r",
-											"#tree_pnl {\r",
-											"  background-color: #E8E8E8;\r",
-											"  float: left;\r",
-											"  width: 50%\r",
-											"}\r",
-											"\r",
-											"#sharethis {\r",
-											"  position: fixed;\r",
-											"  right: 80px;\r",
-											"  top: 10px\r",
-											"}\r",
-											"\r",
-											"#inner_tbl {\r",
-											"  padding-left: 2px\r",
-											"}\r",
-											"\r",
-											".td_row_even {\r",
-											"  padding: 2px;\r",
-											"  background-color: #F6F4F0\r",
-											"}\r",
-											"\r",
-											".td_row_odd {\r",
-											"  padding: 2px;\r",
-											"  background-color: #FFF\r",
-											"}\r",
-											"\r",
-											".td_head {\r",
-											"  padding: 2px;\r",
-											"  font-weight: 700\r",
-											"}\r",
-											"\r",
-											"input,\r",
-											"p,\r",
-											"select,\r",
-											"td,\r",
-											"textarea,\r",
-											"th {\r",
-											"  font-size: 1em\r",
-											"}\r",
-											"\r",
-											"table,\r",
-											"td,\r",
-											"th {\r",
-											"  border: 1px solid gray\r",
-											"}\r",
-											"\r",
-											"textarea {\r",
-											"  -moz-box-sizing: border-box;\r",
-											"  -webkit-box-sizing: border-box;\r",
-											"  box-sizing: border-box;\r",
-											"  display: block;\r",
-											"  width: 100%;\r",
-											"  height: 100%;\r",
-											"  margin: 0;\r",
-											"  padding: 4px;\r",
-											"  border: 1px solid #333;\r",
-											"  overflow-y: auto;\r",
-											"  overflow-x: hidden\r",
-											"}\r",
-											"\r",
-											"*,\r",
-											"html {\r",
-											"  font-family: Verdana, Arial, Helvetica, sans-serif\r",
-											"}\r",
-											"\r",
-											"form,\r",
-											"h1,\r",
-											"h2,\r",
-											"h3,\r",
-											"h4,\r",
-											"h5,\r",
-											"li,\r",
-											"p,\r",
-											"ul {\r",
-											"  margin: 0;\r",
-											"  padding: 0\r",
-											"}\r",
-											"\r",
-											"img {\r",
-											"  border: none\r",
-											"}\r",
-											"\r",
-											"p {\r",
-											"  margin: 0 0 1em\r",
-											"}\r",
-											"\r",
-											"table {\r",
-											"  font-size: 100%;\r",
-											"  background-color: white;\r",
-											"}\r",
-											"\r",
-											"ol.tree {\r",
-											"  padding: 0 0 0 30px;\r",
-											"  width: 300px\r",
-											"}\r",
-											"\r",
-											"li {\r",
-											"  position: relative;\r",
-											"  margin-left: -15px;\r",
-											"  list-style: none\r",
-											"}\r",
-											"\r",
-											"li.file {\r",
-											"  margin-left: -1px !important\r",
-											"}\r",
-											"\r",
-											"li.file a {\r",
-											"  background: url(leaf.png)0 5px no-repeat;\r",
-											"  color: #000;\r",
-											"  padding-left: 12px;\r",
-											"  text-decoration: none;\r",
-											"  display: block;\r",
-											"  font-size: small\r",
-											"}\r",
-											"\r",
-											"li.file a[href$='.css'],\r",
-											"li.file a[href$='.js'],\r",
-											"li.file a[href*='.pdf'],\r",
-											"li.file a[href*='.html'] {\r",
-											"  background: url(http://www.thecssninja.com/demo/css_tree/document.png)no-repeat\r",
-											"}\r",
-											"\r",
-											"li input {\r",
-											"  position: absolute;\r",
-											"  left: 0;\r",
-											"  margin-left: 0;\r",
-											"  opacity: 0;\r",
-											"  z-index: 2;\r",
-											"  cursor: pointer;\r",
-											"  height: 1em;\r",
-											"  width: 1em;\r",
-											"  top: 0\r",
-											"}\r",
-											"\r",
-											"li input+ol {\r",
-											"  background: url(http://www.thecssninja.com/demo/css_tree/toggle-small-expand.png)40px -3px no-repeat;\r",
-											"  margin: -20px 0 0 -44px;\r",
-											"  height: 1em;\r",
-											"  padding: 1.563em 0 0 80px\r",
-											"}\r",
-											"\r",
-											"li label.lbl_array,\r",
-											"li label.lbl_obj {\r",
-											"  display: block;\r",
-											"  padding-left: 33px;\r",
-											"  margin-bottom: 2px\r",
-											"}\r",
-											"\r",
-											"li input+ol>li {\r",
-											"  display: none;\r",
-											"  margin-left: -14px !important;\r",
-											"  padding-left: 1px\r",
-											"}\r",
-											"\r",
-											"li label.lbl_obj {\r",
-											"  background: url(folder.png)15px 1px no-repeat;\r",
-											"  cursor: pointer\r",
-											"}\r",
-											"\r",
-											"li label.lbl_array {\r",
-											"  background: url(array.png)15px 1px no-repeat;\r",
-											"  cursor: pointer\r",
-											"}\r",
-											"\r",
-											"li input:checked+ol {\r",
-											"  background: url(http://www.thecssninja.com/demo/css_tree/toggle-small.png)40px -3px no-repeat;\r",
-											"  margin: -20px 0 0 -44px;\r",
-											"  padding: 1.563em 0 0 80px;\r",
-											"  height: auto\r",
-											"}\r",
-											"\r",
-											"li input:checked+ol>li {\r",
-											"  display: block;\r",
-											"  margin: 0 0 .125em\r",
-											"}\r",
-											"\r",
-											"li input:checked+ol>li:last-child {\r",
-											"  margin: 0 0 .063em\r",
-											"}\r",
-											"\r",
-											".container {\r",
-											"  width: 970px;\r",
-											"  max-width: none !important\r",
-											"}\r",
-											"\r",
-											".col-xs-4 {\r",
-											"  padding-top: 15px;\r",
-											"  padding-bottom: 15px;\r",
-											"  background-color: #eee;\r",
-											"  background-color: rgba(86, 61, 124, .15);\r",
-											"  border: 1px solid #ddd;\r",
-											"  border: 1px solid rgba(86, 61, 124, .2)\r",
-											"}\r",
-											"\r",
-											"    </style>\r",
-											"<div id=\"html\">\r",
-											"<input type=\"text\" id=\"json\">\r",
-											"<script src=\"https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js\"></script>\r",
-											"<!--<script src=\"json2table.js\"></script>-->\r",
-											"<script>\r",
-											"$(function() {\r",
-											"    pm.getData((err, data) => {\r",
-											"        $(\"#json\").val(JSON.stringify(data.json));\r",
-											"        json2table(\"#html\");\r",
-											"    });\r",
-											"});\r",
-											"\r",
-											"function call(a) {\r",
-											"    $(\"#json\").val(JSON.stringify(a, void 0, 2));\r",
-											"    json2table()\r",
-											"}\r",
-											"\r",
-											"function json2table(selector) {\r",
-											"    $(selector).html(buildTable(getJsonVar()));\r",
-											"}\r",
-											"\r",
-											"function getJsonVar() {\r",
-											"    try {\r",
-											"        var a = $.parseJSON($(\"#json\").val());\r",
-											"        $(\"#json\").val(JSON.stringify(a, void 0, 2));\r",
-											"        return a\r",
-											"    } catch (e) {\r",
-											"        //return $(\"#error_msg\").text(e.message), $(\"#errorModal\").modal(\"show\"), {}\r",
-											"        alert(e);\r",
-											"    }\r",
-											"}\r",
-											"\r",
-											"function buildTable(a) {\r",
-											"    var e = document.createElement(\"table\"),\r",
-											"        d, b;\r",
-											"    if (isArray(a)) return buildArray(a);\r",
-											"    for (var c in a) \"object\" != typeof a[c] || isArray(a[c]) ? \"object\" == typeof a[c] && isArray(a[c]) ? (d = e.insertRow(-1), b = d.insertCell(-1), b.colSpan = 2, b.innerHTML = '<div class=\"td_head\">' + encodeText(c) + '</div><table style=\"width:100%\">' + $(buildArray(a[c]), !1).html() + \"</table>\") : (d = e.insertRow(-1), b = d.insertCell(-1), b.innerHTML = \"<div class='td_head'>\" + encodeText(c) + \"</div>\", d = d.insertCell(-1), d.innerHTML = \"<div class='td_row_even'>\" +\r",
-											"        encodeText(a[c]) + \"</div>\") : (d = e.insertRow(-1), b = d.insertCell(-1), b.colSpan = 2, b.innerHTML = '<div class=\"td_head\">' + encodeText(c) + '</div><table style=\"width:100%\">' + $(buildTable(a[c]), !1).html() + \"</table>\");\r",
-											"    return e\r",
-											"}\r",
-											"\r",
-											"function buildArray(a) {\r",
-											"    var e = document.createElement(\"table\"),\r",
-											"        d, b, c = !1,\r",
-											"        p = !1,\r",
-											"        m = {},\r",
-											"        h = -1,\r",
-											"        n = 0,\r",
-											"        l;\r",
-											"    l = \"\";\r",
-											"    if (0 == a.length) return \"<div></div>\";\r",
-											"    d = e.insertRow(-1);\r",
-											"    for (var f = 0; f < a.length; f++)\r",
-											"        if (\"object\" != typeof a[f] || isArray(a[f])) \"object\" == typeof a[f] && isArray(a[f]) ? (b = d.insertCell(h), b.colSpan = 2, b.innerHTML = '<div class=\"td_head\"></div><table style=\"width:100%\">' + $(buildArray(a[f]), !1).html() + \"</table>\", c = !0) : p || (h += 1, p = !0, b = d.insertCell(h), m.empty = h, b.innerHTML = \"<div class='td_head'>&nbsp;</div>\");\r",
-											"        else\r",
-											"            for (var k in a[f]) l =\r",
-											"                \"-\" + k, l in m || (c = !0, h += 1, b = d.insertCell(h), m[l] = h, b.innerHTML = \"<div class='td_head'>\" + encodeText(k) + \"</div>\");\r",
-											"    c || e.deleteRow(0);\r",
-											"    n = h + 1;\r",
-											"    for (f = 0; f < a.length; f++)\r",
-											"        if (d = e.insertRow(-1), td_class = isEven(f) ? \"td_row_even\" : \"td_row_odd\", \"object\" != typeof a[f] || isArray(a[f]))\r",
-											"            if (\"object\" == typeof a[f] && isArray(a[f]))\r",
-											"                for (h = m.empty, c = 0; c < n; c++) b = d.insertCell(c), b.className = td_class, l = c == h ? '<table style=\"width:100%\">' + $(buildArray(a[f]), !1).html() + \"</table>\" : \" \", b.innerHTML = \"<div class='\" + td_class + \"'>\" + encodeText(l) +\r",
-											"                    \"</div>\";\r",
-											"            else\r",
-											"                for (h = m.empty, c = 0; c < n; c++) b = d.insertCell(c), l = c == h ? a[f] : \" \", b.className = td_class, b.innerHTML = \"<div class='\" + td_class + \"'>\" + encodeText(l) + \"</div>\";\r",
-											"    else {\r",
-											"        for (c = 0; c < n; c++) b = d.insertCell(c), b.className = td_class, b.innerHTML = \"<div class='\" + td_class + \"'>&nbsp;</div>\";\r",
-											"        for (k in a[f]) c = a[f], l = \"-\" + k, h = m[l], b = d.cells[h], b.className = td_class, \"object\" != typeof c[k] || isArray(c[k]) ? \"object\" == typeof c[k] && isArray(c[k]) ? b.innerHTML = '<table style=\"width:100%\">' + $(buildArray(c[k]), !1).html() + \"</table>\" : b.innerHTML =\r",
-											"            \"<div class='\" + td_class + \"'>\" + encodeText(c[k]) + \"</div>\" : b.innerHTML = '<table style=\"width:100%\">' + $(buildTable(c[k]), !1).html() + \"</table>\"\r",
-											"    }\r",
-											"    return e\r",
-											"}\r",
-											"\r",
-											"function encodeText(a) {\r",
-											"    return $(\"<div />\").text(a).html()\r",
-											"}\r",
-											"\r",
-											"function isArray(a) {\r",
-											"    return \"[object Array]\" === Object.prototype.toString.call(a)\r",
-											"}\r",
-											"\r",
-											"function isEven(a) {\r",
-											"    return 0 == a % 2\r",
-											"}\r",
-											"</script>`;\r",
-											"\r",
-											"\r",
-											"// In case you only want a specific property, change it here.\r",
-											"//\r",
-											"// Default: You can set the entire JSON response using pm.response.json()\r",
-											"let tableProps = {\r",
-											"    json: pm.response.json()\r",
-											"};\r",
-											"\r",
-											"pm.visualizer.set(template, tableProps);"
-										],
-										"type": "text/javascript",
-										"packages": {}
-									}
-								}
-							],
-							"request": {
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "{{int.api.url}}FHIR/R4/ServiceRequest?_id={{Service_Request_Logical_Id}}&_revinclude=Task:focus",
-									"host": [
-										"{{int.api.url}}FHIR"
-									],
-									"path": [
-										"R4",
-										"ServiceRequest"
-									],
-									"query": [
-										{
-											"key": "_id",
-											"value": "{{Service_Request_Logical_Id}}"
-										},
-										{
-											"key": "_revinclude",
-											"value": "Task:focus"
-										}
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Get tasks for my org",
-							"request": {
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "{{url}}FHIR/R4/Task?owner=697L0",
-									"host": [
-										"{{url}}FHIR"
-									],
-									"path": [
-										"R4",
-										"Task"
-									],
-									"query": [
-										{
-											"key": "owner",
-											"value": "697L0"
-										},
-										{
-											"key": "-date.from",
-											"value": "2024-07-19",
-											"disabled": true
-										},
-										{
-											"key": "_include",
-											"value": "Task:focus",
-											"disabled": true
-										}
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Get All Tasks",
-							"request": {
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "{{int.api.url}}FHIR/R4/Task?owner=697L0",
-									"host": [
-										"{{int.api.url}}FHIR"
-									],
-									"path": [
-										"R4",
-										"Task"
-									],
-									"query": [
-										{
-											"key": "owner",
-											"value": "697L0"
-										}
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Get Task - Logical Id",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"exec": [
-											"const responseJson = pm.response.json();\r",
-											"\r",
-											"// Set the task status to 'accepted'\r",
-											"responseJson.status='accepted';\r",
-											"pm.environment.set(\"ProcessGenomicTest_Task_Resource\",JSON.stringify(responseJson));\r",
-											"\r",
-											"pm.test(\"HTTP Status code is 200\", function () {\r",
-											"  pm.response.to.have.status(200);\r",
-											"});\r",
-											"\r",
-											"pm.test(\"Content-Type header is present\", () => {\r",
-											"  pm.response.to.have.header(\"Content-Type\");\r",
-											"});\r",
-											"\r",
-											"pm.test(\"resourceType type = 'Task'\", () => {\r",
-											"  pm.expect(responseJson.resourceType).to.eql(\"Task\");\r",
-											"});"
-										],
-										"type": "text/javascript",
-										"packages": {}
-									}
+									},
+									"response": []
 								},
 								{
-									"listen": "prerequest",
-									"script": {
-										"exec": [
-											""
-										],
-										"type": "text/javascript",
-										"packages": {}
-									}
-								}
-							],
-							"request": {
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "{{int.api.url}}FHIR/R4/Task/{{task_ProcessGenomicTestRequest}}",
-									"host": [
-										"{{int.api.url}}FHIR"
+									"name": "Get tasks for service request ReAnalysis",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"const responseJson = pm.response.json();\r",
+													"\r",
+													"const Task_Array = [];\r",
+													"responseJson.entry.forEach((entry) => {\r",
+													"    if (entry.resource.resourceType === \"Task\") {\r",
+													"        var code = entry.resource.code.coding[0].code;\r",
+													"        pm.environment.set(\"task_\" + code, entry.resource.id);\r",
+													"        Task_Array.push(entry.resource);\r",
+													"    }\r",
+													"});\r",
+													"\r",
+													"pm.environment.set(\"Task_Array\",Task_Array);\r",
+													"\r",
+													"console.log(Task_Array.toString());\r",
+													"\r",
+													"var template = `\r",
+													"<style type=\"text/css\">\r",
+													"    .tftable {font-size:14px;color:#333333;width:100%;border-width: 1px;border-color: #87ceeb;border-collapse: collapse;}\r",
+													"    .tftable th {font-size:18px;background-color:#87ceeb;border-width: 1px;padding: 8px;border-style: solid;border-color: #87ceeb;text-align:left;}\r",
+													"    .tftable tr {background-color:#ffffff;}\r",
+													"    .tftable td {font-size:14px;border-width: 1px;padding: 8px;border-style: solid;border-color: #87ceeb;}\r",
+													"    .tftable tr:hover {background-color:#e0ffff;}\r",
+													"</style>\r",
+													"\r",
+													"<table class=\"tftable\" border=\"1\">\r",
+													"    <tr>\r",
+													"        <th>Type</th>\r",
+													"        <th>Logical Id</th>\r",
+													"        <th>Category</th>\r",
+													"        <th>Test</th>\r",
+													"        <th>Status</th>\r",
+													"        <th>Intent</th>\r",
+													"        <th>Priority</th>\r",
+													"        <th>Authored On</th>\r",
+													"        <th>Version Id</th>\r",
+													"    </tr>\r",
+													"    \r",
+													"    {{#each response.entry}}\r",
+													"        {{#if @first}} \r",
+													"        <tr>\r",
+													"            <td>{{resource.resourceType}}</td>\r",
+													"            <td>{{resource.id}}</td>\r",
+													"            <td>{{resource.category.[0].coding.[0].display}}</td>\r",
+													"            <td>{{resource.code.coding.[0].code}}-{{resource.code.coding.[0].display}}</td>\r",
+													"            <td>{{resource.status}}</td>\r",
+													"            <td>{{resource.intent}}</td>\r",
+													"            <td>{{resource.priority}}</td>\r",
+													"            <td>{{resource.authoredOn}}</td>\r",
+													"            <td>{{resource.meta.versionId}}</td>\r",
+													"        </tr>\r",
+													"        {{/if}}\r",
+													"    {{/each}}\r",
+													"</table>\r",
+													"<p></p>\r",
+													"<table class=\"tftable\" border=\"1\">\r",
+													"    <tr>\r",
+													"        <th>Type</th>\r",
+													"        <th>Logical Id</th>\r",
+													"        <th>Name</th>\r",
+													"        <th>Status</th>\r",
+													"        <th>Intent</th>\r",
+													"        <th>Priority</th>\r",
+													"        <th>Authored On</th>\r",
+													"        <th>Last Modified</th>\r",
+													"        <th>Specimen</th>\r",
+													"        <th>Version Id</th>\r",
+													"    </tr>\r",
+													"    \r",
+													"    {{#each response.entry}}\r",
+													"            {{#if @first}}\r",
+													"            {{else}}\r",
+													"            <tr>\r",
+													"                <td>{{resource.resourceType}}</td>\r",
+													"                <td>{{resource.id}}</td>\r",
+													"                <td>{{resource.code.coding.[0].display}}</td>\r",
+													"                <td>{{resource.status}}</td>\r",
+													"                <td>{{resource.intent}}</td>\r",
+													"                <td>{{resource.priority}}</td>\r",
+													"                <td>{{resource.authoredOn}}</td>\r",
+													"                <td>{{resource.lastModified}}</td>\r",
+													"                <td>{{resource.input.[0].valueReference.reference}}</td>\r",
+													"                <td>{{resource.meta.versionId}}</td>\r",
+													"            </tr>\r",
+													"            {{/if}}\r",
+													"    {{/each}}\r",
+													"</table>\r",
+													"`;\r",
+													"\r",
+													"function constructVisualizerPayload() {\r",
+													"    return {response: pm.response.json()}\r",
+													"}\r",
+													"\r",
+													"pm.visualizer.set(template, constructVisualizerPayload());"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
 									],
-									"path": [
-										"R4",
-										"Task",
-										"{{task_ProcessGenomicTestRequest}}"
-									]
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{int.api.url}}FHIR/R4/ServiceRequest?_id={{ReAnalysis_Service_Request_Logical_Id}}&_revinclude=Task:focus",
+											"host": [
+												"{{int.api.url}}FHIR"
+											],
+											"path": [
+												"R4",
+												"ServiceRequest"
+											],
+											"query": [
+												{
+													"key": "_id",
+													"value": "{{ReAnalysis_Service_Request_Logical_Id}}"
+												},
+												{
+													"key": "_revinclude",
+													"value": "Task:focus"
+												},
+												{
+													"key": "owner",
+													"value": "697L0",
+													"disabled": true
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Get tasks for service request ReInterpretation",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"const responseJson = pm.response.json();\r",
+													"\r",
+													"const Task_Array = [];\r",
+													"responseJson.entry.forEach((entry) => {\r",
+													"    if (entry.resource.resourceType === \"Task\") {\r",
+													"        var code = entry.resource.code.coding[0].code;\r",
+													"        pm.environment.set(\"task_\" + code, entry.resource.id);\r",
+													"        Task_Array.push(entry.resource);\r",
+													"    }\r",
+													"});\r",
+													"\r",
+													"pm.environment.set(\"Task_Array\",Task_Array);\r",
+													"\r",
+													"console.log(Task_Array.toString());\r",
+													"\r",
+													"var template = `\r",
+													"<style type=\"text/css\">\r",
+													"    .tftable {font-size:14px;color:#333333;width:100%;border-width: 1px;border-color: #87ceeb;border-collapse: collapse;}\r",
+													"    .tftable th {font-size:18px;background-color:#87ceeb;border-width: 1px;padding: 8px;border-style: solid;border-color: #87ceeb;text-align:left;}\r",
+													"    .tftable tr {background-color:#ffffff;}\r",
+													"    .tftable td {font-size:14px;border-width: 1px;padding: 8px;border-style: solid;border-color: #87ceeb;}\r",
+													"    .tftable tr:hover {background-color:#e0ffff;}\r",
+													"</style>\r",
+													"\r",
+													"<table class=\"tftable\" border=\"1\">\r",
+													"    <tr>\r",
+													"        <th>Type</th>\r",
+													"        <th>Logical Id</th>\r",
+													"        <th>Category</th>\r",
+													"        <th>Test</th>\r",
+													"        <th>Status</th>\r",
+													"        <th>Intent</th>\r",
+													"        <th>Priority</th>\r",
+													"        <th>Authored On</th>\r",
+													"        <th>Version Id</th>\r",
+													"    </tr>\r",
+													"    \r",
+													"    {{#each response.entry}}\r",
+													"        {{#if @first}} \r",
+													"        <tr>\r",
+													"            <td>{{resource.resourceType}}</td>\r",
+													"            <td>{{resource.id}}</td>\r",
+													"            <td>{{resource.category.[0].coding.[0].display}}</td>\r",
+													"            <td>{{resource.code.coding.[0].code}}-{{resource.code.coding.[0].display}}</td>\r",
+													"            <td>{{resource.status}}</td>\r",
+													"            <td>{{resource.intent}}</td>\r",
+													"            <td>{{resource.priority}}</td>\r",
+													"            <td>{{resource.authoredOn}}</td>\r",
+													"            <td>{{resource.meta.versionId}}</td>\r",
+													"        </tr>\r",
+													"        {{/if}}\r",
+													"    {{/each}}\r",
+													"</table>\r",
+													"<p></p>\r",
+													"<table class=\"tftable\" border=\"1\">\r",
+													"    <tr>\r",
+													"        <th>Type</th>\r",
+													"        <th>Logical Id</th>\r",
+													"        <th>Name</th>\r",
+													"        <th>Status</th>\r",
+													"        <th>Intent</th>\r",
+													"        <th>Priority</th>\r",
+													"        <th>Authored On</th>\r",
+													"        <th>Last Modified</th>\r",
+													"        <th>Specimen</th>\r",
+													"        <th>Version Id</th>\r",
+													"    </tr>\r",
+													"    \r",
+													"    {{#each response.entry}}\r",
+													"            {{#if @first}}\r",
+													"            {{else}}\r",
+													"            <tr>\r",
+													"                <td>{{resource.resourceType}}</td>\r",
+													"                <td>{{resource.id}}</td>\r",
+													"                <td>{{resource.code.coding.[0].display}}</td>\r",
+													"                <td>{{resource.status}}</td>\r",
+													"                <td>{{resource.intent}}</td>\r",
+													"                <td>{{resource.priority}}</td>\r",
+													"                <td>{{resource.authoredOn}}</td>\r",
+													"                <td>{{resource.lastModified}}</td>\r",
+													"                <td>{{resource.input.[0].valueReference.reference}}</td>\r",
+													"                <td>{{resource.meta.versionId}}</td>\r",
+													"            </tr>\r",
+													"            {{/if}}\r",
+													"    {{/each}}\r",
+													"</table>\r",
+													"`;\r",
+													"\r",
+													"function constructVisualizerPayload() {\r",
+													"    return {response: pm.response.json()}\r",
+													"}\r",
+													"\r",
+													"pm.visualizer.set(template, constructVisualizerPayload());"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{int.api.url}}FHIR/R4/ServiceRequest?_id={{ReInterpretation_Service_Request_Logical_Id}}&_revinclude=Task:focus",
+											"host": [
+												"{{int.api.url}}FHIR"
+											],
+											"path": [
+												"R4",
+												"ServiceRequest"
+											],
+											"query": [
+												{
+													"key": "_id",
+													"value": "{{ReInterpretation_Service_Request_Logical_Id}}"
+												},
+												{
+													"key": "_revinclude",
+													"value": "Task:focus"
+												},
+												{
+													"key": "owner",
+													"value": "697L0",
+													"disabled": true
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Get tasks for service request - Rendering All Items",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"const responseJson = pm.response.json();\r",
+													"\r",
+													"const Task_Array = [];\r",
+													"responseJson.entry.forEach((entry) => {\r",
+													"    if (entry.resource.resourceType === \"Task\") {\r",
+													"        var code = entry.resource.code.coding[0].code;\r",
+													"        pm.environment.set(\"task_\" + code, entry.resource.id);\r",
+													"        Task_Array.push(entry.resource);\r",
+													"    }\r",
+													"});\r",
+													"\r",
+													"pm.environment.set(\"Task_Array\",Task_Array);\r",
+													"\r",
+													"console.log(Task_Array.toString());\r",
+													"\r",
+													"// GO TO THE END OF THE TEST SCRIPT.\r",
+													"var template = `\r",
+													"<style>\r",
+													"        .fill,\r",
+													"body,\r",
+													"html {\r",
+													"  height: 100%\r",
+													"}\r",
+													"\r",
+													"#json_vl,\r",
+													".td_head,\r",
+													".td_row_even,\r",
+													".td_row_odd {\r",
+													"  font-size: small\r",
+													"}\r",
+													"\r",
+													"#json_pnl,\r",
+													"#xxa,\r",
+													".navbar-header,\r",
+													".navbar-nav,\r",
+													".navbar-nav>li,\r",
+													".td_head {\r",
+													"  float: left\r",
+													"}\r",
+													"\r",
+													".fill {\r",
+													"  min-height: 100%\r",
+													"}\r",
+													"\r",
+													"#json_vl {\r",
+													"  font-family: Consolas, Monaco, Lucida Console, Liberation Mono, DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace\r",
+													"}\r",
+													"\r",
+													"#widget {\r",
+													"  width: 100%\r",
+													"}\r",
+													"\r",
+													".top_size {\r",
+													"  height: 51px\r",
+													"}\r",
+													"\r",
+													"#all_panels {\r",
+													"  height: 100%;\r",
+													"  min-height: 100%\r",
+													"}\r",
+													"\r",
+													"#aboutLnk {\r",
+													"  position: fixed;\r",
+													"  right: 10px;\r",
+													"  top: 15px\r",
+													"}\r",
+													"\r",
+													"#inner_text {\r",
+													"  display: block;\r",
+													"  position: absolute;\r",
+													"  height: auto;\r",
+													"  bottom: 0;\r",
+													"  top: 0;\r",
+													"  left: 0;\r",
+													"  right: 0;\r",
+													"  margin-top: 51px;\r",
+													"  margin-bottom: 0\r",
+													"}\r",
+													"\r",
+													"#json_pnl {\r",
+													"  background-color: #ccc;\r",
+													"  width: 33.3%\r",
+													"}\r",
+													"\r",
+													"#xxa {\r",
+													"  background-color: #E8E8E8;\r",
+													"  width: 66.7%\r",
+													"}\r",
+													"\r",
+													"#table_pnl,\r",
+													"#tree_pnl {\r",
+													"  background-color: #E8E8E8;\r",
+													"  float: left;\r",
+													"  width: 50%\r",
+													"}\r",
+													"\r",
+													"#sharethis {\r",
+													"  position: fixed;\r",
+													"  right: 80px;\r",
+													"  top: 10px\r",
+													"}\r",
+													"\r",
+													"#inner_tbl {\r",
+													"  padding-left: 2px\r",
+													"}\r",
+													"\r",
+													".td_row_even {\r",
+													"  padding: 2px;\r",
+													"  background-color: #F6F4F0\r",
+													"}\r",
+													"\r",
+													".td_row_odd {\r",
+													"  padding: 2px;\r",
+													"  background-color: #FFF\r",
+													"}\r",
+													"\r",
+													".td_head {\r",
+													"  padding: 2px;\r",
+													"  font-weight: 700\r",
+													"}\r",
+													"\r",
+													"input,\r",
+													"p,\r",
+													"select,\r",
+													"td,\r",
+													"textarea,\r",
+													"th {\r",
+													"  font-size: 1em\r",
+													"}\r",
+													"\r",
+													"table,\r",
+													"td,\r",
+													"th {\r",
+													"  border: 1px solid gray\r",
+													"}\r",
+													"\r",
+													"textarea {\r",
+													"  -moz-box-sizing: border-box;\r",
+													"  -webkit-box-sizing: border-box;\r",
+													"  box-sizing: border-box;\r",
+													"  display: block;\r",
+													"  width: 100%;\r",
+													"  height: 100%;\r",
+													"  margin: 0;\r",
+													"  padding: 4px;\r",
+													"  border: 1px solid #333;\r",
+													"  overflow-y: auto;\r",
+													"  overflow-x: hidden\r",
+													"}\r",
+													"\r",
+													"*,\r",
+													"html {\r",
+													"  font-family: Verdana, Arial, Helvetica, sans-serif\r",
+													"}\r",
+													"\r",
+													"form,\r",
+													"h1,\r",
+													"h2,\r",
+													"h3,\r",
+													"h4,\r",
+													"h5,\r",
+													"li,\r",
+													"p,\r",
+													"ul {\r",
+													"  margin: 0;\r",
+													"  padding: 0\r",
+													"}\r",
+													"\r",
+													"img {\r",
+													"  border: none\r",
+													"}\r",
+													"\r",
+													"p {\r",
+													"  margin: 0 0 1em\r",
+													"}\r",
+													"\r",
+													"table {\r",
+													"  font-size: 100%;\r",
+													"  background-color: white;\r",
+													"}\r",
+													"\r",
+													"ol.tree {\r",
+													"  padding: 0 0 0 30px;\r",
+													"  width: 300px\r",
+													"}\r",
+													"\r",
+													"li {\r",
+													"  position: relative;\r",
+													"  margin-left: -15px;\r",
+													"  list-style: none\r",
+													"}\r",
+													"\r",
+													"li.file {\r",
+													"  margin-left: -1px !important\r",
+													"}\r",
+													"\r",
+													"li.file a {\r",
+													"  background: url(leaf.png)0 5px no-repeat;\r",
+													"  color: #000;\r",
+													"  padding-left: 12px;\r",
+													"  text-decoration: none;\r",
+													"  display: block;\r",
+													"  font-size: small\r",
+													"}\r",
+													"\r",
+													"li.file a[href$='.css'],\r",
+													"li.file a[href$='.js'],\r",
+													"li.file a[href*='.pdf'],\r",
+													"li.file a[href*='.html'] {\r",
+													"  background: url(http://www.thecssninja.com/demo/css_tree/document.png)no-repeat\r",
+													"}\r",
+													"\r",
+													"li input {\r",
+													"  position: absolute;\r",
+													"  left: 0;\r",
+													"  margin-left: 0;\r",
+													"  opacity: 0;\r",
+													"  z-index: 2;\r",
+													"  cursor: pointer;\r",
+													"  height: 1em;\r",
+													"  width: 1em;\r",
+													"  top: 0\r",
+													"}\r",
+													"\r",
+													"li input+ol {\r",
+													"  background: url(http://www.thecssninja.com/demo/css_tree/toggle-small-expand.png)40px -3px no-repeat;\r",
+													"  margin: -20px 0 0 -44px;\r",
+													"  height: 1em;\r",
+													"  padding: 1.563em 0 0 80px\r",
+													"}\r",
+													"\r",
+													"li label.lbl_array,\r",
+													"li label.lbl_obj {\r",
+													"  display: block;\r",
+													"  padding-left: 33px;\r",
+													"  margin-bottom: 2px\r",
+													"}\r",
+													"\r",
+													"li input+ol>li {\r",
+													"  display: none;\r",
+													"  margin-left: -14px !important;\r",
+													"  padding-left: 1px\r",
+													"}\r",
+													"\r",
+													"li label.lbl_obj {\r",
+													"  background: url(folder.png)15px 1px no-repeat;\r",
+													"  cursor: pointer\r",
+													"}\r",
+													"\r",
+													"li label.lbl_array {\r",
+													"  background: url(array.png)15px 1px no-repeat;\r",
+													"  cursor: pointer\r",
+													"}\r",
+													"\r",
+													"li input:checked+ol {\r",
+													"  background: url(http://www.thecssninja.com/demo/css_tree/toggle-small.png)40px -3px no-repeat;\r",
+													"  margin: -20px 0 0 -44px;\r",
+													"  padding: 1.563em 0 0 80px;\r",
+													"  height: auto\r",
+													"}\r",
+													"\r",
+													"li input:checked+ol>li {\r",
+													"  display: block;\r",
+													"  margin: 0 0 .125em\r",
+													"}\r",
+													"\r",
+													"li input:checked+ol>li:last-child {\r",
+													"  margin: 0 0 .063em\r",
+													"}\r",
+													"\r",
+													".container {\r",
+													"  width: 970px;\r",
+													"  max-width: none !important\r",
+													"}\r",
+													"\r",
+													".col-xs-4 {\r",
+													"  padding-top: 15px;\r",
+													"  padding-bottom: 15px;\r",
+													"  background-color: #eee;\r",
+													"  background-color: rgba(86, 61, 124, .15);\r",
+													"  border: 1px solid #ddd;\r",
+													"  border: 1px solid rgba(86, 61, 124, .2)\r",
+													"}\r",
+													"\r",
+													"    </style>\r",
+													"<div id=\"html\">\r",
+													"<input type=\"text\" id=\"json\">\r",
+													"<script src=\"https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js\"></script>\r",
+													"<!--<script src=\"json2table.js\"></script>-->\r",
+													"<script>\r",
+													"$(function() {\r",
+													"    pm.getData((err, data) => {\r",
+													"        $(\"#json\").val(JSON.stringify(data.json));\r",
+													"        json2table(\"#html\");\r",
+													"    });\r",
+													"});\r",
+													"\r",
+													"function call(a) {\r",
+													"    $(\"#json\").val(JSON.stringify(a, void 0, 2));\r",
+													"    json2table()\r",
+													"}\r",
+													"\r",
+													"function json2table(selector) {\r",
+													"    $(selector).html(buildTable(getJsonVar()));\r",
+													"}\r",
+													"\r",
+													"function getJsonVar() {\r",
+													"    try {\r",
+													"        var a = $.parseJSON($(\"#json\").val());\r",
+													"        $(\"#json\").val(JSON.stringify(a, void 0, 2));\r",
+													"        return a\r",
+													"    } catch (e) {\r",
+													"        //return $(\"#error_msg\").text(e.message), $(\"#errorModal\").modal(\"show\"), {}\r",
+													"        alert(e);\r",
+													"    }\r",
+													"}\r",
+													"\r",
+													"function buildTable(a) {\r",
+													"    var e = document.createElement(\"table\"),\r",
+													"        d, b;\r",
+													"    if (isArray(a)) return buildArray(a);\r",
+													"    for (var c in a) \"object\" != typeof a[c] || isArray(a[c]) ? \"object\" == typeof a[c] && isArray(a[c]) ? (d = e.insertRow(-1), b = d.insertCell(-1), b.colSpan = 2, b.innerHTML = '<div class=\"td_head\">' + encodeText(c) + '</div><table style=\"width:100%\">' + $(buildArray(a[c]), !1).html() + \"</table>\") : (d = e.insertRow(-1), b = d.insertCell(-1), b.innerHTML = \"<div class='td_head'>\" + encodeText(c) + \"</div>\", d = d.insertCell(-1), d.innerHTML = \"<div class='td_row_even'>\" +\r",
+													"        encodeText(a[c]) + \"</div>\") : (d = e.insertRow(-1), b = d.insertCell(-1), b.colSpan = 2, b.innerHTML = '<div class=\"td_head\">' + encodeText(c) + '</div><table style=\"width:100%\">' + $(buildTable(a[c]), !1).html() + \"</table>\");\r",
+													"    return e\r",
+													"}\r",
+													"\r",
+													"function buildArray(a) {\r",
+													"    var e = document.createElement(\"table\"),\r",
+													"        d, b, c = !1,\r",
+													"        p = !1,\r",
+													"        m = {},\r",
+													"        h = -1,\r",
+													"        n = 0,\r",
+													"        l;\r",
+													"    l = \"\";\r",
+													"    if (0 == a.length) return \"<div></div>\";\r",
+													"    d = e.insertRow(-1);\r",
+													"    for (var f = 0; f < a.length; f++)\r",
+													"        if (\"object\" != typeof a[f] || isArray(a[f])) \"object\" == typeof a[f] && isArray(a[f]) ? (b = d.insertCell(h), b.colSpan = 2, b.innerHTML = '<div class=\"td_head\"></div><table style=\"width:100%\">' + $(buildArray(a[f]), !1).html() + \"</table>\", c = !0) : p || (h += 1, p = !0, b = d.insertCell(h), m.empty = h, b.innerHTML = \"<div class='td_head'>&nbsp;</div>\");\r",
+													"        else\r",
+													"            for (var k in a[f]) l =\r",
+													"                \"-\" + k, l in m || (c = !0, h += 1, b = d.insertCell(h), m[l] = h, b.innerHTML = \"<div class='td_head'>\" + encodeText(k) + \"</div>\");\r",
+													"    c || e.deleteRow(0);\r",
+													"    n = h + 1;\r",
+													"    for (f = 0; f < a.length; f++)\r",
+													"        if (d = e.insertRow(-1), td_class = isEven(f) ? \"td_row_even\" : \"td_row_odd\", \"object\" != typeof a[f] || isArray(a[f]))\r",
+													"            if (\"object\" == typeof a[f] && isArray(a[f]))\r",
+													"                for (h = m.empty, c = 0; c < n; c++) b = d.insertCell(c), b.className = td_class, l = c == h ? '<table style=\"width:100%\">' + $(buildArray(a[f]), !1).html() + \"</table>\" : \" \", b.innerHTML = \"<div class='\" + td_class + \"'>\" + encodeText(l) +\r",
+													"                    \"</div>\";\r",
+													"            else\r",
+													"                for (h = m.empty, c = 0; c < n; c++) b = d.insertCell(c), l = c == h ? a[f] : \" \", b.className = td_class, b.innerHTML = \"<div class='\" + td_class + \"'>\" + encodeText(l) + \"</div>\";\r",
+													"    else {\r",
+													"        for (c = 0; c < n; c++) b = d.insertCell(c), b.className = td_class, b.innerHTML = \"<div class='\" + td_class + \"'>&nbsp;</div>\";\r",
+													"        for (k in a[f]) c = a[f], l = \"-\" + k, h = m[l], b = d.cells[h], b.className = td_class, \"object\" != typeof c[k] || isArray(c[k]) ? \"object\" == typeof c[k] && isArray(c[k]) ? b.innerHTML = '<table style=\"width:100%\">' + $(buildArray(c[k]), !1).html() + \"</table>\" : b.innerHTML =\r",
+													"            \"<div class='\" + td_class + \"'>\" + encodeText(c[k]) + \"</div>\" : b.innerHTML = '<table style=\"width:100%\">' + $(buildTable(c[k]), !1).html() + \"</table>\"\r",
+													"    }\r",
+													"    return e\r",
+													"}\r",
+													"\r",
+													"function encodeText(a) {\r",
+													"    return $(\"<div />\").text(a).html()\r",
+													"}\r",
+													"\r",
+													"function isArray(a) {\r",
+													"    return \"[object Array]\" === Object.prototype.toString.call(a)\r",
+													"}\r",
+													"\r",
+													"function isEven(a) {\r",
+													"    return 0 == a % 2\r",
+													"}\r",
+													"</script>`;\r",
+													"\r",
+													"\r",
+													"// In case you only want a specific property, change it here.\r",
+													"//\r",
+													"// Default: You can set the entire JSON response using pm.response.json()\r",
+													"let tableProps = {\r",
+													"    json: pm.response.json()\r",
+													"};\r",
+													"\r",
+													"pm.visualizer.set(template, tableProps);"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{int.api.url}}FHIR/R4/ServiceRequest?_id={{Service_Request_Logical_Id}}&_revinclude=Task:focus",
+											"host": [
+												"{{int.api.url}}FHIR"
+											],
+											"path": [
+												"R4",
+												"ServiceRequest"
+											],
+											"query": [
+												{
+													"key": "_id",
+													"value": "{{Service_Request_Logical_Id}}"
+												},
+												{
+													"key": "_revinclude",
+													"value": "Task:focus"
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Get tasks for my org",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{url}}FHIR/R4/Task?owner=697L0",
+											"host": [
+												"{{url}}FHIR"
+											],
+											"path": [
+												"R4",
+												"Task"
+											],
+											"query": [
+												{
+													"key": "owner",
+													"value": "697L0"
+												},
+												{
+													"key": "-date.from",
+													"value": "2024-07-19",
+													"disabled": true
+												},
+												{
+													"key": "_include",
+													"value": "Task:focus",
+													"disabled": true
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Get All Tasks",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{int.api.url}}FHIR/R4/Task?owner=697L0",
+											"host": [
+												"{{int.api.url}}FHIR"
+											],
+											"path": [
+												"R4",
+												"Task"
+											],
+											"query": [
+												{
+													"key": "owner",
+													"value": "697L0"
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Get Task - Logical Id",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"const responseJson = pm.response.json();\r",
+													"\r",
+													"// Set the task status to 'accepted'\r",
+													"responseJson.status='accepted';\r",
+													"pm.environment.set(\"ProcessGenomicTest_Task_Resource\",JSON.stringify(responseJson));\r",
+													"\r",
+													"pm.test(\"HTTP Status code is 200\", function () {\r",
+													"  pm.response.to.have.status(200);\r",
+													"});\r",
+													"\r",
+													"pm.test(\"Content-Type header is present\", () => {\r",
+													"  pm.response.to.have.header(\"Content-Type\");\r",
+													"});\r",
+													"\r",
+													"pm.test(\"resourceType type = 'Task'\", () => {\r",
+													"  pm.expect(responseJson.resourceType).to.eql(\"Task\");\r",
+													"});"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{int.api.url}}FHIR/R4/Task/{{task_ProcessGenomicTestRequest}}",
+											"host": [
+												"{{int.api.url}}FHIR"
+											],
+											"path": [
+												"R4",
+												"Task",
+												"{{task_ProcessGenomicTestRequest}}"
+											]
+										}
+									},
+									"response": []
 								}
-							},
-							"response": []
+							]
 						},
 						{
-							"name": "Update Task - Process Genomic Request",
-							"event": [
+							"name": "Task Management",
+							"item": [
 								{
-									"listen": "prerequest",
-									"script": {
-										"exec": [
-											"const bundle_id = pm.variables.replaceIn(\"{{$guid}}\");\r",
-											"pm.environment.set(\"bundle_id\",bundle_id);\r",
-											"\r",
-											"//const specimen_id = pm.variables.replaceIn(\"{{$guid}}\");\r",
-											"//pm.environment.set(\"specimen_id\",specimen_id);\r",
-											"\r",
-											"//const test_specimen_id = pm.variables.replaceIn(\"{{$randomBankAccount}}\");\r",
-											"//pm.environment.set(\"test_specimen_id\",test_specimen_id);\r",
-											"\r",
-											"//const specimen_collection_time=pm.variables.replaceIn(\"{{$isoTimestamp}}\");\r",
-											"//pm.environment.set(\"specimen_collection_time\",specimen_collection_time);"
-										],
-										"type": "text/javascript",
-										"packages": {}
-									}
-								},
+									"name": "Update Task - Process Genomic Request",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													"const bundle_id = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"pm.environment.set(\"bundle_id\",bundle_id);\r",
+													"\r",
+													"//const specimen_id = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"//pm.environment.set(\"specimen_id\",specimen_id);\r",
+													"\r",
+													"//const test_specimen_id = pm.variables.replaceIn(\"{{$randomBankAccount}}\");\r",
+													"//pm.environment.set(\"test_specimen_id\",test_specimen_id);\r",
+													"\r",
+													"//const specimen_collection_time=pm.variables.replaceIn(\"{{$isoTimestamp}}\");\r",
+													"//pm.environment.set(\"specimen_collection_time\",specimen_collection_time);"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"var template = `\r",
+													"<style type=\"text/css\">\r",
+													"    .tftable {font-size:14px;color:#333333;width:100%;border-width: 1px;border-color: #87ceeb;border-collapse: collapse;}\r",
+													"    .tftable th {font-size:18px;background-color:#87ceeb;border-width: 1px;padding: 8px;border-style: solid;border-color: #87ceeb;text-align:left;}\r",
+													"    .tftable tr {background-color:#ffffff;}\r",
+													"    .tftable td {font-size:14px;border-width: 1px;padding: 8px;border-style: solid;border-color: #87ceeb;}\r",
+													"    .tftable tr:hover {background-color:#e0ffff;}\r",
+													"</style>\r",
+													"\r",
+													"<table class=\"tftable\" border=\"1\">\r",
+													"    <tr>\r",
+													"        <th>Type</th>\r",
+													"        <th>ID</th>\r",
+													"        <th>Task Name</th>\r",
+													"        <th>Full URL</th>\r",
+													"        <th>Status</th>\r",
+													"        <th>Intent</th>\r",
+													"        <th>Last Updated</th>\r",
+													"        <th>Version Id</th>\r",
+													"    </tr>\r",
+													"    \r",
+													"    {{#each response.entry}}\r",
+													"        <tr>\r",
+													"            <td>{{resource.resourceType}}</td>\r",
+													"            <td>{{resource.id}}</td>\r",
+													"            <td>{{resource.code.coding.[0].display}}</td>\r",
+													"            <td>{{fullUrl}}</td>\r",
+													"            <td>{{resource.status}}</td>\r",
+													"            <td>{{resource.intent}}</td>\r",
+													"            <td>{{resource.meta.lastUpdated}}</td>\r",
+													"            <td>{{resource.meta.versionId}}</td>\r",
+													"        </tr>\r",
+													"    {{/each}}\r",
+													"</table>\r",
+													"`;\r",
+													"\r",
+													"function constructVisualizerPayload() {\r",
+													"    return { response: pm.response.json() }\r",
+													"}\r",
+													"\r",
+													"pm.visualizer.set(template, constructVisualizerPayload());"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"resourceType\": \"Bundle\",\r\n    \"id\": \"{{bundle_id}}\",\r\n    \"type\": \"transaction\",\r\n    \"entry\": [{\r\n            \"fullUrl\": \"Task/{{task_ProcessGenomicTestRequest}}\",\r\n            \"resource\": {{ProcessGenomicTest_Task_Resource}},\r\n            \"request\": {\r\n                \"method\": \"PUT\",\r\n                \"url\": \"Task\"\r\n            }\r\n        }\r\n    ]\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{int.api.url}}FHIR/R4",
+											"host": [
+												"{{int.api.url}}FHIR"
+											],
+											"path": [
+												"R4"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "Analysis",
+							"item": [
 								{
-									"listen": "test",
-									"script": {
-										"exec": [
-											"var template = `\r",
-											"<style type=\"text/css\">\r",
-											"    .tftable {font-size:14px;color:#333333;width:100%;border-width: 1px;border-color: #87ceeb;border-collapse: collapse;}\r",
-											"    .tftable th {font-size:18px;background-color:#87ceeb;border-width: 1px;padding: 8px;border-style: solid;border-color: #87ceeb;text-align:left;}\r",
-											"    .tftable tr {background-color:#ffffff;}\r",
-											"    .tftable td {font-size:14px;border-width: 1px;padding: 8px;border-style: solid;border-color: #87ceeb;}\r",
-											"    .tftable tr:hover {background-color:#e0ffff;}\r",
-											"</style>\r",
-											"\r",
-											"<table class=\"tftable\" border=\"1\">\r",
-											"    <tr>\r",
-											"        <th>Type</th>\r",
-											"        <th>ID</th>\r",
-											"        <th>Task Name</th>\r",
-											"        <th>Full URL</th>\r",
-											"        <th>Status</th>\r",
-											"        <th>Intent</th>\r",
-											"        <th>Last Updated</th>\r",
-											"        <th>Version Id</th>\r",
-											"    </tr>\r",
-											"    \r",
-											"    {{#each response.entry}}\r",
-											"        <tr>\r",
-											"            <td>{{resource.resourceType}}</td>\r",
-											"            <td>{{resource.id}}</td>\r",
-											"            <td>{{resource.code.coding.[0].display}}</td>\r",
-											"            <td>{{fullUrl}}</td>\r",
-											"            <td>{{resource.status}}</td>\r",
-											"            <td>{{resource.intent}}</td>\r",
-											"            <td>{{resource.meta.lastUpdated}}</td>\r",
-											"            <td>{{resource.meta.versionId}}</td>\r",
-											"        </tr>\r",
-											"    {{/each}}\r",
-											"</table>\r",
-											"`;\r",
-											"\r",
-											"function constructVisualizerPayload() {\r",
-											"    return { response: pm.response.json() }\r",
-											"}\r",
-											"\r",
-											"pm.visualizer.set(template, constructVisualizerPayload());"
-										],
-										"type": "text/javascript",
-										"packages": {}
-									}
+									"name": "Attach Genomic Data",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													"const bundle_id = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"pm.environment.set(\"bundle_id\",bundle_id);\r",
+													"\r",
+													"const documentreference_id = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"pm.environment.set(\"documentreference_id\",documentreference_id);\r",
+													"\r",
+													"const report_identifier = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"pm.environment.set(\"report_identifier\",report_identifier);\r",
+													"\r",
+													"const report_time=pm.variables.replaceIn(\"{{$isoTimestamp}}\");\r",
+													"pm.environment.set(\"report_time\",report_time);\r",
+													"\r",
+													"const specimen_collection_time=pm.variables.replaceIn(\"{{$isoTimestamp}}\");\r",
+													"pm.environment.set(\"specimen_collection_time\",specimen_collection_time);"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"const responseJson = pm.response.json();\r",
+													"//console.log(responseJson.entry[3].fullUrl.split(\"/\")[1]);\r",
+													"\r",
+													"pm.test(\"HTTP Status code is 200\", function () {\r",
+													"  pm.response.to.have.status(200);\r",
+													"});\r",
+													"\r",
+													"pm.test(\"Content-Type header is present\", () => {\r",
+													"  pm.response.to.have.header(\"Content-Type\");\r",
+													"});\r",
+													"\r",
+													"pm.test(\"Response type = 'transaction-response'\", () => {\r",
+													"  pm.expect(responseJson.type).to.eql(\"transaction-response\");\r",
+													"});\r",
+													"\r",
+													"pm.test('No of operation outcomes matches the resources sent == 1', () => {\r",
+													"    pm.expect(responseJson.entry.length).to.eql(1);\r",
+													"});\r",
+													"\r",
+													"const DocumentReference_Logical_Id = responseJson.entry[0].fullUrl.split(\"/\")[1];\r",
+													"pm.environment.set(\"DocumentReference_Logical_Id\",DocumentReference_Logical_Id);\r",
+													"\r",
+													"pm.test('DocumentReference_Logical_Id is a valid UUID', () => {\r",
+													"    pm.expect(DocumentReference_Logical_Id).to.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i);\r",
+													"});"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"resourceType\": \"Bundle\",\r\n    \"id\": \"{{bundle_id}}\",\r\n    \"type\": \"transaction\",\r\n    \"entry\": [{\r\n            \"fullUrl\": \"urn:uuid:{{documentreference_id}}\",\r\n            \"resource\": {\r\n                \"resourceType\": \"DocumentReference\",\r\n                \"id\": \"{{documentreference_id}}\",\r\n                \"status\": \"current\",\r\n                \"docStatus\": \"final\",\r\n                \"subject\": {\r\n                    \"reference\": \"Patient/{{Patient_Logical_Id}}\"\r\n                },\r\n                \"date\": \"2023-11-24T09:45:00Z\",\r\n                \"author\": [{\r\n                        \"identifier\": {\r\n                            \"system\": \"https://fhir.nhs.uk/Id/ods-organization-code\",\r\n                            \"value\": \"697L0\"\r\n                        }\r\n                    }\r\n                ],\r\n                \"description\": \"Phenotype Report\",\r\n                \"content\": [{\r\n                        \"attachment\": {\r\n                            \"contentType\": \"application/json\",\r\n                            \"url\": \"drs://drs.exampleglh.nhs.uk/ga4gh/drs/v1/objects/42375e7d-071c-4eb3-b1c8-cec11e245cf0\",\r\n                            \"title\": \"PharmCAT JSON report\"\r\n                        }\r\n                    }\r\n                ],\r\n                \"context\": {\r\n                    \"related\": [{\r\n                            \"reference\": \"ServiceRequest/{{Service_Request_Logical_Id}}\"\r\n                        }, {\r\n                            \"reference\": \"Specimen/{{Specimen_Logical_Id}}\"\r\n                        }\r\n                    ]\r\n                }\r\n            },\r\n            \"request\": {\r\n                \"method\": \"POST\",\r\n                \"url\": \"DocumentReference\"\r\n            }\r\n        }\r\n    ]\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{int.api.url}}FHIR/R4",
+											"host": [
+												"{{int.api.url}}FHIR"
+											],
+											"path": [
+												"R4"
+											]
+										}
+									},
+									"response": []
 								}
 							],
-							"request": {
-								"method": "POST",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\r\n    \"resourceType\": \"Bundle\",\r\n    \"id\": \"{{bundle_id}}\",\r\n    \"type\": \"transaction\",\r\n    \"entry\": [{\r\n            \"fullUrl\": \"Task/{{task_ProcessGenomicTestRequest}}\",\r\n            \"resource\": {{ProcessGenomicTest_Task_Resource}},\r\n            \"request\": {\r\n                \"method\": \"PUT\",\r\n                \"url\": \"Task\"\r\n            }\r\n        }\r\n    ]\r\n}",
-									"options": {
-										"raw": {
-											"language": "json"
+							"description": "1. Attach a DocumentReference resource which catures the location of the digital DNA data"
+						},
+						{
+							"name": "Attach Report",
+							"item": [
+								{
+									"name": "Rare Disease - Non-WGS-R132.1 - Attach Report",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													"const bundle_id = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"pm.environment.set(\"bundle_id\",bundle_id);\r",
+													"\r",
+													"const report_id = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"pm.environment.set(\"report_id\",report_id);\r",
+													"\r",
+													"const report_identifier = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"pm.environment.set(\"report_identifier\",report_identifier);\r",
+													"\r",
+													"const report_time=pm.variables.replaceIn(\"{{$isoTimestamp}}\");\r",
+													"pm.environment.set(\"report_time\",report_time);\r",
+													"\r",
+													"const specimen_collection_time=pm.variables.replaceIn(\"{{$isoTimestamp}}\");\r",
+													"pm.environment.set(\"specimen_collection_time\",specimen_collection_time);"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"const responseJson = pm.response.json();\r",
+													"//console.log(responseJson.entry[3].fullUrl.split(\"/\")[1]);\r",
+													"\r",
+													"pm.test(\"HTTP Status code is 200\", function () {\r",
+													"  pm.response.to.have.status(200);\r",
+													"});\r",
+													"\r",
+													"pm.test(\"Content-Type header is present\", () => {\r",
+													"  pm.response.to.have.header(\"Content-Type\");\r",
+													"});\r",
+													"\r",
+													"pm.test(\"Response type = 'transaction-response'\", () => {\r",
+													"  pm.expect(responseJson.type).to.eql(\"transaction-response\");\r",
+													"});\r",
+													"\r",
+													"pm.test('No of operation outcomes matches the resources sent == 1', () => {\r",
+													"    pm.expect(responseJson.entry.length).to.eql(1);\r",
+													"});\r",
+													"\r",
+													"const Report_Logical_Id = responseJson.entry[0].fullUrl.split(\"/\")[1];\r",
+													"pm.environment.set(\"Report_Logical_Id\",Report_Logical_Id);\r",
+													"\r",
+													"pm.test('Report_Logical_Id is a valid UUID', () => {\r",
+													"    pm.expect(Report_Logical_Id).to.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i);\r",
+													"});"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
 										}
-									}
-								},
-								"url": {
-									"raw": "{{int.api.url}}FHIR/R4",
-									"host": [
-										"{{int.api.url}}FHIR"
 									],
-									"path": [
-										"R4"
-									]
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"resourceType\": \"Bundle\",\r\n    \"id\": \"{{bundle_id}}\",\r\n    \"type\": \"transaction\",\r\n    \"entry\":  [\r\n        {\r\n            \"fullUrl\": \"urn:uuid:{{report_id}}\",\r\n            \"resource\": {\r\n                \"resourceType\": \"DiagnosticReport\",\r\n                \"id\": \"{{report_id}}\",\r\n                \"identifier\":  [\r\n                    {\r\n                        \"system\": \"https://www.guysandstthomas.nhs.uk/SEGLH/lims\",\r\n                        \"value\": \"{{report_identifier}}\",\r\n                        \"assigner\": {\r\n                            \"identifier\": {\r\n                                \"system\": \"https://fhir.nhs.uk/Id/ods-organization-code\",\r\n                                \"value\": \"RP4\"\r\n                            }\r\n                        }\r\n                    }\r\n                ],\r\n                \"basedOn\":  [\r\n                    {\r\n                        \"reference\": \"ServiceRequest/{{Service_Request_Logical_Id}}\"\r\n                    }\r\n                ],\r\n                \"status\": \"partial\",\r\n                \"category\":  [\r\n                    {\r\n                        \"coding\":  [\r\n                            {\r\n                                \"system\": \"http://terminology.hl7.org/CodeSystem/v2-0074\",\r\n                                \"code\": \"GE\",\r\n                                \"display\": \"Genetics\"\r\n                            }\r\n                        ]\r\n                    }\r\n                ],\r\n                \"code\": {\r\n                    \"coding\":  [\r\n                        {\r\n                            \"system\": \"http://snomed.info/sct\",\r\n                            \"code\": \"1054161000000101\",\r\n                            \"display\": \"Genetic report\"\r\n                        }\r\n                    ]\r\n                },\r\n                \"subject\": {\r\n                    \"reference\": \"Patient/{{Patient_Logical_Id}}\"\r\n                },\r\n                \"issued\": \"{{report_time}}\",\r\n                \"performer\":  [\r\n                    {\r\n                        \"identifier\": {\r\n                            \"system\": \"https://fhir.nhs.uk/Id/ods-organization-code\",\r\n                            \"value\": \"69A70\"\r\n                        }\r\n                    }\r\n                ],\r\n                \"specimen\":  [\r\n                    {\r\n                        \"reference\": \"Specimen/{{Specimen_Logical_Id}}\"\r\n                    }\r\n                ],\r\n                \"presentedForm\":  [\r\n                    {\r\n                        \"contentType\": \"application/pdf\",\r\n                        \"language\": \"en-GB\",\r\n                        \"url\": \"https://o719on.axshare.com/?id=8aol33&p=introduction&g=1\",\r\n                        \"size\": 43272,\r\n                        \"title\": \"Genomic Report for Anita Lamberts\",\r\n                        \"creation\": \"{{report_time}}\"\r\n                    }\r\n                ]\r\n            },\r\n            \"request\": {\r\n                \"method\": \"POST\",\r\n                \"url\": \"DiagnosticReport\"\r\n            }\r\n        }\r\n    ]\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{int.api.url}}FHIR/R4",
+											"host": [
+												"{{int.api.url}}FHIR"
+											],
+											"path": [
+												"R4"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Get Report - logical id",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"const responseJson = pm.response.json();\r",
+													"\r",
+													"pm.test(\"HTTP Status code is 200\", function () {\r",
+													"  pm.response.to.have.status(200);\r",
+													"});\r",
+													"\r",
+													"pm.test(\"Content-Type header is present\", () => {\r",
+													"  pm.response.to.have.header(\"Content-Type\");\r",
+													"});\r",
+													"\r",
+													"pm.test(\"resourceType type = 'DiagnosticReport'\", () => {\r",
+													"  pm.expect(responseJson.resourceType).to.eql(\"DiagnosticReport\");\r",
+													"});\r",
+													"\r",
+													"const Response_DiagnosticReport_Logical_Id = responseJson.id\r",
+													"pm.test(\"Logical id of the resource matches\", () => {\r",
+													"  pm.expect(Response_DiagnosticReport_Logical_Id).to.eql(pm.environment.get('Report_Logical_Id'));\r",
+													"})\r",
+													"\r",
+													"pm.test('Response_DiagnosticReport_Logical_Id is a valid UUID', () => {\r",
+													"    pm.expect(Response_DiagnosticReport_Logical_Id).to.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i);\r",
+													"});\r",
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{int.api.url}}FHIR/R4/DiagnosticReport/{{Report_Logical_Id}}",
+											"host": [
+												"{{int.api.url}}FHIR"
+											],
+											"path": [
+												"R4",
+												"DiagnosticReport",
+												"{{Report_Logical_Id}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Rare Disease - Non-WGS-R132.1 -Update Report",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													"const bundle_id = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"pm.environment.set(\"bundle_id\",bundle_id);\r",
+													"\r",
+													"const report_id = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"pm.environment.set(\"report_id\",report_id);\r",
+													"\r",
+													"const report_time=pm.variables.replaceIn(\"{{$isoTimestamp}}\");\r",
+													"pm.environment.set(\"report_time\",report_time);\r",
+													"\r",
+													"const specimen_collection_time=pm.variables.replaceIn(\"{{$isoTimestamp}}\");\r",
+													"pm.environment.set(\"specimen_collection_time\",specimen_collection_time);\r",
+													"\r",
+													"const provenance_id = pm.variables.replaceIn(\"{{$guid}}\");\r",
+													"const provenance_time=pm.variables.replaceIn(\"{{$isoTimestamp}}\");\r",
+													"const signature_time=pm.variables.replaceIn(\"{{$isoTimestamp}}\");\r",
+													"\r",
+													"pm.environment.set(\"provenance_id\",provenance_id);\r",
+													"pm.environment.set(\"provenance_time\",provenance_time);\r",
+													"pm.environment.set(\"signature_time\",signature_time);"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"const responseJson = pm.response.json();\r",
+													"//console.log(responseJson.entry[3].fullUrl.split(\"/\")[1]);\r",
+													"\r",
+													"pm.test(\"HTTP Status code is 200\", function () {\r",
+													"  pm.response.to.have.status(200);\r",
+													"});\r",
+													"\r",
+													"pm.test(\"Content-Type header is present\", () => {\r",
+													"  pm.response.to.have.header(\"Content-Type\");\r",
+													"});\r",
+													"\r",
+													"pm.test(\"Response type = 'transaction-response'\", () => {\r",
+													"  pm.expect(responseJson.type).to.eql(\"transaction-response\");\r",
+													"});\r",
+													"\r",
+													"pm.test('No of operation outcomes matches the resources sent == 2', () => {\r",
+													"    pm.expect(responseJson.entry.length).to.eql(2);\r",
+													"});\r",
+													"\r",
+													"const Report_Logical_Id = responseJson.entry[0].fullUrl.split(\"/\")[1];\r",
+													"pm.environment.set(\"Report_Logical_Id\",Report_Logical_Id);\r",
+													"\r",
+													"pm.test('Report_Logical_Id is a valid UUID', () => {\r",
+													"    pm.expect(Report_Logical_Id).to.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i);\r",
+													"});"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"resourceType\": \"Bundle\",\r\n    \"id\": \"{{bundle_id}}\",\r\n    \"type\": \"transaction\",\r\n    \"entry\":  [\r\n        {\r\n            \"fullUrl\": \"DiagnosticReport/{{Report_Logical_Id}}\",\r\n            \"resource\": {\r\n                \"resourceType\": \"DiagnosticReport\",\r\n                \"id\": \"{{Report_Logical_Id}}\",\r\n                \"extension\" : [\r\n                    {\r\n                        \"url\" : \"http://hl7.org/fhir/StructureDefinition/workflow-supportingInfo\",\r\n                        \"valueReference\" : {\r\n                            \"reference\" : \"DocumentReference/{{DocumentReference_Logical_Id}}\"\r\n                        }\r\n                    }\r\n                ],\r\n                \"identifier\":  [\r\n                    {\r\n                        \"system\": \"https://www.guysandstthomas.nhs.uk/SEGLH/lims\",\r\n                        \"value\": \"{{report_identifier}}\",\r\n                        \"assigner\": {\r\n                            \"identifier\": {\r\n                                \"system\": \"https://fhir.nhs.uk/Id/ods-organization-code\",\r\n                                \"value\": \"RP4\"\r\n                            }\r\n                        }\r\n                    }\r\n                ],\r\n                \"basedOn\":  [\r\n                    {\r\n                        \"reference\": \"ServiceRequest/{{Service_Request_Logical_Id}}\"\r\n                    }\r\n                ],\r\n                \"status\": \"final\",\r\n                \"category\":  [\r\n                    {\r\n                        \"coding\":  [\r\n                            {\r\n                                \"system\": \"http://terminology.hl7.org/CodeSystem/v2-0074\",\r\n                                \"code\": \"GE\",\r\n                                \"display\": \"Genetics\"\r\n                            }\r\n                        ]\r\n                    }\r\n                ],\r\n                \"code\": {\r\n                    \"coding\":  [\r\n                        {\r\n                            \"system\": \"http://snomed.info/sct\",\r\n                            \"code\": \"1054161000000101\",\r\n                            \"display\": \"Genetic report\"\r\n                        }\r\n                    ]\r\n                },\r\n                \"subject\": {\r\n                    \"reference\": \"Patient/{{Patient_Logical_Id}}\"\r\n                },\r\n                \"issued\": \"{{report_time}}\",\r\n                \"performer\":  [\r\n                    {\r\n                        \"identifier\": {\r\n                            \"system\": \"https://fhir.nhs.uk/Id/ods-organization-code\",\r\n                            \"value\": \"69A70\"\r\n                        }\r\n                    }\r\n                ],\r\n                \"specimen\":  [\r\n                    {\r\n                        \"reference\": \"Specimen/{{Specimen_Logical_Id}}\"\r\n                    }\r\n                ],\r\n                \"presentedForm\":  [\r\n                    {\r\n                        \"contentType\": \"application/pdf\",\r\n                        \"language\": \"en-GB\",\r\n                        \"url\": \"https://o719on.axshare.com/?id=8aol33&p=introduction&g=1\",\r\n                        \"size\": 43272,\r\n                        \"title\": \"Genomic Report for Anita Lamberts\",\r\n                        \"creation\": \"{{report_time}}\"\r\n                    }\r\n                ]\r\n            },\r\n            \"request\": {\r\n                \"method\": \"PUT\",\r\n                \"url\": \"DiagnosticReport/{{Report_Logical_Id}}\"\r\n            }\r\n        }, {\r\n            \"fullUrl\": \"urn:uuid:{{provenance_id}}\",\r\n            \"resource\": {\r\n                \"resourceType\": \"Provenance\",\r\n                \"id\": \"{{provenance_id}}\",\r\n                \"target\": [{\r\n                        \"reference\": \"DiagnosticReport/{{Report_Logical_Id}}\"\r\n                    }\r\n                ],\r\n                \"recorded\": \"{{provenance_time}}\",\r\n                \"reason\": [{\r\n                        \"coding\": [{\r\n                                \"system\": \"http://terminology.hl7.org/CodeSystem/v3-ActReason\",\r\n                                \"code\": \"TREAT\",\r\n                                \"display\": \"treatment\"\r\n                            }\r\n                        ]\r\n                    }\r\n                ],\r\n                \"activity\": {\r\n                    \"coding\": [{\r\n                            \"system\": \"http://terminology.hl7.org/CodeSystem/v3-DataOperation\",\r\n                            \"code\": \"UPDATE\",\r\n                            \"display\": \"revise\"\r\n                        }\r\n                    ]\r\n                },\r\n                \"agent\": [{\r\n                        \"type\": {\r\n                            \"coding\": [{\r\n                                    \"system\": \"http://terminology.hl7.org/CodeSystem/provenance-participant-type\",\r\n                                    \"code\": \"author\",\r\n                                    \"display\": \"Author\"\r\n                                }\r\n                            ]\r\n                        },\r\n                        \"who\": {\r\n                            \"reference\": \"PractitionerRole/{{PractitionerRole_Logical_Id}}\"\r\n                        }\r\n                    }\r\n                ],\r\n                \"entity\": [{\r\n                        \"role\": \"source\",\r\n                        \"what\": {\r\n                            \"reference\": \"DiagnosticReport/{{Report_Logical_Id}}\"\r\n                        }\r\n                    }\r\n                ],\r\n                \"signature\": [{\r\n                        \"type\": [{\r\n                                \"system\": \"urn:iso-astm:E1762-95:2013\",\r\n                                \"code\": \"1.2.840.10065.1.12.1.15\",\r\n                                \"display\": \"Addendum Signature\"\r\n                            }\r\n                        ],\r\n                        \"when\": \"{{signature_time}}\",\r\n                        \"who\": {\r\n                            \"reference\": \"PractitionerRole/{{PractitionerRole_Logical_Id}}\"\r\n                        },\r\n                        \"data\": \"DQo8U2lnbmF0dXJlIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwLzA5L3htbGRzaWcjIj4NCiAgICA8U2lnbmVkSW5mbz48Q2Fub25pY2FsaXphdGlvbk1ldGhvZCBBbGdvcml0aG09Imh0dHA6Ly93d3cudzMub3JnLzIwMDEvMTAveG1sLWV4Yy1jMTRuIyI+PC9DYW5vbmljYWxpemF0aW9uTWV0aG9kPjxTaWduYXR1cmVNZXRob2QgQWxnb3JpdGhtPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwLzA5L3htbGRzaWcjcnNhLXNoYTEiPjwvU2lnbmF0dXJlTWV0aG9kPjxSZWZlcmVuY2U+PFRyYW5zZm9ybXM+PFRyYW5zZm9ybSBBbGdvcml0aG09Imh0dHA6Ly93d3cudzMub3JnLzIwMDEvMTAveG1sLWV4Yy1jMTRuIyI+PC9UcmFuc2Zvcm0+PC9UcmFuc2Zvcm1zPjxEaWdlc3RNZXRob2QgQWxnb3JpdGhtPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwLzA5L3htbGRzaWcjc2hhMSI+PC9EaWdlc3RNZXRob2Q+PERpZ2VzdFZhbHVlPjJ5cUJISDVLK05ibVA1WWY3bVE3WmVFYWN0Yz08L0RpZ2VzdFZhbHVlPjwvUmVmZXJlbmNlPjwvU2lnbmVkSW5mbz4NCiAgICA8U2lnbmF0dXJlVmFsdWU+aE9DaXVJOGIyTEFaRXoxUDdXcGFlRDBQUWQ2bVJKdzVSV2JNV2ZMcU1OUWtRMzIzbnpWTDk3a01XZUJycnJzNU5vTHhGb28vKzFPUjYxcmNXNTJEamlHdjRRcE53QmJOQkYvMi9hUWxqd3pUdm9tQm9tUlpnbUtRQWpyZU1iOTZNM0hjajVvVFNBZG9tUEc2TGw3RVRCS25wRTVJdW5EamducUIxelhEWllVPTwvU2lnbmF0dXJlVmFsdWU+DQogICAgPEtleUluZm8+DQogICAgICAgIDxYNTA5RGF0YT4NCiAgICAgICAgICAgIDxYNTA5Q2VydGlmaWNhdGU+TUlJRHVEQ0NBcUNnQXdJQkFnSUVYY210SHpBTkJna3Foa2lHOXcwQkFRc0ZBREEyTVF3d0NnWURWUVFLRXdOdWFITXhDekFKQmdOVkJBc1RBa05CTVJrd0Z3WURWUVFERXhCT1NGTWdTVTVVSUV4bGRtVnNJREZFTUI0WERUSXdNVEF5TWpFd01qRTFOVm9YRFRJeU1UQXlNakV3TlRFMU5Wb3dRekVNTUFvR0ExVUVDaE1EYm1oek1ROHdEUVlEVlFRTEV3WlFaVzl3YkdVeElqQWdCZ05WQkFNTUdUVTFOVEkxTXpVeU1URXdPRjlTUVU1RVQwMWZWVk5GVWxFd2daOHdEUVlKS29aSWh2Y05BUUVCQlFBRGdZMEFNSUdKQW9HQkFLdDRzek53N09BSDdBUVJyRGUveEJJbXNNbU1pUzlFc3JUM2EzcC9MaDNicmR6STlhYWpUVVoyYi9jdmJPYTdQZVlkN3UrSzRhMlpkMFhrKzBHRm1ZR3pTVlg2aVlqYmx3cjB2YWkzMXpWN0crbEd2SHhINnBTb0xDd0lDYVpBRndhYmVENU96OTQreUEzYVdOV3RHVjBEZmg5cXdIM1pGQ0lNUnN2ZXJOMXBBZ01CQUFHamdnRkRNSUlCUHpBT0JnTlZIUThCQWY4RUJBTUNCa0F3WlFZRFZSMGdBUUgvQkZzd1dUQlhCZ3NxaGpvQWlYdG1BQU1DQURCSU1FWUdDQ3NHQVFVRkJ3SUJGanBvZEhSd2N6b3ZMM0JyYVM1dWFITXVkV3N2WTJWeWRHbG1hV05oZEdWZmNHOXNhV05wWlhNdlkyOXVkR1Z1ZEY5amIyMXRhWFJ0Wlc1ME1ETUdBMVVkSHdRc01Db3dLS0Ftb0NTR0ltaDBkSEE2THk5amNtd3VibWh6TG5WckwybHVkQzh4WkM5amNteGpNeTVqY213d0t3WURWUjBRQkNRd0lvQVBNakF5TURFd01qSXhNREl4TlRWYWdROHlNREl5TURNeE56RXdOVEUxTlZvd0h3WURWUjBqQkJnd0ZvQVVvSllmZ1lUTlBkNkVVS0w2UUxJekh4WTVQRkl3SFFZRFZSME9CQllFRkx0eXZZU3lhcWc2MEFFVVpneGswd3JqUkpjK01Ba0dBMVVkRXdRQ01BQXdHUVlKS29aSWh2WjlCMEVBQkF3d0Noc0VWamd1TXdNQ0JMQXdEUVlKS29aSWh2Y05BUUVMQlFBRGdnRUJBQmN6eThCOGp1UHBJZmFUTkZjeHJDMjJhQ1gveFlabWhyTC9OdklCQWFYMUc1aGppd21rR0tFMmhSVElyNjdQeFp4bVhzSnhpZ1JCTUhQbEkrbFkvK29rekgwR2k3YjVicWx3N3B4R0lnSk8wMDB3OHBGc3ZvOXc0MklZaEhvZHN2bkRWU3hoTVQwSjQ2UWhrOXNvRTBMam9FVUxLUVBQbFlHa2UvR2wzbTE3SXRGWXdPYlFIMGZNRXdtaXFCeWVJZno3Z1NjY096TDVjSXA2UGNaVE9qbzJJcVFwZ0VtaGpPY1JJbkVxQU5pdFNkam9pSkFKenBhYVpqWVRSZEhVWDdpN2FqRWlING05MW5GVys0QXFrTnR0bGI0V2NHS3NTbVdnZktLaGVGNElvWktNRTgweGVyU2dNeTh2dGpMT0JKQ0dYejB3TEdtUXVSbXhNVHE4OHE0PTwvWDUwOUNlcnRpZmljYXRlPg0KICAgICAgICA8L1g1MDlEYXRhPg0KICAgIDwvS2V5SW5mbz4NCjwvU2lnbmF0dXJlPg0K\"\r\n                    }\r\n                ]\r\n            },\r\n            \"request\": {\r\n                \"method\": \"POST\",\r\n                \"url\": \"Provenance\"\r\n            }\r\n        }\r\n    ]\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{int.api.url}}FHIR/R4",
+											"host": [
+												"{{int.api.url}}FHIR"
+											],
+											"path": [
+												"R4"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Get Report - logical id",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"const responseJson = pm.response.json();\r",
+													"\r",
+													"pm.test(\"HTTP Status code is 200\", function () {\r",
+													"  pm.response.to.have.status(200);\r",
+													"});\r",
+													"\r",
+													"pm.test(\"Content-Type header is present\", () => {\r",
+													"  pm.response.to.have.header(\"Content-Type\");\r",
+													"});\r",
+													"\r",
+													"pm.test(\"resourceType type = 'DiagnosticReport'\", () => {\r",
+													"  pm.expect(responseJson.resourceType).to.eql(\"DiagnosticReport\");\r",
+													"});\r",
+													"\r",
+													"const Response_DiagnosticReport_Logical_Id = responseJson.id\r",
+													"pm.test(\"Logical id of the resource matches\", () => {\r",
+													"  pm.expect(Response_DiagnosticReport_Logical_Id).to.eql(pm.environment.get('Report_Logical_Id'));\r",
+													"})\r",
+													"\r",
+													"pm.test('Response_DiagnosticReport_Logical_Id is a valid UUID', () => {\r",
+													"    pm.expect(Response_DiagnosticReport_Logical_Id).to.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i);\r",
+													"});\r",
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{int.api.url}}FHIR/R4/DiagnosticReport/{{Report_Logical_Id}}",
+											"host": [
+												"{{int.api.url}}FHIR"
+											],
+											"path": [
+												"R4",
+												"DiagnosticReport",
+												"{{Report_Logical_Id}}"
+											],
+											"query": [
+												{
+													"key": "_include",
+													"value": "DiagnosticReport:subject",
+													"disabled": true
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Get Report - Search",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"const responseJson = pm.response.json();\r",
+													"\r",
+													"pm.test(\"HTTP Status code is 200\", function () {\r",
+													"  pm.response.to.have.status(200);\r",
+													"});\r",
+													"\r",
+													"pm.test(\"Content-Type header is present\", () => {\r",
+													"  pm.response.to.have.header(\"Content-Type\");\r",
+													"});\r",
+													"\r",
+													"pm.test(\"resourceType type = 'searchset'\", () => {\r",
+													"  pm.expect(responseJson.type).to.eql(\"searchset\");\r",
+													"});\r",
+													"\r",
+													"const Response_DiagnosticReport_Logical_Id = responseJson.entry[0].resource.id;\r",
+													"pm.environment.set(\"Response_DiagnosticReport_Logical_Id\",Response_DiagnosticReport_Logical_Id);\r",
+													"\r",
+													"pm.test(\"Logical id of the resource matches\", () => {\r",
+													"  pm.expect(Response_DiagnosticReport_Logical_Id).to.eql(pm.environment.get('Report_Logical_Id'));\r",
+													"})\r",
+													"\r",
+													"pm.test('Response_DiagnosticReport_Logical_Id is a valid UUID', () => {\r",
+													"    pm.expect(Response_DiagnosticReport_Logical_Id).to.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i);\r",
+													"});\r",
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{int.api.url}}FHIR/R4/DiagnosticReport/?_id={{Report_Logical_Id}}&_include=DiagnosticReport:subject",
+											"host": [
+												"{{int.api.url}}FHIR"
+											],
+											"path": [
+												"R4",
+												"DiagnosticReport",
+												""
+											],
+											"query": [
+												{
+													"key": "_id",
+													"value": "{{Report_Logical_Id}}"
+												},
+												{
+													"key": "_include",
+													"value": "DiagnosticReport:subject"
+												},
+												{
+													"key": "_include",
+													"value": "DiagnosticReport:specimen",
+													"disabled": true
+												},
+												{
+													"key": "_include",
+													"value": "DiagnosticReport:extension:valueReference",
+													"disabled": true
+												}
+											]
+										}
+									},
+									"response": []
 								}
-							},
-							"response": []
+							],
+							"description": "1. Attach a draft report\n    \n2. Update the final report with pointer to the genomic data driving the report"
 						}
 					]
 				},
