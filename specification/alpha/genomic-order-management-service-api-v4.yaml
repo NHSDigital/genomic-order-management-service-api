@@ -2399,6 +2399,7 @@ paths:
           $ref: '#/components/responses/200-goms-bundle-practitionerrole-get'
         4XX:
           $ref: '#/components/responses/4XX-goms-error'
+  /FHIR/R4/PractitionerRole/{id}:
     put:
       operationId: updatePractitionerRole
       summary: Update an existing PractitionerRole

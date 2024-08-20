@@ -1751,6 +1751,8 @@ paths:
   /FHIR/R4/ServiceRequest:
     get:
       operationId: getServiceRequests
+      security:
+        - app-level0: []
       summary: Search for ServiceRequests
       description: >
         ## Overview
@@ -1810,6 +1812,8 @@ paths:
   /FHIR/R4/Task:
     get:
       operationId: getTasks
+      security:
+        - app-level0: []
       summary: Search for Tasks
       description: >
         ## Overview
@@ -2420,6 +2424,7 @@ paths:
           $ref: '#/components/responses/200-goms-bundle-practitionerrole-get'
         4XX:
           $ref: '#/components/responses/4XX-goms-error'
+  /FHIR/R4/PractitionerRole/{id}:
     put:
       operationId: updatePractitionerRole
       security:
