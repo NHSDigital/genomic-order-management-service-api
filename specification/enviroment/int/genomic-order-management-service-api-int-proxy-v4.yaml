@@ -2623,7 +2623,7 @@ paths:
       description: >
         ## Overview
 
-        This endpoint allows to retrieve the capability statement from server
+        This endpoint allows to retrieve the [capability statement](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/CapabilityStatements?version=0.3.0) from server
       tags:
         - meta
       parameters:
