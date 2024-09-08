@@ -4992,7 +4992,7 @@ x-nhsd-apim:
   target:
     type: external
     healthcheck: /_status
-    url: https://mgq002nolc.execute-api.eu-west-2.amazonaws.com/stag
+    url: https://glu-api.aireinnovate.com/genomics-stag
     security:
       type: apikey
       header: X-Api-Key
