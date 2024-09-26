@@ -11578,80 +11578,6 @@
 								}
 							},
 							"response": []
-						},
-						{
-							"name": "Get RelatedPerson",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"exec": [
-											"var template = `\r",
-											"<style type=\"text/css\">\r",
-											"    .tftable {font-size:14px;color:#333333;width:100%;border-width: 1px;border-color: #87ceeb;border-collapse: collapse;}\r",
-											"    .tftable th {font-size:18px;background-color:#87ceeb;border-width: 1px;padding: 8px;border-style: solid;border-color: #87ceeb;text-align:left;}\r",
-											"    .tftable tr {background-color:#ffffff;}\r",
-											"    .tftable td {font-size:14px;border-width: 1px;padding: 8px;border-style: solid;border-color: #87ceeb;}\r",
-											"    .tftable tr:hover {background-color:#e0ffff;}\r",
-											"</style>\r",
-											"\r",
-											"<table class=\"tftable\" border=\"1\">\r",
-											"    <tr>\r",
-											"        <th>Type</th>\r",
-											"        <th>ID</th>\r",
-											"        <th>Name</th>\r",
-											"        <th>Status</th>\r",
-											"        <th>Intent</th>\r",
-											"        <th>Priority</th>\r",
-											"        <th>Authored On</th>\r",
-											"        <th>Last Modified</th>\r",
-											"        <th>Version Id</th>\r",
-											"    </tr>\r",
-											"    \r",
-											"    {{#each response.entry}}\r",
-											"        <tr>\r",
-											"            <td>{{resource.resourceType}}</td>\r",
-											"            <td>{{resource.id}}</td>\r",
-											"            <td>{{resource.code.coding.[0].display}}</td>\r",
-											"            <td>{{resource.status}}</td>\r",
-											"            <td>{{resource.intent}}</td>\r",
-											"            <td>{{resource.priority}}</td>\r",
-											"            <td>{{resource.authoredOn}}</td>\r",
-											"            <td>{{resource.lastModified}}</td>\r",
-											"            <td>{{resource.meta.versionId}}</td>\r",
-											"        </tr>\r",
-											"    {{/each}}\r",
-											"</table>\r",
-											"`;\r",
-											"\r",
-											"function constructVisualizerPayload() {\r",
-											"    return { response: pm.response.json() }\r",
-											"}\r",
-											"\r",
-											"pm.visualizer.set(template, constructVisualizerPayload());"
-										],
-										"type": "text/javascript",
-										"packages": {}
-									}
-								}
-							],
-							"request": {
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "{{url}}FHIR/R4/RelatedPerson/64e68128-6192-4c04-a780-7e197df3e479/_history",
-									"host": [
-										"{{url}}FHIR"
-									],
-									"path": [
-										"R4",
-										"RelatedPerson",
-										"64e68128-6192-4c04-a780-7e197df3e479",
-										"_history"
-									]
-								}
-							},
-							"response": []
 						}
 					]
 				},
@@ -13391,37 +13317,6 @@
 									"response": []
 								}
 							]
-						}
-					]
-				},
-				{
-					"name": "SystemFix",
-					"item": [
-						{
-							"name": "FixRelatedPerson",
-							"request": {
-								"method": "POST",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\r\n    \"resourceType\": \"Bundle\",\r\n    \"id\": \"d32e967a-1420-4573-bbce-ff375e327f99\",\r\n    \"type\": \"transaction\",\r\n    \"entry\": [\r\n        {\r\n            \"fullUrl\": \"RelatedPerson/64e68128-6192-4c04-a780-7e197df3e479\",\r\n            \"resource\": {\r\n                \"resourceType\": \"RelatedPerson\",\r\n                \"id\": \"64e68128-6192-4c04-a780-7e197df3e479\",\r\n                \"identifier\": [\r\n                    {\r\n                        \"system\": \"https://fhir.nhs.uk/Id/nhs-number\",\r\n                        \"value\": \"DUMMY\"\r\n                    }\r\n                ],\r\n                \"patient\": {\r\n                    \"identifier\": {\r\n                        \"system\": \"https://fhir.nhs.uk/Id/nhs-number\",\r\n                        \"value\": \"9449304424\"\r\n                    }\r\n                },\r\n                \"relationship\": [\r\n                    {\r\n                        \"coding\": [\r\n                            {\r\n                                \"system\": \"http://terminology.hl7.org/CodeSystem/v3-RoleCode\",\r\n                                \"code\": \"MTH\",\r\n                                \"display\": \"Mother\"\r\n                            }\r\n                        ]\r\n                    }\r\n                ]\r\n            },\r\n            \"request\": {\r\n                \"method\": \"PUT\",\r\n                \"url\": \"RelatedPerson/64e68128-6192-4c04-a780-7e197df3e479\",\r\n                \"ifMatch\" : \"1\"\r\n            }\r\n        }\r\n    ]\r\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "{{int.api.url}}FHIR/R4",
-									"host": [
-										"{{int.api.url}}FHIR"
-									],
-									"path": [
-										"R4"
-									]
-								}
-							},
-							"response": []
 						}
 					]
 				}
