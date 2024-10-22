@@ -457,6 +457,7 @@ tags:
   - name: patient
   - name: practitionerrole
   - name: history
+  - name: ugr
   - name: meta
 paths:
   /FHIR/R4:
@@ -1760,6 +1761,7 @@ paths:
         ## UGR - Search for patient genomic test requests.        
       tags:
         - order
+        - ugr
       parameters:
         - $ref: '#/components/parameters/apikey'
         - $ref: '#/components/parameters/NHSDSessionURID'
@@ -1996,6 +1998,7 @@ paths:
         ## UGR - Search for patient test reports.
       tags:
         - report
+        - ugr
       parameters:
         - $ref: '#/components/parameters/apikey'
         - $ref: '#/components/parameters/NHSDSessionURID'
@@ -2256,6 +2259,7 @@ paths:
         ## UGR - Search for patient genomic record
       tags:
         - patient
+        - ugr
       parameters:
         - $ref: '#/components/parameters/apikey'
         - $ref: '#/components/parameters/NHSDSessionURID'
