@@ -13206,7 +13206,12 @@
 													"\r",
 													"pm.test(\"Response type = 'transaction-response'\", () => {\r",
 													"  pm.expect(responseJson.type).to.eql(\"transaction-response\");\r",
-													"});"
+													"});\r",
+													"\r",
+													"pm.test(\"ServiceRequest response status = '422 UNPROCESSABLE_ENTITY'\", () => {\r",
+													"  pm.expect(responseJson.entry[3].response.status).to.eql(\"422 UNPROCESSABLE_ENTITY\");\r",
+													"});\r",
+													""
 												],
 												"type": "text/javascript",
 												"packages": {}
@@ -13330,6 +13335,10 @@
 													"\r",
 													"pm.test(\"Response type = 'transaction-response'\", () => {\r",
 													"  pm.expect(responseJson.type).to.eql(\"transaction-response\");\r",
+													"});\r",
+													"\r",
+													"pm.test(\"ServiceRequest response status = '400 INVALID'\", () => {\r",
+													"  pm.expect(responseJson.entry[3].response.status).to.eql(\"400 INVALID\");\r",
 													"});"
 												],
 												"type": "text/javascript",
@@ -13454,6 +13463,10 @@
 													"pm.test(\"Response type = 'transaction-response'\", () => {\r",
 													"  pm.expect(responseJson.type).to.eql(\"transaction-response\");\r",
 													"});\r",
+													"\r",
+													"pm.test(\"Observation Ethinicity response status = '404 NOT_FOUND'\", () => {\r",
+													"  pm.expect(responseJson.entry[2].response.status).to.eql(\"404 NOT_FOUND\");\r",
+													"});\r",
 													""
 												],
 												"type": "text/javascript",
@@ -13577,6 +13590,10 @@
 													"\r",
 													"pm.test(\"Response type = 'transaction-response'\", () => {\r",
 													"  pm.expect(responseJson.type).to.eql(\"transaction-response\");\r",
+													"});\r",
+													"\r",
+													"pm.test(\"ServiceRequest response status = '422 UNPROCESSABLE_ENTITY'\", () => {\r",
+													"  pm.expect(responseJson.entry[3].response.status).to.eql(\"422 UNPROCESSABLE_ENTITY\");\r",
 													"});"
 												],
 												"type": "text/javascript",
@@ -13701,6 +13718,11 @@
 													"pm.test(\"Response type = 'transaction-response'\", () => {\r",
 													"  pm.expect(responseJson.type).to.eql(\"transaction-response\");\r",
 													"});\r",
+													"\r",
+													"pm.test(\"Observation Multiple renal cysts response status = '404 NOT_FOUND'\", () => {\r",
+													"  pm.expect(responseJson.entry[10].response.status).to.eql(\"404 NOT_FOUND\");\r",
+													"});\r",
+													"\r",
 													""
 												],
 												"type": "text/javascript",
