@@ -9958,7 +9958,7 @@
 											"urlencoded": []
 										},
 										"url": {
-											"raw": "{{int.api.url}}FHIR/R4/ServiceRequest?performer:identifier=697L0",
+											"raw": "{{int.api.url}}FHIR/R4/ServiceRequest?performer:identifier=697L0&authored=2024-11-13&code=R132.1",
 											"host": [
 												"{{int.api.url}}FHIR"
 											],
@@ -9977,14 +9977,17 @@
 													"disabled": true
 												},
 												{
-													"key": "-date.from",
-													"value": "2024-07-19",
-													"disabled": true
+													"key": "authored",
+													"value": "2024-11-13"
 												},
 												{
 													"key": "category",
 													"value": "rare-disease-wgs",
 													"disabled": true
+												},
+												{
+													"key": "code",
+													"value": "R132.1"
 												}
 											]
 										}
