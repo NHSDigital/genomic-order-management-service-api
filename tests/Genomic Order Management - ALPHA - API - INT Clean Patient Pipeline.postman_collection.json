@@ -1,0 +1,174 @@
+{
+	"info": {
+		"_postman_id": "673d7820-c556-4167-98f7-cfaa603884b0",
+		"name": "Genomic Order Management - ALPHA - Clean Patient Pipeline",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "13103948"
+	},
+	"item": [
+		{
+			"name": "CleanPipeline",
+			"item": [
+				{
+					"name": "Clean Pipeline - Logical Id",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const bundle_id = pm.variables.replaceIn(\"{{$guid}}\");\r",
+									"const focus_id = pm.variables.replaceIn(\"{{$guid}}\");\r",
+									"pm.environment.set(\"bundle_id\",bundle_id);\r",
+									"pm.environment.set(\"focus_id\",focus_id);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-api-key",
+								"value": "{{api-key}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"resourceType\": \"Bundle\",\r\n    \"id\": \"{{bundle_id}}\",\r\n    \"type\": \"batch\",\r\n    \"entry\": [\r\n        {\r\n            \"fullUrl\": \"urn:uuid:{{focus_id}}\",\r\n            \"request\": {\r\n                \"method\": \"DELETE\",\r\n                \"url\": \"Patient/{{patient_logical_id_server}}\"\r\n            }\r\n        }\r\n    ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://glu-api.aireinnovate.com/genomics-stag/FHIR/R4/PipelineClean",
+							"protocol": "https",
+							"host": [
+								"glu-api",
+								"aireinnovate",
+								"com"
+							],
+							"path": [
+								"genomics-stag",
+								"FHIR",
+								"R4",
+								"PipelineClean"
+							],
+							"query": [
+								{
+									"key": "",
+									"value": "",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Clean Pipeline - Identifier",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const bundle_id = pm.variables.replaceIn(\"{{$guid}}\");\r",
+									"const focus_id = pm.variables.replaceIn(\"{{$guid}}\");\r",
+									"pm.environment.set(\"bundle_id\",bundle_id);\r",
+									"pm.environment.set(\"focus_id_patient\",focus_id);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-api-key",
+								"value": "{{api-key}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"resourceType\": \"Bundle\",\r\n    \"id\": \"{{bundle_id}}\",\r\n    \"type\": \"batch\",\r\n    \"entry\": [\r\n        {\r\n            \"fullUrl\": \"urn:uuid:{{focus_id}}\",\r\n            \"request\": {\r\n                \"method\": \"DELETE\",\r\n                \"url\": \"Patient?identifier={{patient_nhs_no_delete}}\"\r\n            }\r\n        }\r\n    ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://glu-api.aireinnovate.com/genomics-stag/FHIR/R4/PipelineClean",
+							"protocol": "https",
+							"host": [
+								"glu-api",
+								"aireinnovate",
+								"com"
+							],
+							"path": [
+								"genomics-stag",
+								"FHIR",
+								"R4",
+								"PipelineClean"
+							],
+							"query": [
+								{
+									"key": "",
+									"value": "",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "patient_nhs_no_delete",
+			"value": "9449310300",
+			"type": "string"
+		},
+		{
+			"key": "patient_logical_id_server",
+			"value": "efac122a-9ef9-4880-8edd-2d3dffbb17cb",
+			"type": "string"
+		},
+		{
+			"key": "api-key",
+			"value": "",
+			"type": "string"
+		}
+	]
+}
