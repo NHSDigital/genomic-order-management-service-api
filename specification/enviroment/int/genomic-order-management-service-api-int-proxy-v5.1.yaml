@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: Genomic Order Management Service (FHIR) API
-  version: v0.5.0 Alpha
+  version: v0.5.1 Alpha
   description: >
 
     ## Overview
