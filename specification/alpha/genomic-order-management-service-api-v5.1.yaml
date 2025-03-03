@@ -2384,6 +2384,7 @@ paths:
   /FHIR/R4/RelatedPerson:
     get:
       operationId: getRelatedPerson
+      summary: Search for RelatedPerson
       description: >
         ## Overview
 
