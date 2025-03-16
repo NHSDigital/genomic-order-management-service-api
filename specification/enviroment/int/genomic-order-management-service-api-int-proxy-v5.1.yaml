@@ -3425,6 +3425,33 @@ paths:
             #/components/responses/20X-goms-bundle-diagnostic-report-create-update
         4XX:
           $ref: '#/components/responses/4XX-goms-error'
+  /FHIR/R4/DiagnosticReport/{id}/$graph:
+    get:
+      operationId: getservicerequestreportinformation
+      security:
+        - app-level0: []
+      summary: Get detailed information around a service request report.
+      description: >
+        This endpoint allows to retrieve all related records of a ServiceRequest Report
+
+        using logical identifier and [graph
+        definition](https://simplifier.net/guide/FHIR-Genomics-Implementation-Guide/Home/FHIRAssets/GraphDefinitions?version=current)
+        on the server. 
+      tags:
+        - report
+        - ugr
+      parameters:
+        - $ref: '#/components/parameters/apikey'
+        - $ref: '#/components/parameters/NHSDSessionURID'
+        - $ref: '#/components/parameters/RequestID'
+        - $ref: '#/components/parameters/CorrelationID'
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/Graph'
+      responses:
+        '200':
+          $ref: '#/components/responses/200-goms-bundle-diagnosticreports-get'
+        4XX:
+          $ref: '#/components/responses/4XX-goms-error'
   /FHIR/R4/Specimen:
     get:
       operationId: getSpecimens
@@ -3862,6 +3889,31 @@ paths:
 
         This endpoint allows you to retrieve the record of a single FHIR
         resource latest version by its logical id.
+      tags:
+        - history
+      parameters:
+        - $ref: '#/components/parameters/apikey'
+        - $ref: '#/components/parameters/NHSDSessionURID'
+        - $ref: '#/components/parameters/RequestID'
+        - $ref: '#/components/parameters/CorrelationID'
+        - $ref: '#/components/parameters/ResourceName'
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          $ref: >-
+            #/components/responses/200-goms-bundle-practitionerrole-get-logical-id
+        4XX:
+          $ref: '#/components/responses/4XX-goms-error'
+  /FHIR/R4/{resourceName}/{id}/$diff:
+    get:
+      operationId: diffResourceVersion
+      security:
+        - app-level0: []
+      summary: Diff resource version to identify change
+      description: >
+        ## Overview
+
+        This endpoint allows to diff resource versions
       tags:
         - history
       parameters:
