@@ -163,14 +163,14 @@ info:
     Documentation and guidance for technical audiences:
 
     * [Implementation guide for Genomics FHIR
-    standard](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/Design/Interactions?version=current)
+    standard](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/Design/Interactions)
     - the implementation guide contains detailed information, example, error
     codes and processes. This is for technical audiences like developers.
 
 
     * [FHIR UK Core R4](https://simplifier.net/hl7fhirukcorer4) - Core FHIR
     standard mandated for adoption and implementation in UK and our [Genomics
-    IG]((https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/Design/Interactions?version=current)
+    IG]((https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/Design/Interactions)
     is based on this standard.
 
 
@@ -238,7 +238,7 @@ info:
     [capabilities](http://hl7.org/fhir/R4/http.html#capabilities) interaction. 
 
     Refer to [Genomics FHIR
-    IG](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home?version=current)
+    IG](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home)
     for more details to the implementation requirements. This specification is
     based on UK Core Ballot2 and conforms to the same.
 
@@ -470,7 +470,7 @@ paths:
       description: |
         ## Overview
         [FHIR Restful](https://hl7.org/fhir/R4/http.html) endpoint to 
-         register a **new test or update tests or add reports etc**. This end point uses FHIR [bundle](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-Bundle?version=current) of type **transaction** and the list of resources that forms the payload are listed [here](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/Build/How-to-construct-Bundles?version=current). 
+         register a **new test or update tests or add reports etc**. This end point uses FHIR [bundle](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-Bundle) of type **transaction** and the list of resources that forms the payload are listed [here](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/Build/How-to-construct-Bundles). 
       tags:
         - process
       parameters:
@@ -491,19 +491,19 @@ paths:
                 - entry
               description: >
                 A FHIR
-                [bundle](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-Bundle?version=current)
+                [bundle](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-Bundle)
                 with collection of [genomics test order request
-                resources.](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/MessageDefinitions/Genomic-Test-Request?version=current).
+                resources.](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/MessageDefinitions/Genomic-Test-Request).
             examples:
               Non-WGS-Test-Request-Rare-Disease:
                 summary: Bundle-NonWGSTestOrderForm-Example
                 description: >-
                   Example
-                  [transaction](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/Examples/Bundle/Bundle-NonWGSTestOrderForm-Example?version=current)
+                  [transaction](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/Examples/Bundle/Bundle-NonWGSTestOrderForm-Example)
                   of a Non-WGS test request sent to the central broker, as
                   described in the Clinica Scenario [**Non-WGS Test Request -
                   Rare
-                  Disease**](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/Design/Clinical-Scenarios?version=current#Non-WGS-Test-Request---Rare-Disease).
+                  Disease**](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/Design/Clinical-Scenarios#Non-WGS-Test-Request---Rare-Disease).
                 value:
                   resourceType: Bundle
                   id: Bundle-NonWGSTestOrderForm-Example
@@ -887,10 +887,10 @@ paths:
                 summary: Bundle-WGSTestOrderForm-Example
                 description: >-
                   Example
-                  [transaction](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/Examples/Bundle/Bundle-WGSTestOrderForm-Example?version=current)
+                  [transaction](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/Examples/Bundle/Bundle-WGSTestOrderForm-Example)
                   of a Non-WGS test request sent to the central broker, as
                   described in the Clinica Scenario [**WGS-Test-Request -
-                  Rare-Disease**](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/Design/Clinical-Scenarios?version=current#WGS-Test-Request---Rare-Disease).
+                  Rare-Disease**](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/Design/Clinical-Scenarios#WGS-Test-Request---Rare-Disease).
                 value:
                   resourceType: Bundle
                   id: Bundle-WGSTestOrderForm-Example
@@ -1386,10 +1386,10 @@ paths:
                 summary: Bundle-NonWGSTestOrderForm-Reanalysis-Example
                 description: >-
                   Example
-                  [transaction](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/Examples/Bundle?version=current#Bundle-NonWGSTestOrderForm-Reanalysis-Example)
+                  [transaction](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/Examples/Bundle#Bundle-NonWGSTestOrderForm-Reanalysis-Example)
                   of a Non-WGS test request sent to the central broker, as
                   described in the Clinica Scenario
-                  [**Re-analysis-R387**](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/Design/Clinical-Scenarios?version=current#Re-analysis--R387).
+                  [**Re-analysis-R387**](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/Design/Clinical-Scenarios#Re-analysis--R387).
                 value:
                   resourceType: Bundle
                   id: Bundle-NonWGSTestOrderForm-Reanalysis-Example
@@ -1783,7 +1783,7 @@ paths:
       description: |
         ## Overview
         [FHIR Restful](https://hl7.org/fhir/R4/http.html) endpoint to 
-         register a **new test or update tests or add reports etc**. This end point uses FHIR [bundle](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-Bundle?version=current) of type **transaction** and the list of resources that forms the payload are listed [here](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/Build/How-to-construct-Bundles?version=current). 
+         register a **new test or update tests or add reports etc**. This end point uses FHIR [bundle](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-Bundle) of type **transaction** and the list of resources that forms the payload are listed [here](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/Build/How-to-construct-Bundles). 
       tags:
         - process
       parameters:
@@ -1804,19 +1804,19 @@ paths:
                 - entry
               description: >
                 A FHIR
-                [bundle](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-Bundle?version=current)
+                [bundle](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-Bundle)
                 with collection of [genomics test order request
-                resources.](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/MessageDefinitions/Genomic-Test-Request?version=current).
+                resources.](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/MessageDefinitions/Genomic-Test-Request).
             examples:
               Non-WGS-Test-Request-Rare-Disease:
                 summary: Bundle-NonWGSTestOrderForm-Example
                 description: >-
                   Example
-                  [transaction](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/Examples/Bundle/Bundle-NonWGSTestOrderForm-Example?version=current)
+                  [transaction](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/Examples/Bundle/Bundle-NonWGSTestOrderForm-Example)
                   of a Non-WGS test request sent to the central broker, as
                   described in the Clinica Scenario [**Non-WGS Test Request -
                   Rare
-                  Disease**](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/Design/Clinical-Scenarios?version=current#Non-WGS-Test-Request---Rare-Disease).
+                  Disease**](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/Design/Clinical-Scenarios#Non-WGS-Test-Request---Rare-Disease).
                 value:
                   resourceType: Bundle
                   id: Bundle-NonWGSTestOrderForm-Example
@@ -2200,10 +2200,10 @@ paths:
                 summary: Bundle-WGSTestOrderForm-Example
                 description: >-
                   Example
-                  [transaction](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/Examples/Bundle/Bundle-WGSTestOrderForm-Example?version=current)
+                  [transaction](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/Examples/Bundle/Bundle-WGSTestOrderForm-Example)
                   of a Non-WGS test request sent to the central broker, as
                   described in the Clinica Scenario [**WGS-Test-Request -
-                  Rare-Disease**](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/Design/Clinical-Scenarios?version=current#WGS-Test-Request---Rare-Disease).
+                  Rare-Disease**](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/Design/Clinical-Scenarios#WGS-Test-Request---Rare-Disease).
                 value:
                   resourceType: Bundle
                   id: Bundle-WGSTestOrderForm-Example
@@ -2699,10 +2699,10 @@ paths:
                 summary: Bundle-NonWGSTestOrderForm-Reanalysis-Example
                 description: >-
                   Example
-                  [transaction](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/Examples/Bundle?version=current#Bundle-NonWGSTestOrderForm-Reanalysis-Example)
+                  [transaction](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/Examples/Bundle#Bundle-NonWGSTestOrderForm-Reanalysis-Example)
                   of a Non-WGS test request sent to the central broker, as
                   described in the Clinica Scenario
-                  [**Re-analysis-R387**](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/Design/Clinical-Scenarios?version=current#Re-analysis--R387).
+                  [**Re-analysis-R387**](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/Design/Clinical-Scenarios#Re-analysis--R387).
                 value:
                   resourceType: Bundle
                   id: Bundle-NonWGSTestOrderForm-Reanalysis-Example
@@ -3074,7 +3074,7 @@ paths:
         ## Overview
 
         This endpoint allows you to retrieve the records of ServiceRequests
-        using various query parameters. Refer [search](https://simplifier.net/guide/FHIR-Genomics-Implementation-Guide/Home/Build/Supported-CRUD-capability?version=current#Read) for more details.
+        using various query parameters. Refer [search](https://simplifier.net/guide/FHIR-Genomics-Implementation-Guide/Home/Build/Supported-CRUD-capability#Read) for more details.
 
         ## UGR - Search for patient genomic test requests.        
       tags:
@@ -3112,7 +3112,7 @@ paths:
         This endpoint allows to retrieve all related records of a ServiceRequest
 
         using logical identifier and [graph
-        definition](https://simplifier.net/guide/FHIR-Genomics-Implementation-Guide/Home/FHIRAssets/GraphDefinitions?version=current)
+        definition](https://simplifier.net/guide/FHIR-Genomics-Implementation-Guide/Home/FHIRAssets/GraphDefinitions)
         on the server. 
       tags:
         - order
@@ -3138,7 +3138,7 @@ paths:
         ## Overview
 
         This endpoint allows you to retrieve the records of Tasks using various
-        query parameters. Refer [search](https://simplifier.net/guide/FHIR-Genomics-Implementation-Guide/Home/Build/Supported-CRUD-capability?version=current#Read) for more details.
+        query parameters. Refer [search](https://simplifier.net/guide/FHIR-Genomics-Implementation-Guide/Home/Build/Supported-CRUD-capability#Read) for more details.
       tags:
         - task
       parameters:
@@ -3168,7 +3168,7 @@ paths:
       description: |
         ## Overview
         [FHIR Restful](https://hl7.org/fhir/R4/http.html) endpoint to 
-         register a **[new task](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-Task?version=current)**. 
+         register a **[new task](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-Task)**. 
       tags:
         - task
       parameters:
@@ -3189,7 +3189,7 @@ paths:
                 - entry
               description: >
                 A FHIR
-                [Task](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-Task?version=current)
+                [Task](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-Task)
             examples:
               single-item:
                 description: Task for creation
@@ -3243,7 +3243,7 @@ paths:
       description: |
         ## Overview
         [FHIR Restful](https://hl7.org/fhir/R4/http.html) endpoint to 
-         update an existing **[task](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-Task?version=current)**. 
+         update an existing **[task](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-Task)**. 
       tags:
         - task
       parameters:
@@ -3266,7 +3266,7 @@ paths:
                 - entry
               description: >
                 A FHIR
-                [Task](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-Task?version=current)
+                [Task](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-Task)
             examples:
               single-item:
                 description: Task for update
@@ -3321,7 +3321,7 @@ paths:
         ## Overview
 
         This endpoint allows you to retrieve the records of DiagnosticReport
-        using various query parameters. Refer [search](https://simplifier.net/guide/FHIR-Genomics-Implementation-Guide/Home/Build/Supported-CRUD-capability?version=current#Read) for more details.
+        using various query parameters. Refer [search](https://simplifier.net/guide/FHIR-Genomics-Implementation-Guide/Home/Build/Supported-CRUD-capability#Read) for more details.
         
         ## UGR - Search for patient test reports.
       tags:
@@ -3354,7 +3354,7 @@ paths:
       description: |
         ## Overview
         [FHIR Restful](https://hl7.org/fhir/R4/http.html) endpoint to 
-         register a **[new DiagnosticReport](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-DiagnosticReport?version=current)**. 
+         register a **[new DiagnosticReport](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-DiagnosticReport)**. 
       tags:
         - report
       parameters:
@@ -3375,7 +3375,7 @@ paths:
                 - entry
               description: >
                 A FHIR
-                [DiagnosticReport](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-DiagnosticReport?version=current)
+                [DiagnosticReport](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-DiagnosticReport)
             examples:
               single-item:
                 description: DiagnosticReport for creation
@@ -3435,7 +3435,7 @@ paths:
         This endpoint allows to retrieve all related records of a ServiceRequest Report
 
         using logical identifier and [graph
-        definition](https://simplifier.net/guide/FHIR-Genomics-Implementation-Guide/Home/FHIRAssets/GraphDefinitions?version=current)
+        definition](https://simplifier.net/guide/FHIR-Genomics-Implementation-Guide/Home/FHIRAssets/GraphDefinitions)
         on the server. 
       tags:
         - report
@@ -3462,7 +3462,7 @@ paths:
         ## Overview
 
         This endpoint allows you to retrieve the records of Specimens using
-        various query parameters. Refer [search](https://simplifier.net/guide/FHIR-Genomics-Implementation-Guide/Home/Build/Supported-CRUD-capability?version=current#Read) for more details.
+        various query parameters. Refer [search](https://simplifier.net/guide/FHIR-Genomics-Implementation-Guide/Home/Build/Supported-CRUD-capability#Read) for more details.
       tags:
         - specimen
       parameters:
@@ -3492,7 +3492,7 @@ paths:
       description: |
         ## Overview
         [FHIR Restful](https://hl7.org/fhir/R4/http.html) endpoint to 
-         register a **[new specimen](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-Specimen?version=current)**. 
+         register a **[new specimen](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-Specimen)**. 
       tags:
         - specimen
       parameters:
@@ -3513,7 +3513,7 @@ paths:
                 - entry
               description: >
                 A FHIR
-                [Specimen](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-Specimen?version=current)
+                [Specimen](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-Specimen)
             examples:
               single-item:
                 description: Specimen for creation
@@ -3551,7 +3551,7 @@ paths:
       description: |
         ## Overview
         [FHIR Restful](https://hl7.org/fhir/R4/http.html) endpoint to 
-         update an existing **[specimen](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-Specimen?version=current)**. 
+         update an existing **[specimen](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-Specimen)**. 
       tags:
         - specimen
       parameters:
@@ -3574,7 +3574,7 @@ paths:
                 - entry
               description: >
                 A FHIR
-                [Specimen](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-Specimen?version=current)
+                [Specimen](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-Specimen)
             examples:
               single-item:
                 description: Specimen for update
@@ -3619,7 +3619,7 @@ paths:
       description: >
         ## Overview
 
-        This endpoint allows you to retrieve the record of a patient held within  genomic order management service using various query parameters. Refer [search](https://simplifier.net/guide/FHIR-Genomics-Implementation-Guide/Home/Build/Supported-CRUD-capability?version=current#Read) for more details.
+        This endpoint allows you to retrieve the record of a patient held within  genomic order management service using various query parameters. Refer [search](https://simplifier.net/guide/FHIR-Genomics-Implementation-Guide/Home/Build/Supported-CRUD-capability#Read) for more details.
         
         ## UGR - Search for patient genomic record
       tags:
@@ -3646,7 +3646,7 @@ paths:
       description: |
         ## Overview
         [FHIR Restful](https://hl7.org/fhir/R4/http.html) endpoint to 
-         update an existing **[patient](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-Patient?version=current)**. 
+         update an existing **[patient](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-Patient)**. 
       tags:
         - patient
       parameters:
@@ -3669,7 +3669,7 @@ paths:
                 - entry
               description: >
                 A FHIR
-                [Patient](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-Patient?version=current)
+                [Patient](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-Patient)
             examples:
               single-item:
                 description: Patient for update
@@ -3758,7 +3758,7 @@ paths:
 
         This endpoint allows you to retrieve the record of a RelatedPerson
         held within  genomic order management service using various query
-        parameters. Refer [search](https://simplifier.net/guide/FHIR-Genomics-Implementation-Guide/Home/Build/Supported-CRUD-capability?version=current#Read) for more details.
+        parameters. Refer [search](https://simplifier.net/guide/FHIR-Genomics-Implementation-Guide/Home/Build/Supported-CRUD-capability#Read) for more details.
       tags:
         - relatedperson
       parameters:
@@ -3785,7 +3785,7 @@ paths:
 
         This endpoint allows you to retrieve the record of a PractitionerRole
         held within  genomic order management service using various query
-        parameters. Refer [search](https://simplifier.net/guide/FHIR-Genomics-Implementation-Guide/Home/Build/Supported-CRUD-capability?version=current#Read) for more details.
+        parameters. Refer [search](https://simplifier.net/guide/FHIR-Genomics-Implementation-Guide/Home/Build/Supported-CRUD-capability#Read) for more details.
       tags:
         - practitionerrole
       parameters:
@@ -3810,7 +3810,7 @@ paths:
       description: |
         ## Overview
         [FHIR Restful](https://hl7.org/fhir/R4/http.html) endpoint to 
-         update an existing **[PractitionerRole](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-PractitionerRole?version=current)**. 
+         update an existing **[PractitionerRole](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-PractitionerRole)**. 
       tags:
         - practitionerrole
       parameters:
@@ -3833,7 +3833,7 @@ paths:
                 - entry
               description: >
                 A FHIR
-                [PractitionerRole](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-PractitionerRole?version=current)
+                [PractitionerRole](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-PractitionerRole)
             examples:
               single-item:
                 description: PractitionerRole for update
@@ -4031,7 +4031,7 @@ paths:
       description: >
         ## Overview
 
-        This endpoint allows to retrieve the [capability statement](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/CapabilityStatements?version=current) from server
+        This endpoint allows to retrieve the [capability statement](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/CapabilityStatements) from server
       tags:
         - meta
       parameters:
@@ -4349,7 +4349,7 @@ components:
               - entry
             description: >
               A FHIR
-              [Task](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-Task?version=current)
+              [Task](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-Task)
           examples:
             single-item:
               description: Task for creation
@@ -4401,7 +4401,7 @@ components:
               - entry
             description: >
               A FHIR
-              [Task](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-Task?version=current)
+              [Task](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-Task)
           examples:
             single-item:
               description: Task for creation
@@ -4558,7 +4558,7 @@ components:
               - entry
             description: >
               A FHIR
-              [DiagnosticReport](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-DiagnosticReport?version=current)
+              [DiagnosticReport](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-DiagnosticReport)
           examples:
             single-item:
               description: DiagnosticReport for creation
@@ -4701,9 +4701,9 @@ components:
               - entry
             description: >-
               A FHIR
-              [bundle](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-Bundle?version=current)
+              [bundle](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-Bundle)
               with collection of [FHIR
-              DiagnosticReports](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-DiagnosticReport?version=current)
+              DiagnosticReports](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-DiagnosticReport)
           examples:
             single-item:
               description: >-
@@ -4859,9 +4859,9 @@ components:
               - entry
             description: >-
               A FHIR
-              [bundle](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-Bundle?version=current)
+              [bundle](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-Bundle)
               with collection of [FHIR
-              Tasks](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-Task?version=current)
+              Tasks](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-Task)
           examples:
             single-item:
               description: A successful response to a task get, contains a single item.
@@ -4979,9 +4979,9 @@ components:
               - entry
             description: >-
               A FHIR
-              [bundle](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-Bundle?version=current)
+              [bundle](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-Bundle)
               with collection of [FHIR
-              Specimens](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-Specimen?version=current)
+              Specimens](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-Specimen)
           examples:
             single-item:
               description: A successful response to a specimen get, contains a single item.
@@ -5075,9 +5075,9 @@ components:
               - entry
             description: >-
               A FHIR
-              [bundle](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-Bundle?version=current)
+              [bundle](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-Bundle)
               with collection of [FHIR
-              ServiceRequests](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-ServiceRequest?version=current)
+              ServiceRequests](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-ServiceRequest)
           examples:
             single-item:
               description: >-
@@ -5282,7 +5282,7 @@ components:
               - entry
             description: >-
               A single [FHIR
-              ServiceRequest](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-ServiceRequest?version=current)
+              ServiceRequest](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-ServiceRequest)
           examples:
             single-item:
               description: >-
@@ -5357,7 +5357,7 @@ components:
               - entry
             description: >-
               A Bundle containing [FHIR
-              ServiceRequest](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-ServiceRequest?version=current) 
+              ServiceRequest](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-ServiceRequest) 
               history
           examples:
             multiple-items:
@@ -5501,7 +5501,7 @@ components:
               - entry
             description: >-
               A single [FHIR
-              DiagnosticReport](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-DiagnosticReport?version=current)
+              DiagnosticReport](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-DiagnosticReport)
           examples:
             single-item:
               description: >-
@@ -5561,7 +5561,7 @@ components:
               - entry
             description: >-
               A single [FHIR
-              Task](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-Task?version=current)
+              Task](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-Task)
           examples:
             single-item:
               description: A successful response to a task get, contains a single item.
@@ -5599,7 +5599,7 @@ components:
               - entry
             description: >
               A FHIR
-              [Specimen](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-Specimen?version=current)
+              [Specimen](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-Specimen)
           examples:
             single-item:
               description: Specimen for update
@@ -5644,7 +5644,7 @@ components:
               - entry
             description: >-
               A single [FHIR
-              Specimen](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-Specimen?version=current)
+              Specimen](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-Specimen)
           examples:
             single-item:
               description: A successful response to a specimen get, contains a single item.
@@ -5689,7 +5689,7 @@ components:
               - entry
             description: >-
               A single [FHIR
-              Patient](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-Patient?version=current)
+              Patient](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-Patient)
           examples:
             single-item:
               description: A successful response to a patient get, contains a single item.
@@ -5743,8 +5743,8 @@ components:
               - entry
             description: >-
               A FHIR
-              [bundle](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-Bundle?version=current)
-              with collection of [FHIR PractitionerRole](https://simplifier.net/guide/FHIR-Genomics-Implementation-Guide/Home/FHIRAssets/Profiles/All-Profiles/UKCore-PractitionerRole.page.md?version=current)
+              [bundle](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-Bundle)
+              with collection of [FHIR PractitionerRole](https://simplifier.net/guide/FHIR-Genomics-Implementation-Guide/Home/FHIRAssets/Profiles/All-Profiles/UKCore-PractitionerRole.page.md)
           examples:
             single-item:
               description: A successful response to a patient get, contains a single item.
@@ -5801,8 +5801,8 @@ components:
               - entry
             description: >-
               A FHIR
-              [bundle](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-Bundle?version=current)
-              with collection of [FHIR RelatedPerson](https://simplifier.net/guide/FHIR-Genomics-Implementation-Guide/Home/FHIRAssets/Profiles/All-Profiles/UKCore-RelatedPerson.page.md?version=current)
+              [bundle](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-Bundle)
+              with collection of [FHIR RelatedPerson](https://simplifier.net/guide/FHIR-Genomics-Implementation-Guide/Home/FHIRAssets/Profiles/All-Profiles/UKCore-RelatedPerson.page.md)
           examples:
             single-item:
               description: A successful response to a patient get, contains a single item.
@@ -5840,7 +5840,7 @@ components:
               - entry
             description: >-
               A single [FHIR
-              Patient](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-Patient?version=current)
+              Patient](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-Patient)
           examples:
             single-item:
               description: A successful response to a patient get, contains a single item.
@@ -5927,9 +5927,9 @@ components:
               - entry
             description: >-
               A FHIR
-              [bundle](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-Bundle?version=current)
+              [bundle](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-Bundle)
               with collection of [FHIR
-              Patient](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-Patient?version=current)
+              Patient](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Genomics-Patient)
           examples:
             single-item:
               description: A successful response to a patient get, contains a single item.
@@ -6195,7 +6195,7 @@ components:
       description: >-
         The parameter to get all information related to a service request based
         on  it logical identifier and associated [graph
-        definition](https://simplifier.net/guide/FHIR-Genomics-Implementation-Guide/Home/FHIRAssets/GraphDefinitions?version=current)
+        definition](https://simplifier.net/guide/FHIR-Genomics-Implementation-Guide/Home/FHIRAssets/GraphDefinitions)
         on server.
       schema:
         type: string
@@ -6350,7 +6350,7 @@ components:
       name: category
       description: >-
         Parameter to search Service Request based on
-        [category](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/ValueSets?version=current#Genomic-Test-Types)
+        [category](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/ValueSets#Genomic-Test-Types)
       schema:
         type: string
         default: null
@@ -6366,7 +6366,7 @@ components:
       name: business-status
       description: >-
         Parameter to search based on
-        [BusinessStatus](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/ValueSets?version=current#Genomic-Business-Status)
+        [BusinessStatus](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/ValueSets#Genomic-Business-Status)
         of a Task Resource
       schema:
         type: string
@@ -6376,7 +6376,7 @@ components:
       name: code
       description: >-
         Parameter to search based on
-        [TaskCode](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/CodeSystems?version=current#Genomic-Task-Code)
+        [TaskCode](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/CodeSystems#Genomic-Task-Code)
         of a Task Resource
       schema:
         type: string
