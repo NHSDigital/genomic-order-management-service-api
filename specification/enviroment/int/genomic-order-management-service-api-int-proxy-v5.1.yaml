@@ -6457,6 +6457,7 @@ components:
           - Patient
           - DocumentReference
           - RelatedPerson
+          - Provenance
         example: ServiceRequest
   schemas: {}
   requestBodies: {}
