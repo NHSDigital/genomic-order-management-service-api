@@ -206,14 +206,7 @@ info:
     * we expect to make breaking changes based on developer feedback
 
 
-    To see our roadmap, or to suggest, comment or vote on features for this API,
-    see our [interactive product
-    backlog](https://nhs-digital-api-management.featureupvote.com/?tag=genomics-diag-order-management).
-
-
-    If you have any other queries, please [contact
-    us](https://digital.nhs.uk/developer/help-and-support).
-
+    
 
     ## Service level
 
@@ -413,6 +406,11 @@ info:
 
     To understand how our online digital onboarding process works, see [digital
     onboarding](https://digital.nhs.uk/developer/guides-and-documentation/digital-onboarding#using-the-digital-onboarding-portal).
+
+    ## Contact us
+    
+    For help and support connecting to our APIs and to join our developer community, see [Help and support building healthcare software](https://digital.nhs.uk/developer/help-and-support).
+
 x-spec-publication:
   operation-order:
     - operations:
