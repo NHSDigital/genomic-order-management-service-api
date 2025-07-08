@@ -22,5 +22,5 @@ paths = ['''.terraform.lock.hcl''', '''poetry.lock''', '''yarn.lock''']
 description = "Hl7 UK Issued OIDs publicly available here: https://www.hl7.org.uk/standards/object-identifiers-oids/hl7-uk-issued-oids/"
 regexTarget = "match"
 regexes = [
-	'''urn:oid:[0-9]+(\.[0-9]+)*'''
+	'''urn:oid:[0-9]+(\.[0-9]+)*''',
 ]
