@@ -17,7 +17,7 @@ info:
 
     * increased access to molecular diagnostics and offer genomic testing
     routinely to all people with cancer
-     
+
     * improve early detection and treatment of high-risk conditions including
     expanding genomic testing for familial hypocholesterolaemia
 
@@ -105,14 +105,14 @@ info:
 
 
     The API's provide the core capabilities around the patient Unified Genomic
-    Record (**UGR**). 
+    Record (**UGR**).
 
 
     ## Who can use this API
       This API can only be used where there is a legal basis to do so. Make sure you have a valid use case before you go too far with your development.
 
     ## Related APIs
-       
+
     ### Services
 
     These services must be used alongside genomic order management service to
@@ -206,13 +206,6 @@ info:
     * we expect to make breaking changes based on developer feedback
 
 
-    To see our roadmap, or to suggest, comment or vote on features for this API,
-    see our [interactive product
-    backlog](https://nhs-digital-api-management.featureupvote.com/?tag=genomics-diag-order-management).
-
-
-    If you have any other queries, please [contact
-    us](https://digital.nhs.uk/developer/help-and-support).
 
 
     ## Service level
@@ -235,7 +228,7 @@ info:
     [FHIR](https://digital.nhs.uk/developer/guides-and-documentation/our-api-technologies#fhir)
     global standard for health care data exchange, specifically to [FHIR R4
     (v4.0.1)](https://hl7.org/fhir/r4/), except that it does not support the
-    [capabilities](http://hl7.org/fhir/R4/http.html#capabilities) interaction. 
+    [capabilities](http://hl7.org/fhir/R4/http.html#capabilities) interaction.
 
     Refer to [Genomics FHIR
     IG](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home)
@@ -309,7 +302,7 @@ info:
 
     **FOR ALPHA** phase the API would be demonstrated using
     application-restricted access using [API key
-    authentication](https://digital.nhs.uk/developer/guides-and-documentation/security-and-authorisation/application-restricted-restful-apis-api-key-authentication). 
+    authentication](https://digital.nhs.uk/developer/guides-and-documentation/security-and-authorisation/application-restricted-restful-apis-api-key-authentication).
 
 
     **FOR PRIVATE BETA / LIVE**  phase the API would be [user-restricted
@@ -352,13 +345,13 @@ info:
 
     |------------------|---------------------------------------------------------------------|
 
-    | Sandbox (N/A)         
+    | Sandbox (N/A)
     |`https://sandbox.api.service.nhs.uk/genomic-order-management-service`|
 
-    | Integration         
+    | Integration
     |`https://int.api.service.nhs.uk/genomic-order-management-service`|
 
-     ![Postman](https://run.pstmn.io/button.svg) collection to test against [INT environment](https://github.com/NHSDigital/genomic-order-management-service-api/tree/main/tests).
+    ![Postman](https://run.pstmn.io/button.svg) collection to test against [INT environment](https://github.com/NHSDigital/genomic-order-management-service-api/tree/main/tests).
 
     ### Sandbox testing
 
@@ -413,6 +406,11 @@ info:
 
     To understand how our online digital onboarding process works, see [digital
     onboarding](https://digital.nhs.uk/developer/guides-and-documentation/digital-onboarding#using-the-digital-onboarding-portal).
+
+    ## Contact us
+
+    For help and support connecting to our APIs and to join our developer community, see [Help and support building healthcare software](https://digital.nhs.uk/developer/help-and-support).
+
 x-spec-publication:
   operation-order:
     - operations:
@@ -467,8 +465,8 @@ paths:
       summary: Process genomic test request
       description: |
         ## Overview
-        [FHIR Restful](https://hl7.org/fhir/R4/http.html) endpoint to 
-         register a **new test or update tests or add reports etc**. This end point uses FHIR [bundle](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Bundle) of type **transaction** and the list of resources that forms the payload are listed [here](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/Build/How-to-construct-Bundles). 
+        [FHIR Restful](https://hl7.org/fhir/R4/http.html) endpoint to
+         register a **new test or update tests or add reports etc**. This end point uses FHIR [bundle](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Bundle) of type **transaction** and the list of resources that forms the payload are listed [here](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/Build/How-to-construct-Bundles).
       tags:
         - process
       parameters:
@@ -1604,7 +1602,7 @@ paths:
                               relevant information including family history,
                               phenotypic details/ HPO Terms/E.g. Reanlaysis -
                               change in observed phenotype. Epilepsy test
-                              previously ordered on patient 5 years ago. 
+                              previously ordered on patient 5 years ago.
                       request:
                         method: POST
                         url: ServiceRequest
@@ -1759,7 +1757,7 @@ paths:
         This endpoint allows you to retrieve the records of ServiceRequests
         using various query parameters. Refer [search](https://simplifier.net/guide/FHIR-Genomics-Implementation-Guide/Home/Build/Supported-CRUD-capability#Read) for more details.
 
-        ## UGR - Search for patient genomic test requests.        
+        ## UGR - Search for patient genomic test requests.
       tags:
         - order
         - ugr
@@ -1794,7 +1792,7 @@ paths:
 
         using logical identifier and [graph
         definition](https://simplifier.net/guide/FHIR-Genomics-Implementation-Guide/Home/FHIRAssets/GraphDefinitions)
-        on the server. 
+        on the server.
       tags:
         - order
       parameters:
@@ -1844,8 +1842,8 @@ paths:
       summary: Create a new Task
       description: |
         ## Overview
-        [FHIR Restful](https://hl7.org/fhir/R4/http.html) endpoint to 
-         register a **[new task](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Task)**. 
+        [FHIR Restful](https://hl7.org/fhir/R4/http.html) endpoint to
+         register a **[new task](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Task)**.
       tags:
         - task
       parameters:
@@ -1917,8 +1915,8 @@ paths:
       summary: Update an existing Task
       description: |
         ## Overview
-        [FHIR Restful](https://hl7.org/fhir/R4/http.html) endpoint to 
-         update an existing **[task](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Task)**. 
+        [FHIR Restful](https://hl7.org/fhir/R4/http.html) endpoint to
+         update an existing **[task](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Task)**.
       tags:
         - task
       parameters:
@@ -2024,8 +2022,8 @@ paths:
       summary: Create a new DiagnosticReport
       description: |
         ## Overview
-        [FHIR Restful](https://hl7.org/fhir/R4/http.html) endpoint to 
-         register a **[new DiagnosticReport](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/UKCore-DiagnosticReport)**. 
+        [FHIR Restful](https://hl7.org/fhir/R4/http.html) endpoint to
+         register a **[new DiagnosticReport](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/UKCore-DiagnosticReport)**.
       tags:
         - report
       parameters:
@@ -2131,8 +2129,8 @@ paths:
       summary: Create a new Specimen
       description: |
         ## Overview
-        [FHIR Restful](https://hl7.org/fhir/R4/http.html) endpoint to 
-         register a **[new specimen](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/UKCore-Specimen)**. 
+        [FHIR Restful](https://hl7.org/fhir/R4/http.html) endpoint to
+         register a **[new specimen](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/UKCore-Specimen)**.
       tags:
         - specimen
       parameters:
@@ -2188,8 +2186,8 @@ paths:
       summary: Update an existing Specimen
       description: |
         ## Overview
-        [FHIR Restful](https://hl7.org/fhir/R4/http.html) endpoint to 
-         update an existing **[specimen](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/UKCore-Specimen)**. 
+        [FHIR Restful](https://hl7.org/fhir/R4/http.html) endpoint to
+         update an existing **[specimen](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/UKCore-Specimen)**.
       tags:
         - specimen
       parameters:
@@ -2256,7 +2254,7 @@ paths:
         ## Overview
 
         This endpoint allows you to retrieve the record of a patient held within  genomic order management service using various query parameters. Refer [search](https://simplifier.net/guide/FHIR-Genomics-Implementation-Guide/Home/Build/Supported-CRUD-capability#Read) for more details.
-        
+
         ## UGR - Search for patient genomic record
       tags:
         - patient
@@ -2279,8 +2277,8 @@ paths:
       summary: Update an existing Patient
       description: |
         ## Overview
-        [FHIR Restful](https://hl7.org/fhir/R4/http.html) endpoint to 
-         update an existing **[patient](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/UKCore-Patient)**. 
+        [FHIR Restful](https://hl7.org/fhir/R4/http.html) endpoint to
+         update an existing **[patient](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/UKCore-Patient)**.
       tags:
         - patient
       parameters:
@@ -2437,8 +2435,8 @@ paths:
       summary: Update an existing PractitionerRole
       description: |
         ## Overview
-        [FHIR Restful](https://hl7.org/fhir/R4/http.html) endpoint to 
-         update an existing **[PractitionerRole](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/UKCore-PractitionerRole)**. 
+        [FHIR Restful](https://hl7.org/fhir/R4/http.html) endpoint to
+         update an existing **[PractitionerRole](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/UKCore-PractitionerRole)**.
       tags:
         - practitionerrole
       parameters:
@@ -2547,17 +2545,17 @@ paths:
 
 
         | Scenario                                |
-        Request                                                                                                                                                        
+        Request                                                                                                                                                    
         |
-        Response                                                               
+        Response
         |
 
         | ----------------------------------------|
         ----------------------------------------------------------------------------------------------------------------------------------------------------------------|
         ------------------------------------------------------------------------|
 
-        |                                        
-        |                                                                                                                                                                
+        |
+        |                                                                                      
         |                                                                        
         |
       tags:
@@ -2591,18 +2589,18 @@ paths:
 
 
         | Scenario                                |
-        Request                                                                                                                                                        
+        Request                                                                                    
         |
-        Response                                                               
+        Response
         |
 
         | ----------------------------------------|
         ----------------------------------------------------------------------------------------------------------------------------------------------------------------|
         ------------------------------------------------------------------------|
 
-        |                                        
-        |                                                                                                                                                                
-        |                                                                        
+        |
+        |                                                                                      
+        |
         |
       tags:
         - history
@@ -2777,7 +2775,7 @@ components:
                         description: >-
                           This element is deprecated because it is XML specific.
                           It is replaced by issue.expression, which is format
-                          independent, and simpler to parse. 
+                          independent, and simpler to parse.
 
 
                           For resource issues, this will be a simple XPath
@@ -3948,7 +3946,7 @@ components:
               - entry
             description: >-
               A Bundle containing [FHIR
-              ServiceRequest](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/UKCore-ServiceRequest) 
+             ServiceRequest](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/UKCore-ServiceRequest) 
               history
           examples:
             multiple-items:
@@ -4742,7 +4740,7 @@ components:
     BasedOn:
       in: query
       name: based-on
-      description: The service request reference the report related to 
+      description: The service request reference the report related to
       schema:
         type: string
         example: b4dccd9f-1f49-45aa-8566-3a517fc98d3d
