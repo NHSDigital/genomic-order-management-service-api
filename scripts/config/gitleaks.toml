@@ -16,4 +16,4 @@ regexes = [
 ]
 
 [allowlist]
-paths = ['''.terraform.lock.hcl''', '''poetry.lock''', '''yarn.lock''','''genomic-order-management-service-api.json''','''genomic-order-management-service-api.yaml''','''genomic-order-management-service-api-v2.yaml''','''genomic-order-management-service-api-v3.yaml''','''genomic-order-management-service-api-v4.yaml''','''genomic-order-management-service-api-v5.yaml''']
+paths = ['''.terraform.lock.hcl''', '''poetry.lock''', '''yarn.lock''','''genomic-order-management-service-api.json''','''genomic-order-management-service-api.yaml''','''genomic-order-management-service-api-v2.yaml''','''genomic-order-management-service-api-v3.yaml''','''genomic-order-management-service-api-v4.yaml''','''genomic-order-management-service-api-v5.yaml''','''genomic-order-management-service-api-int-proxy.yaml''','''genomic-order-management-service-api-int-proxy-v2.yaml''','''genomic-order-management-service-api-int-proxy-v3.yaml''','''genomic-order-management-service-api-int-proxy-v4.yaml''','''genomic-order-management-service-api-int-proxy-v5.yaml''']
