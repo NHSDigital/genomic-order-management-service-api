@@ -17,3 +17,11 @@ regexes = [
 
 [allowlist]
 paths = ['''.terraform.lock.hcl''', '''poetry.lock''', '''yarn.lock''','''genomic-order-management-service-api.json''','''genomic-order-management-service-api.yaml''','''genomic-order-management-service-api-v2.yaml''','''genomic-order-management-service-api-v3.yaml''','''genomic-order-management-service-api-v4.yaml''','''genomic-order-management-service-api-v5.yaml''','''genomic-order-management-service-api-int-proxy.yaml''','''genomic-order-management-service-api-int-proxy-v2.yaml''','''genomic-order-management-service-api-int-proxy-v3.yaml''','''genomic-order-management-service-api-int-proxy-v4.yaml''','''genomic-order-management-service-api-int-proxy-v5.yaml''']
+
+
+[[allowlists]]
+description = "Hl7 UK Issued OIDs publicly available here: https://www.hl7.org.uk/standards/object-identifiers-oids/hl7-uk-issued-oids/"
+regexTarget = "line"
+regexes = [
+    '''2.16.840.1.113883.2.1.3.2.4.18.24'''
+]
