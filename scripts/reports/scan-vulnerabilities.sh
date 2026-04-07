@@ -54,9 +54,10 @@ function run-grype-in-docker() {
   image=$(name=ghcr.io/anchore/grype docker-get-image-version-and-pull)
 
   docker run --rm --platform linux/amd64 \
+    --entrypoint /bin/sh \
     --volume "$PWD":/workdir \
     "$image" \
-    sh -c "
+    -c "
       grype db update &&
       grype \
         sbom:/workdir/sbom-repository-report.json \
