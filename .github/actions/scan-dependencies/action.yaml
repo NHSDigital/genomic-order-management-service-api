@@ -39,7 +39,7 @@ runs:
         retention-days: 21
     - name: Clean Grype DB cache
       shell: bash
-      run: rm -rf /tmp/grype/db
+      run: rm -rf ~/.cache/grype
     - name: "Scan vulnerabilities"
       shell: bash
       run: |
