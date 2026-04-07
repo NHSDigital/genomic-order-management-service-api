@@ -49,26 +49,21 @@ function run-grype-natively() {
 
 function run-grype-in-docker() {
 
-  # shellcheck disable=SC1091
   source ./scripts/docker/docker.lib.sh
-  
-  # shellcheck disable=SC2155
   local image
   image=$(name=ghcr.io/anchore/grype docker-get-image-version-and-pull)
-  
-  # 1 Update DB inside the container (no host mounts)
-  docker run --rm --platform linux/amd64 \
-    "$image" \
-    db update
 
-  # 2️ Run the scan using the same image version
   docker run --rm --platform linux/amd64 \
     --volume "$PWD":/workdir \
     "$image" \
-      sbom:/workdir/sbom-repository-report.json \
-      --config /workdir/scripts/config/grype.yaml \
-      --output json \
-      --file /workdir/vulnerabilities-repository-report.tmp.json
+    sh -c "
+      grype db update &&
+      grype \
+        sbom:/workdir/sbom-repository-report.json \
+        --config /workdir/scripts/config/grype.yaml \
+        --output json \
+        --file /workdir/vulnerabilities-repository-report.tmp.json
+    "
 }
 
 function enrich-report() {
