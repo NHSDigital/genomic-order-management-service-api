@@ -42,7 +42,9 @@ runs:
       run: |
         source ./scripts/docker/docker.lib.sh
         IMAGE=$(name=ghcr.io/anchore/grype docker-get-image-version-and-pull)
+        
         mkdir -p /tmp/grype/db
+        
         docker run --rm \
         --platform linux/amd64 \
         --volume /tmp/grype/db:/home/grype/.cache/grype/db \

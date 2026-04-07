@@ -56,7 +56,7 @@ function run-grype-in-docker() {
   local image=$(name=ghcr.io/anchore/grype docker-get-image-version-and-pull)
   docker run --rm --platform linux/amd64 \
     --volume "$PWD":/workdir \
-    --volume /tmp/grype/db:/.cache/grype/db \
+    --volume /tmp/grype/db:/home/grype/.cache/grype/db \
     "$image" \
       sbom:/workdir/sbom-repository-report.json \
       --config /workdir/scripts/config/grype.yaml \
