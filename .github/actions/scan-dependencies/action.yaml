@@ -40,13 +40,13 @@ runs:
     - name: Update Grype DB (Docker)
       shell: bash
       run: |
+        source ./scripts/docker/docker.lib.sh
+        IMAGE=$(name=ghcr.io/anchore/grype docker-get-image-version-and-pull)
         mkdir -p /tmp/grype/db
-        IMAGE="ghcr.io/anchore/grype:latest"
-        docker pull "$IMAGE"
         docker run --rm \
-          --platform linux/amd64 \
-          --volume /tmp/grype/db:/.cache/grype/db \
-          "$IMAGE" db update
+        --platform linux/amd64 \
+        --volume /tmp/grype/db:/.cache/grype/db \
+        "$IMAGE" db update
     - name: "Scan vulnerabilities"
       shell: bash
       run: |
