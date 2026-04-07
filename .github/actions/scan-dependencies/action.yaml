@@ -45,7 +45,7 @@ runs:
         mkdir -p /tmp/grype/db
         docker run --rm \
         --platform linux/amd64 \
-        --volume /tmp/grype/db:/.cache/grype/db \
+        --volume /tmp/grype/db:/home/grype/.cache/grype/db \
         "$IMAGE" db update
     - name: "Scan vulnerabilities"
       shell: bash
