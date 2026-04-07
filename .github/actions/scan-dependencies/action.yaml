@@ -37,9 +37,16 @@ runs:
         name: sbom-repository-report.json.zip
         path: ./sbom-repository-report.json.zip
         retention-days: 21
-    - name: Force Grype DB update
+    - name: Update Grype DB (Docker)
       shell: bash
-      run: grype db update || true
+      run: |
+        mkdir -p /tmp/grype/db
+        IMAGE="ghcr.io/anchore/grype:latest"
+        docker pull "$IMAGE"
+        docker run --rm \
+          --platform linux/amd64 \
+          --volume /tmp/grype/db:/.cache/grype/db \
+          "$IMAGE" db update
     - name: "Scan vulnerabilities"
       shell: bash
       run: |
