@@ -45,3 +45,4 @@ terraform plan \
 
 # Apply the infrastructure
 terraform apply
+
