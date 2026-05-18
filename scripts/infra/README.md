@@ -44,13 +44,13 @@ terraform apply
 ### Configuration
 
 Environment variables and defaults:
-- `aws_region`: `eu-west-2` (default)
-- `environment`: `prod` (default)
-- `github_org`: `NHSDigital` (default)
-- `github_repo`: `genomic-order-management-service-api` (default)
-- `github_branch`: `main` (default)
-- `role_name`: `github-genomics-oidc-role` (default)
-- `project`: `genomics` (default)
+1. aws_region  - eu-west-2 (default)
+2. environment - prod (default)
+3. github_org - NHSDigital (default)
+4. github_repo - genomic-order-management-service-api (default)
+5. github_branch - main (default)
+6. role_name - github-genomics-oidc-role (default)
+7. project - genomics (default)
 
 Override defaults via `-var` flags or `terraform.tfvars` file.
 
@@ -74,21 +74,21 @@ After applying, the following outputs are available:
 
 ## Important Notes
 
-⚠️ **This is a one-time bootstrap setup**
-- Do NOT re-apply this configuration unless you need to update it
-- Do NOT delete resources unless you understand the impact on existing deployments
-- The IAM role and S3/DynamoDB resources are critical for all infrastructure management
+**This is a one-time bootstrap setup**
+Do NOT re-apply this configuration unless you need to update it
+Do NOT delete resources unless you understand the impact on existing deployments
+The IAM role and S3/DynamoDB resources are critical for all infrastructure management
 
-✅ **Used by**
-- All infrastructure deployments in `infrastructure/` directory
-- GitHub Actions workflows for managing application infrastructure
-- Terraform state backend for tracking resource state
+**Used by**
+All infrastructure deployments in `infrastructure/` directory
+GitHub Actions workflows for managing application infrastructure
+Terraform state backend for tracking resource state
 
 ## Related Documentation
 
-- **Infrastructure Deployments**: See `infrastructure/` directory for NHS-E application infrastructure
-- **GitHub Workflows**: See `.github/workflows/infra-*.yaml` for deployment automation
-- **IAM Permissions**: Review `iam-oidc.tf` for GitHub Actions role permissions
+**Infrastructure Deployments**: See `infrastructure/` directory for NHS-E application infrastructure
+**GitHub Workflows**: See `.github/workflows/infra-*.yaml` for deployment automation
+**IAM Permissions**: Review `iam-oidc.tf` for GitHub Actions role permissions
 
 ## Files in This Directory
 
