@@ -26,3 +26,4 @@ ignore = true
 
 [.github/workflows/WORKFLOWS.md]
 ignore = true
+
