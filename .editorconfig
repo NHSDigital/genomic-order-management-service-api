@@ -23,3 +23,6 @@ indent_style = tab
 
 [scripts/infra/README.md]
 ignore = true
+
+[.github/workflows/WORKFLOWS.md]
+ignore = true

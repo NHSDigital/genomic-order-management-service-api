@@ -121,14 +121,14 @@ jobs:
           script: |
             const fs = require('fs');
             const plan = fs.readFileSync('infrastructure/environments/${{ matrix.environment }}/tfplan.txt', 'utf8');
-            
-            const output = `#### Terraform Plan for \`${{ matrix.environment }}\` 📋
-            
+
+            const output = `#### Terraform Plan for \`${{ matrix.environment }}\`
+
             \`\`\`
             ${plan.substring(0, 65536)}
             \`\`\`
             `;
-            
+
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
@@ -151,8 +151,8 @@ jobs:
       - name: "Check validation status"
         run: |
           if [ "${{ needs.terraform-plan.result }}" == "failure" ]; then
-            echo "❌ Infrastructure validation failed"
+            echo "Infrastructure validation failed"
             exit 1
           else
-            echo "✅ Infrastructure validation passed"
+            echo "Infrastructure validation passed"
           fi

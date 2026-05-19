@@ -154,7 +154,7 @@ jobs:
     name: "Terraform apply to ${{ github.event.inputs.environment }}"
     needs: [metadata, terraform-plan]
     runs-on: ubuntu-latest
-    environment: 
+    environment:
       name: ${{ github.event.inputs.environment }}-infrastructure
     timeout-minutes: 30
     steps:
@@ -198,29 +198,4 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           terraform output -json | jq -r 'to_entries[] | "- **\(.key)**: `\(.value.value)`"' >> $GITHUB_STEP_SUMMARY
 
-  post-deployment:
-    name: "Post-deployment validation"
-    needs: [terraform-apply]
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    steps:
-      - name: "Checkout code"
-        uses: actions/checkout@v4
-        with:
-          ref: main
 
-      - name: "Configure AWS credentials"
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
-          aws-region: eu-west-2
-
-      - name: "Validate infrastructure"
-        run: |
-          echo "✅ Infrastructure deployed successfully to ${{ github.event.inputs.environment }}"
-          echo ""
-          echo "Next steps:"
-          echo "1. Verify IAM role assumption from IRS"
-          echo "2. Test KMS key access"
-          echo "3. Validate secret retrieval"
-          echo "4. Review CloudTrail logs"
