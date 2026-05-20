@@ -426,13 +426,10 @@ x-spec-publication:
           path: /FHIR/R4/ServiceRequest
     - operations:
         - method: POST
-          path: /FHIR/R4/Task
+          path: /FHIR/R4/RequestGroup
     - operations:
         - method: GET
           path: /FHIR/R4/Task
-    - operations:
-        - method: POST
-          path: /FHIR/R4/DiagnosticReport
     - operations:
         - method: GET
           path: /FHIR/R4/DiagnosticReport
@@ -4673,6 +4670,12 @@ components:
           - Consent
           - Condition
           - Observation
+          - QuestionnaireResponse
+          - Procedure
+          - BodyStructure
+          - FamilyMemberHistory
+          - Provenance
+          - Group
         example: ServiceRequest
   schemas: {}
   requestBodies: {}
