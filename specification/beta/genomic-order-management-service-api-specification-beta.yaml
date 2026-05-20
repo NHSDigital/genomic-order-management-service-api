@@ -4188,7 +4188,7 @@ components:
     CorrelationID:
       in: header
       name: X-Correlation-ID
-      required: true
+      required: false
       description: >
         An optional ID which you can use to track transactions across multiple
         systems. It can take any value, but we recommend avoiding `.`
