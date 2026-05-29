@@ -53,7 +53,7 @@ jobs:
 
   terraform-plan:
     name: "Terraform plan for ${{ matrix.environment }}"
-    needs: [metadata, commit-stage]
+    needs: [metadata]
     runs-on: ubuntu-latest
     timeout-minutes: 10
     strategy:
