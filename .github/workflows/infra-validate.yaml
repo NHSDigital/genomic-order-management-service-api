@@ -105,7 +105,7 @@ jobs:
       - name: "Configure AWS credentials"
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          role-to-assume: ${{ secrets.AWS_READONLY_ROLE_ARN }}
           aws-region: eu-west-2
 
       - name: "Terraform Init - ${{ matrix.environment }}"
@@ -118,7 +118,7 @@ jobs:
         run: |
           make terraform-plan \
             dir=infrastructure/environments/${{ matrix.environment }} \
-            opts="-var-file=../terraform.tfvars -var-file=terraform.tfvars -var 'AWS_ROLE_ARN=${{ secrets.AWS_ROLE_ARN }}' -no-color -out=tfplan"
+            opts="-var-file=../terraform.tfvars -var-file=terraform.tfvars -var 'AWS_READONLY_ROLE_ARN=${{ secrets.AWS_READONLY_ROLE_ARN }}' -no-color -out=tfplan"
           terraform show -no-color infrastructure/environments/${{ matrix.environment }}/tfplan > infrastructure/environments/${{ matrix.environment }}/tfplan.txt
 
       - name: "Comment Plan on PR"

@@ -1,8 +1,8 @@
-data "aws_iam_openid_connect_provider" "github_actions" {
+data "aws_iam_openid_connect_provider" "github_actions_readonly" {
   arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:oidc-provider/${var.oidc_provider}"
 }
 
-data "aws_iam_policy_document" "github_actions_assume_role" {
+data "aws_iam_policy_document" "github_actions_assume_role_readonly" {
   statement {
     effect = "Allow"
 
@@ -29,31 +29,23 @@ data "aws_iam_policy_document" "github_actions_assume_role" {
   }
 }
 
-resource "aws_iam_role" "github_actions" {
-  name               = var.role_name
-  assume_role_policy = data.aws_iam_policy_document.github_actions_assume_role.json
+resource "aws_iam_role" "github_actions_readonly" {
+  name               = var.role_name_readonly
+  assume_role_policy = data.aws_iam_policy_document.github_actions_assume_role_readonly.json
 }
 
-data "aws_iam_policy_document" "deploy_permissions" {
+data "aws_iam_policy_document" "deploy_permissions_readonly" {
   statement {
     sid    = "S3BucketManagement"
     effect = "Allow"
 
     actions = [
-      "s3:CreateBucket",
-      "s3:DeleteBucket",
       "s3:GetBucketVersioning",
-      "s3:PutBucketVersioning",
       "s3:GetBucketEncryption",
-      "s3:PutBucketEncryption",
       "s3:GetBucketPublicAccessBlock",
-      "s3:PutBucketPublicAccessBlock",
       "s3:GetBucketPolicy",
-      "s3:PutBucketPolicy",
       "s3:ListBucket",
       "s3:GetObject",
-      "s3:PutObject",
-      "s3:DeleteObject",
     ]
 
     resources = [
@@ -67,15 +59,10 @@ data "aws_iam_policy_document" "deploy_permissions" {
     effect = "Allow"
 
     actions = [
-      "dynamodb:CreateTable",
-      "dynamodb:DeleteTable",
-      "dynamodb:DescribeTable",
-      "dynamodb:UpdateTable",
       "dynamodb:ListTables",
+      "dynamodb:DescribeTable",
       "dynamodb:GetItem",
-      "dynamodb:PutItem",
-      "dynamodb:UpdateItem",
-      "dynamodb:DeleteItem",
+      "dynamodb:Query"
     ]
 
     resources = ["arn:aws:dynamodb:*:*:table/*"]
@@ -86,12 +73,8 @@ data "aws_iam_policy_document" "deploy_permissions" {
     effect = "Allow"
 
     actions = [
-      "secretsmanager:CreateSecret",
-      "secretsmanager:DeleteSecret",
       "secretsmanager:DescribeSecret",
       "secretsmanager:GetSecretValue",
-      "secretsmanager:PutSecretValue",
-      "secretsmanager:UpdateSecret",
       "secretsmanager:ListSecrets",
     ]
 
@@ -103,16 +86,10 @@ data "aws_iam_policy_document" "deploy_permissions" {
     effect = "Allow"
 
     actions = [
-      "kms:CreateKey",
       "kms:DescribeKey",
       "kms:ListKeys",
       "kms:ListAliases",
-      "kms:CreateAlias",
-      "kms:DeleteAlias",
-      "kms:UpdateAlias",
       "kms:GetKeyPolicy",
-      "kms:PutKeyPolicy",
-      "kms:Decrypt",
       "kms:Encrypt",
       "kms:GenerateDataKey",
       "kms:ScheduleKeyDeletion",
@@ -126,13 +103,10 @@ data "aws_iam_policy_document" "deploy_permissions" {
     effect = "Allow"
 
     actions = [
-      "iam:CreateRole",
-      "iam:DeleteRole",
       "iam:GetRole",
       "iam:ListRoles",
       "iam:UpdateAssumeRolePolicy",
       "iam:GetAssumeRolePolicy",
-      "iam:PassRole",
       "iam:TagRole",
       "iam:UntagRole",
     ]
@@ -145,20 +119,12 @@ data "aws_iam_policy_document" "deploy_permissions" {
     effect = "Allow"
 
     actions = [
-      "iam:CreatePolicy",
-      "iam:DeletePolicy",
       "iam:GetPolicy",
       "iam:ListPolicies",
-      "iam:CreatePolicyVersion",
-      "iam:DeletePolicyVersion",
       "iam:ListPolicyVersions",
       "iam:GetPolicyVersion",
-      "iam:AttachRolePolicy",
-      "iam:DetachRolePolicy",
       "iam:ListAttachedRolePolicies",
-      "iam:PutRolePolicy",
       "iam:GetRolePolicy",
-      "iam:DeleteRolePolicy",
       "iam:ListRolePolicies",
     ]
 
@@ -173,18 +139,19 @@ data "aws_iam_policy_document" "deploy_permissions" {
     effect = "Allow"
 
     actions = [
-      "logs:CreateLogGroup",
-      "logs:DeleteLogGroup",
       "logs:DescribeLogGroups",
-      "logs:ListLogGroups",
+      "logs:DescribeLogStreams",
+      "logs:GetLogEvents",
+      "logs:FilterLogEvents",
+      "logs:ListTagsLogGroup"
     ]
 
     resources = ["arn:aws:logs:*:*:log-group:*"]
   }
 }
 
-resource "aws_iam_role_policy" "deploy_permissions" {
-  name   = "deploy-permissions"
-  role   = aws_iam_role.github_actions.id
-  policy = data.aws_iam_policy_document.deploy_permissions.json
+resource "aws_iam_role_policy" "deploy_permissions_readonly" {
+  name   = "deploy-permissions-readonly"
+  role   = aws_iam_role.github_actions_readonly.id
+  policy = data.aws_iam_policy_document.deploy_permissions_readonly.json
 }

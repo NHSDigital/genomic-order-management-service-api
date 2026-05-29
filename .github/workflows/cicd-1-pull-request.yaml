@@ -7,13 +7,13 @@ on:
     branches:
       - "**"
   pull_request:
-    types: [opened, reopened]
+    types: [opened, reopened, synchronize]
 
 jobs:
   metadata:
     name: "Set CI/CD metadata"
     runs-on: ubuntu-latest
-    timeout-minutes: 1
+    timeout-minutes: 5
     outputs:
       build_datetime_london: ${{ steps.variables.outputs.build_datetime_london }}
       build_datetime: ${{ steps.variables.outputs.build_datetime }}
@@ -37,7 +37,7 @@ jobs:
           echo "build_timestamp=$(date --date=$datetime -u +'%Y%m%d%H%M%S')" >> $GITHUB_OUTPUT
           echo "build_epoch=$(date --date=$datetime -u +'%s')" >> $GITHUB_OUTPUT
           echo "nodejs_version=$(grep "^nodejs" .tool-versions | cut -f2 -d' ')" >> $GITHUB_OUTPUT
-          echo "python_version=$(grep "^nodejs" .tool-versions | cut -f2 -d' ')" >> $GITHUB_OUTPUT
+          echo "python_version=$(grep "^python" .tool-versions | cut -f2 -d' ')" >> $GITHUB_OUTPUT
           echo "terraform_version=$(grep "^terraform" .tool-versions | cut -f2 -d' ')" >> $GITHUB_OUTPUT
           echo "version=$(head -n 1 .version 2> /dev/null || echo unknown)" >> $GITHUB_OUTPUT
       - name: "Check if pull request exists for this branch"
@@ -79,6 +79,19 @@ jobs:
       terraform_version: "${{ needs.metadata.outputs.terraform_version }}"
       version: "${{ needs.metadata.outputs.version }}"
     secrets: inherit
+  infra-validate-stage:
+    name: "Infrastructure validation"
+    needs: [metadata, commit-stage]
+    uses: ./.github/workflows/infra-validate.yaml
+    with:
+      build_datetime: "${{ needs.metadata.outputs.build_datetime }}"
+      build_timestamp: "${{ needs.metadata.outputs.build_timestamp }}"
+      build_epoch: "${{ needs.metadata.outputs.build_epoch }}"
+      nodejs_version: "${{ needs.metadata.outputs.nodejs_version }}"
+      python_version: "${{ needs.metadata.outputs.python_version }}"
+      terraform_version: "${{ needs.metadata.outputs.terraform_version }}"
+      version: "${{ needs.metadata.outputs.version }}"
+    secrets: inherit
   test-stage: # Recommended maximum execution time is 5 minutes
     name: "Test stage"
     needs: [metadata, commit-stage]
@@ -111,19 +124,6 @@ jobs:
     needs: [metadata, build-stage]
     uses: ./.github/workflows/stage-4-acceptance.yaml
     if: needs.metadata.outputs.does_pull_request_exist == 'true' || (github.event_name == 'pull_request' && (github.event.action == 'opened' || github.event.action == 'reopened'))
-    with:
-      build_datetime: "${{ needs.metadata.outputs.build_datetime }}"
-      build_timestamp: "${{ needs.metadata.outputs.build_timestamp }}"
-      build_epoch: "${{ needs.metadata.outputs.build_epoch }}"
-      nodejs_version: "${{ needs.metadata.outputs.nodejs_version }}"
-      python_version: "${{ needs.metadata.outputs.python_version }}"
-      terraform_version: "${{ needs.metadata.outputs.terraform_version }}"
-      version: "${{ needs.metadata.outputs.version }}"
-    secrets: inherit
-  infra-validate-stage:
-    name: "Infrastructure validation"
-    needs: [metadata, commit-stage]
-    uses: ./.github/workflows/infra-validate.yaml
     with:
       build_datetime: "${{ needs.metadata.outputs.build_datetime }}"
       build_timestamp: "${{ needs.metadata.outputs.build_timestamp }}"

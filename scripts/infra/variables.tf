@@ -40,6 +40,12 @@ variable "role_name" {
   default     = "github-genomics-order-management-oidc-role"
 }
 
+variable "role_name_readonly" {
+  description = "Name of the IAM role created for GitHub Actions."
+  type        = string
+  default     = "github-genomics-order-management-oidc-role-readonly"
+}
+
 variable "oidc_provider" {
   description = "OIDC provider host for GitHub Actions."
   type        = string
