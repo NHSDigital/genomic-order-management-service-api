@@ -1,8 +1,8 @@
 # Shared variables for all environments
 variable "project" {
-  description = "Project name used for tagging and resource naming."
+  description = "Project name used for tagging."
   type        = string
-  default     = "genomics"
+  default     = "genomics-order-management"
 }
 
 variable "region" {
