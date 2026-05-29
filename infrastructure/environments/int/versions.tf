@@ -9,7 +9,7 @@ terraform {
   }
 
   backend "s3" {
-    bucket         = "genomics-order-management-tfstate-prod"
+    bucket         = "genomics-order-management-tfstate-int"
     key            = "nhs-e/infrastructure/terraform.tfstate"
     region         = "eu-west-2"
     dynamodb_table = "genomic-order-management-service-api-tfstate-lock-prod"
