@@ -120,3 +120,8 @@ jobs:
       terraform_version: "${{ needs.metadata.outputs.terraform_version }}"
       version: "${{ needs.metadata.outputs.version }}"
     secrets: inherit
+  infra-validate-stage:
+    name: "Infrastructure validation"
+    needs: [metadata, commit-stage]
+    uses: ./.github/workflows/infra-validate.yaml
+    secrets: inherit

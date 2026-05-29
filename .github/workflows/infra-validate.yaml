@@ -111,7 +111,7 @@ jobs:
         run: |
           make terraform-plan \
             dir=infrastructure/environments/${{ matrix.environment }} \
-            opts="-var-file=../terraform.tfvars -var-file=terraform.tfvars -var 'irs_role_arn=${{ secrets.IRS_ROLE_ARN }}' -no-color -out=tfplan"
+            opts="-var-file=../terraform.tfvars -var-file=terraform.tfvars -var 'AWS_ROLE_ARN=${{ secrets.AWS_ROLE_ARN }}' -no-color -out=tfplan"
           terraform show -no-color infrastructure/environments/${{ matrix.environment }}/tfplan > infrastructure/environments/${{ matrix.environment }}/tfplan.txt
 
       - name: "Comment Plan on PR"

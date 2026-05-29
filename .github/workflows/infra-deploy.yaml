@@ -1,19 +1,14 @@
 name: "Infrastructure Deploy"
 
 # Deployment workflow for infrastructure changes
-# Manual dispatch after merge - deploys to selected environment
+# Called from cicd-3-deploy after merge - deploys to selected environment
 
 on:
-  workflow_dispatch:
+  workflow_call:
     inputs:
       environment:
-        description: 'Target environment for deployment'
         required: true
-        type: choice
-        default: 'int'
-        options:
-          - int
-          - prod
+        type: string
 
 permissions:
   id-token: write
@@ -67,15 +62,6 @@ jobs:
           ref: main
           fetch-depth: 0
 
-      - name: "Scan secrets"
-        uses: ./.github/actions/scan-secrets
-
-      - name: "Check file format"
-        uses: ./.github/actions/check-file-format
-
-      - name: "Lint Terraform"
-        uses: ./.github/actions/lint-terraform
-
   terraform-validate:
     name: "Terraform validate"
     needs: [metadata, commit-checks]
@@ -101,24 +87,19 @@ jobs:
       - name: "Terraform Init"
         run: |
           make terraform-init \
-            dir=infrastructure/environments/${{ github.event.inputs.environment }}
+            dir=infrastructure/environments/${{ inputs.environment }}
 
       - name: "Terraform Validate"
         run: |
           make terraform-validate \
-            dir=infrastructure/environments/${{ github.event.inputs.environment }}
+            dir=infrastructure/environments/${{ inputs.environment }}
 
   terraform-plan:
-    name: "Terraform plan for ${{ github.event.inputs.environment }}"
-    needs: [metadata, terraform-validate]
+    name: "Terraform plan for ${{ inputs.environment }}"
+    needs: [terraform-validate]
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - name: "Checkout code"
-        uses: actions/checkout@v4
-        with:
-          ref: main
-
       - name: "Setup Terraform"
         uses: hashicorp/setup-terraform@v3
         with:
@@ -133,30 +114,29 @@ jobs:
       - name: "Terraform Init"
         run: |
           make terraform-init \
-            dir=infrastructure/environments/${{ github.event.inputs.environment }}
+            dir=infrastructure/environments/${{ inputs.environment }}
 
       - name: "Terraform Plan"
         id: plan
         run: |
           make terraform-plan \
-            dir=infrastructure/environments/${{ github.event.inputs.environment }} \
-            opts="-var-file=../terraform.tfvars -var-file=terraform.tfvars -var 'irs_role_arn=${{ secrets.IRS_ROLE_ARN }}' -no-color -out=tfplan"
-          echo "plan_output=$(terraform show -no-color infrastructure/environments/${{ github.event.inputs.environment }}/tfplan | head -100)" >> $GITHUB_OUTPUT
+            dir=infrastructure/environments/${{ inputs.environment }} \
+            opts="-var-file=../terraform.tfvars -var-file=terraform.tfvars -var 'AWS_ROLE_ARN=${{ secrets.AWS_ROLE_ARN }}' -no-color -out=tfplan"
+          echo "plan_output=$(terraform show -no-color infrastructure/environments/${{ inputs.environment }}/tfplan | head -100)" >> $GITHUB_OUTPUT
 
       - name: "Save tfplan"
         uses: actions/upload-artifact@v4
         with:
-          name: tfplan-${{ github.event.inputs.environment }}-${{ github.run_id }}
-          path: infrastructure/environments/${{ github.event.inputs.environment }}/tfplan
+          name: tfplan-${{ inputs.environment }}-${{ github.run_id }}
+          path: infrastructure/environments/${{ inputs.environment }}/tfplan
           retention-days: 7
 
   terraform-apply:
-    name: "Terraform apply to ${{ github.event.inputs.environment }}"
-    needs: [metadata, terraform-plan]
+    name: "Terraform apply to ${{ inputs.environment }}"
+    needs: [terraform-plan]
     runs-on: ubuntu-latest
     environment:
-      name: ${{ github.event.inputs.environment }}-infrastructure
-    timeout-minutes: 30
+      name: ${{ inputs.environment }}
     steps:
       - name: "Checkout code"
         uses: actions/checkout@v4
@@ -177,25 +157,19 @@ jobs:
       - name: "Terraform Init"
         run: |
           make terraform-init \
-            dir=infrastructure/environments/${{ github.event.inputs.environment }}
+            dir=infrastructure/environments/${{ inputs.environment }}
 
       - name: "Download tfplan artifact"
         uses: actions/download-artifact@v4
         with:
-          name: tfplan-${{ github.event.inputs.environment }}-${{ github.run_id }}
-          path: infrastructure/environments/${{ github.event.inputs.environment }}/
+          name: tfplan-${{ inputs.environment }}-${{ github.run_id }}
+          path: infrastructure/environments/${{ inputs.environment }}/
 
       - name: "Terraform Apply"
         run: |
           make terraform-apply \
-            dir=infrastructure/environments/${{ github.event.inputs.environment }} \
+            dir=infrastructure/environments/${{ inputs.environment }} \
             opts="-no-color tfplan"
 
-      - name: "Output infrastructure details"
-        working-directory: infrastructure/environments/${{ github.event.inputs.environment }}
-        run: |
-          echo "## Infrastructure Deployment Summary for ${{ github.event.inputs.environment }}" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          terraform output -json | jq -r 'to_entries[] | "- **\(.key)**: `\(.value.value)`"' >> $GITHUB_STEP_SUMMARY
 
 

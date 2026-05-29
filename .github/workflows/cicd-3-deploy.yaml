@@ -7,7 +7,10 @@ on:
         description: "This is the tag that is oging to be deployed"
         required: true
         default: "latest"
-
+      environment:
+        description: "Target environment"
+        required: true
+        default: "prod"
 jobs:
   metadata:
     name: "Set CI/CD metadata"
@@ -57,6 +60,15 @@ jobs:
     steps:
       - name: "Checkout code"
         uses: actions/checkout@v4
+        with:
+          ref: main
+  infra-deploy:
+    needs: [deploy]
+    uses: ./.github/workflows/infra-deploy.yaml
+    with:
+      environment: ${{ github.event.inputs.environment }}
+    secrets: inherit
+
   # TODO: More jobs or/and steps here
   # success:
   #   name: "Success notification"
