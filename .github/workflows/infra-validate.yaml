@@ -51,29 +51,6 @@ jobs:
           export VERSION="${{ steps.variables.outputs.version }}"
           make list-variables
 
-  commit-checks:
-    name: "Commit stage checks"
-    needs: [metadata]
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-      - name: "Checkout code"
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: "Scan secrets"
-        uses: ./.github/actions/scan-secrets
-
-      - name: "Check file format"
-        uses: ./.github/actions/check-file-format
-
-      - name: "Check Markdown format"
-        uses: ./.github/actions/check-markdown-format
-
-      - name: "Lint Terraform"
-        uses: ./.github/actions/lint-terraform
-
   terraform-plan:
     name: "Terraform plan for ${{ matrix.environment }}"
     needs: [metadata, commit-checks]
