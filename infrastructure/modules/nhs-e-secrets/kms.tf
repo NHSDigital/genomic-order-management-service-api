@@ -6,7 +6,6 @@ resource "aws_kms_alias" "nhs_e_secrets" {
 # KMS Customer Managed Key for encrypting secrets
 resource "aws_kms_key" "nhs_e_secrets" {
   description             = "KMS key for NHS-E secrets encryption - ${var.environment}"
-  deletion_window_in_days = 30
   enable_key_rotation     = true
 
   tags = {
