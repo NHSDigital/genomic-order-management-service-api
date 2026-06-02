@@ -121,6 +121,7 @@ jobs:
       - name: "Terraform Plan - ${{ inputs.environment }}"
         id: plan
         run: |
+          set -x
           make terraform-plan \
             dir=infrastructure/environments/${{ inputs.environment }} \
             opts="-var-file=infrastructure/environments/terraform.tfvars -var-file=infrastructure/environments/${{ inputs.environment }}/terraform.tfvars -no-color -out=tfplan"
