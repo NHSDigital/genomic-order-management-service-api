@@ -116,7 +116,7 @@ jobs:
       python_version: "${{ needs.metadata.outputs.python_version }}"
       terraform_version: "${{ needs.metadata.outputs.terraform_version }}"
       version: "${{ needs.metadata.outputs.version }}"
-      environment: ${{ matrix.environment }} 
+      environment: ${{ matrix.environment }}
     secrets: inherit
   test-stage: # Recommended maximum execution time is 5 minutes
     name: "Test stage"
