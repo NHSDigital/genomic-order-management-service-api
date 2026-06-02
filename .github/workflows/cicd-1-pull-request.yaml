@@ -101,12 +101,14 @@ jobs:
           else
             printf -v matrix_json '[%s]' "$(IFS=,; echo "${entries[*]}")"
             echo "matrix=$matrix_json" >> $GITHUB_OUTPUT
+            echo "matrix=$matrix_json"
           fi
   infra-validate-stage:
     name: "Infrastructure validation"
     needs: [metadata, commit-stage, build-matrix]
     strategy:
-      matrix: ${{ fromJson(needs.build-matrix.outputs.matrix) }}
+      matrix:
+        include: ${{ fromJson(needs.build-matrix.outputs.matrix) }}
     uses: ./.github/workflows/infra-validate.yaml
     with:
       build_datetime: "${{ needs.metadata.outputs.build_datetime }}"
