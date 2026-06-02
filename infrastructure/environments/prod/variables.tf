@@ -19,9 +19,16 @@ variable "environment" {
 variable "intersystems_role_arn" {
   description = "ARN of the InterSystems IAM role that will assume the NHS-E cross-account role."
   type        = string
+  default     = ""
 }
 
 variable "external_id" {
   description = "external_id passed by InterSystems"
   type        = string
+}
+
+variable "enable_kms_key_rotation" {
+  description = "Enable KMS key rotation for secrets manager."
+  type        = bool
+  default     = false
 }
