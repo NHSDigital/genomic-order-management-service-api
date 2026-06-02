@@ -87,6 +87,8 @@ jobs:
       id-token: write
       contents: read
       pull-requests: write
+    env:
+      AWS_READONLY_ROLE_ARN: ${{ inputs.environment == 'prod' && secrets.AWS_READONLY_ROLE_ARN_PROD || secrets.AWS_READONLY_ROLE_ARN_INT }}
     steps:
       - name: "Checkout code"
         uses: actions/checkout@v4
@@ -96,18 +98,10 @@ jobs:
         with:
           terraform_version: ${{ needs.metadata.outputs.terraform_version }}
 
-      - name: Configure AWS credentials (prod)
-        if: ${{ inputs.environment == 'prod' }}
+      - name: Configure AWS credentials 
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: ${{ secrets.AWS_READ_ONLY_ARN_PROD }}
-          aws-region: eu-west-2
-
-      - name: Configure AWS credentials (non-prod)
-        if: ${{ inputs.environment == 'int' }}
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: ${{ secrets.AWS_READ_ONLY_ARN_INT }}
+          role-to-assume: ${{ env.AWS_READONLY_ROLE_ARN }}
           aws-region: eu-west-2
 
       - name: "Terraform Init - ${{ inputs.environment }}"
@@ -118,11 +112,15 @@ jobs:
       - name: "Terraform Plan - ${{ inputs.environment }}"
         id: plan
         run: |
-          make terraform-plan \
-            dir=infrastructure/environments/${{ inputs.environment }} \
-            opts="-var-file=../terraform.tfvars -var-file=terraform.tfvars -var 'AWS_READONLY_ROLE_ARN=${{ secrets.AWS_READONLY_ROLE_ARN }}' -no-color -out=tfplan"
-          terraform show -no-color infrastructure/environments/${{ inputs.environment }}/tfplan > infrastructure/environments/${{ inputs.environment }}/tfplan.txt
+          cd infrastructure/environments/${{ inputs.environment }}
+          terraform plan \
+            -var-file=../terraform.tfvars \
+            -var-file=terraform.tfvars \
+            -var "AWS_READONLY_ROLE_ARN=${AWS_READONLY_ROLE_ARN}" \
+            -no-color \
+            -out=tfplan
 
+          terraform show -no-color tfplan > tfplan.txt
       - name: "Comment Plan on PR"
         uses: actions/github-script@v7
         if: github.event_name == 'pull_request'
