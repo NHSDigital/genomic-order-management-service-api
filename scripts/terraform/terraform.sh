@@ -50,14 +50,14 @@ function run-terraform-in-docker() {
   # shellcheck disable=SC2155
   local image=$(name=hashicorp/terraform docker-get-image-version-and-pull)
   # shellcheck disable=SC2086
+  echo "TOKEN LENGTH: ${#AWS_SESSION_TOKEN}"
   echo docker run --rm --platform linux/amd64 \
     --volume "$PWD":/workdir \
     --workdir /workdir \
-    -e AWS_ACCESS_KEY_ID \
-    -e AWS_SECRET_ACCESS_KEY \
-    -e AWS_SESSION_TOKEN \
-    -e AWS_DEFAULT_REGION \
-    -e AWS_REGION \
+    -e AWS_ACCESS_KEY_ID="$AWS_ACCESS_KEY_ID" \
+    -e AWS_SECRET_ACCESS_KEY="$AWS_SECRET_ACCESS_KEY" \
+    -e AWS_SESSION_TOKEN="$AWS_SESSION_TOKEN" \
+    -e AWS_REGION="$AWS_REGION" \
     "$image" \
       $cmd
   echo $cmd

@@ -25,7 +25,6 @@ variable "intersystems_role_arn" {
 variable "external_id" {
   description = "external_id passed by InterSystems"
   type        = string
-  default     = ""
 }
 
 variable "enable_kms_key_rotation" {

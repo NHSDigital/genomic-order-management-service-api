@@ -115,6 +115,7 @@ jobs:
 
       - name: "Terraform Init - ${{ inputs.environment }}"
         run: |
+          echo "TOKEN LENGTH: ${#AWS_SESSION_TOKEN}"
           make terraform-init \
             FORCE_USE_DOCKER=true \
             dir=infrastructure/environments/${{ inputs.environment }}
@@ -122,7 +123,6 @@ jobs:
       - name: "Terraform Plan - ${{ inputs.environment }}"
         id: plan
         run: |
-          set -x
           make terraform-plan \
             FORCE_USE_DOCKER=true \
             dir=infrastructure/environments/${{ inputs.environment }} \
