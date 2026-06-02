@@ -127,12 +127,12 @@ jobs:
       - name: "Terraform Plan - ${{ inputs.environment }}"
         id: plan
         run: |
-          export AWS_ACCESS_KEY_ID
-          export AWS_SECRET_ACCESS_KEY
-          export AWS_SESSION_TOKEN
-          export AWS_REGION
-          export AWS_DEFAULT_REGION
           make terraform-plan \
+            AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID} \
+            AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY} \
+            AWS_SESSION_TOKEN=${AWS_SESSION_TOKEN} \
+            AWS_REGION=${AWS_REGION} \
+            AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION} \
             FORCE_USE_DOCKER=true \
             dir=infrastructure/environments/${{ inputs.environment }} \
             opts="-var-file=../terraform.tfvars -var-file=./terraform.tfvars -no-color -out=tfplan"
