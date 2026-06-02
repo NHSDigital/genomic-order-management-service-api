@@ -46,8 +46,6 @@ function run-terraform-in-docker() {
 
   # shellcheck disable=SC1091
   source ./scripts/docker/docker.lib.sh
-
-  env | grep '^AWS_' | sed 's/=.*/=***redacted***/'
   # shellcheck disable=SC2155
   local image=$(name=hashicorp/terraform docker-get-image-version-and-pull)
   # shellcheck disable=SC2086
