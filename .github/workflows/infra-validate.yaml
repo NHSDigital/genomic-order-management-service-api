@@ -44,6 +44,9 @@ permissions:
   contents: read
   pull-requests: write
 
+env:
+  AWS_READONLY_ROLE_ARN: ${{ inputs.environment == 'prod' && secrets.AWS_READONLY_ROLE_ARN_PROD || secrets.AWS_READONLY_ROLE_ARN_INT }}
+
 jobs:
   metadata:
     name: "Set CI/CD metadata"
@@ -87,8 +90,6 @@ jobs:
       id-token: write
       contents: read
       pull-requests: write
-    env:
-      AWS_READONLY_ROLE_ARN: ${{ inputs.environment == 'prod' && secrets.AWS_READONLY_ROLE_ARN_PROD || secrets.AWS_READONLY_ROLE_ARN_INT }}
     steps:
       - name: "Checkout code"
         uses: actions/checkout@v4
@@ -97,6 +98,14 @@ jobs:
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: ${{ needs.metadata.outputs.terraform_version }}
+
+      - name: "Validate AWS role ARN secret"
+        run: |
+          if [ -z "${AWS_READONLY_ROLE_ARN:-}" ]; then
+            echo "ERROR: Missing AWS role ARN secret for environment '${{ inputs.environment }}'." >&2
+            echo "Set '${{ inputs.environment == 'prod' && 'AWS_READONLY_ROLE_ARN_PROD' || 'AWS_READONLY_ROLE_ARN_INT' }}' in repository secrets." >&2
+            exit 1
+          fi
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -112,15 +121,11 @@ jobs:
       - name: "Terraform Plan - ${{ inputs.environment }}"
         id: plan
         run: |
-          cd infrastructure/environments/${{ inputs.environment }}
-          terraform plan \
-            -var-file=../terraform.tfvars \
-            -var-file=terraform.tfvars \
-            -var "AWS_READONLY_ROLE_ARN=${AWS_READONLY_ROLE_ARN}" \
-            -no-color \
-            -out=tfplan
+          make terraform-plan \
+            dir=infrastructure/environments/${{ inputs.environment }} \
+            opts="-var-file=../terraform.tfvars -var-file=terraform.tfvars -var 'AWS_READONLY_ROLE_ARN=${AWS_READONLY_ROLE_ARN}' -no-color -out=tfplan"
+          terraform show -no-color infrastructure/environments/${{ inputs.environment }}/tfplan > infrastructure/environments/${{ inputs.environment }}/tfplan.txt
 
-          terraform show -no-color tfplan > tfplan.txt
       - name: "Comment Plan on PR"
         uses: actions/github-script@v7
         if: github.event_name == 'pull_request'

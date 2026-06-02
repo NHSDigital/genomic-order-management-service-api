@@ -16,19 +16,12 @@ variable "environment" {
   type        = string
 }
 
-variable "irs_role_arn" {
+variable "intersystems_role_arn" {
   description = "ARN of the InterSystems IAM role that will assume the NHS-E cross-account role."
   type        = string
 }
 
-variable "create_placeholder_secrets" {
-  description = "Whether to create placeholder secrets in AWS Secrets Manager for IAM policy scoping."
-  type        = bool
-  default     = true
-}
-
-variable "enable_kms_key_rotation" {
-  description = "Enable automatic rotation of the KMS CMK."
-  type        = bool
-  default     = true
+variable "external_id" {
+  description = "external_id passed by InterSystems"
+  type        = string
 }

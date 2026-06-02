@@ -14,19 +14,12 @@ variable "environment" {
   type        = string
 }
 
-variable "irs_role_arn" {
+variable "intersystems_role_arn" {
   description = "ARN of the InterSystems IAM role that will assume this NHS-E role"
   type        = string
 }
 
-variable "create_placeholder_secrets" {
-  description = "Whether to create placeholder secrets"
-  type        = bool
-  default     = true
-}
-
-variable "enable_kms_key_rotation" {
-  description = "Enable automatic rotation of the KMS key"
-  type        = bool
-  default     = true
+variable "external_id" {
+  description = "external_id passed by InterSystems"
+  type        = string
 }

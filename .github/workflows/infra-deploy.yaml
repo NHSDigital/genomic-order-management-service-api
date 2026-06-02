@@ -14,9 +14,24 @@ permissions:
   id-token: write
   contents: read
 
+env:
+  AWS_ROLE_ARN: ${{ inputs.environment == 'prod' && secrets.AWS_ARN_PROD || secrets.AWS_ARN_INT }}
+
 jobs:
+  validate-main-branch:
+    name: "Validate deployment from main branch"
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Check branch"
+        run: |
+          if [ "${{ github.ref }}" != "refs/heads/main" ]; then
+            echo "ERROR: This workflow can only be run from the 'main' branch." >&2
+            echo "Current branch: ${{ github.ref }}" >&2
+            exit 1
+          fi
   metadata:
     name: "Set CI/CD metadata"
+    needs: [validate-main-branch]
     runs-on: ubuntu-latest
     timeout-minutes: 1
     outputs:
@@ -50,18 +65,6 @@ jobs:
           export VERSION="${{ steps.variables.outputs.version }}"
           make list-variables
 
-  commit-checks:
-    name: "Pre-deployment checks"
-    needs: [metadata]
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-      - name: "Checkout code"
-        uses: actions/checkout@v4
-        with:
-          ref: main
-          fetch-depth: 0
-
   terraform-validate:
     name: "Terraform validate"
     needs: [metadata, commit-checks]
@@ -81,7 +84,7 @@ jobs:
       - name: "Configure AWS credentials"
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          role-to-assume: ${{ env.AWS_ROLE_ARN }}
           aws-region: eu-west-2
 
       - name: "Terraform Init"
@@ -108,7 +111,7 @@ jobs:
       - name: "Configure AWS credentials"
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          role-to-assume: ${{ env.AWS_ROLE_ARN }}
           aws-region: eu-west-2
 
       - name: "Terraform Init"
@@ -121,7 +124,8 @@ jobs:
         run: |
           make terraform-plan \
             dir=infrastructure/environments/${{ inputs.environment }} \
-            opts="-var-file=../terraform.tfvars -var-file=terraform.tfvars -var 'AWS_ROLE_ARN=${{ secrets.AWS_ROLE_ARN }}' -no-color -out=tfplan"
+            opts="-var-file=../terraform.tfvars -var-file=terraform.tfvars -no-color -out=tfplan"
+
           echo "plan_output=$(terraform show -no-color infrastructure/environments/${{ inputs.environment }}/tfplan | head -100)" >> $GITHUB_OUTPUT
 
       - name: "Save tfplan"
@@ -151,19 +155,13 @@ jobs:
       - name: "Configure AWS credentials"
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          role-to-assume: ${{ env.AWS_ROLE_ARN }}
           aws-region: eu-west-2
 
       - name: "Terraform Init"
         run: |
           make terraform-init \
             dir=infrastructure/environments/${{ inputs.environment }}
-
-      - name: "Download tfplan artifact"
-        uses: actions/download-artifact@v4
-        with:
-          name: tfplan-${{ inputs.environment }}-${{ github.run_id }}
-          path: infrastructure/environments/${{ inputs.environment }}/
 
       - name: "Terraform Apply"
         run: |
