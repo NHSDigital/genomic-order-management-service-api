@@ -120,6 +120,7 @@ jobs:
           export AWS_SESSION_TOKEN
           export AWS_REGION
           export AWS_DEFAULT_REGION
+          echo "KEY=$AWS_ACCESS_KEY_ID"
           make terraform-init \
             FORCE_USE_DOCKER=true \
             dir=infrastructure/environments/${{ inputs.environment }}
