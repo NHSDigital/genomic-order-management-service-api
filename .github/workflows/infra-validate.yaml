@@ -124,7 +124,7 @@ jobs:
           set -x
           make terraform-plan \
             dir=infrastructure/environments/${{ inputs.environment }} \
-            opts="-var-file=infrastructure/environments/terraform.tfvars -var-file=infrastructure/environments/${{ inputs.environment }}/terraform.tfvars -no-color -out=tfplan"
+            opts="-var-file=../terraform.tfvars -var-file=./terraform.tfvars -no-color -out=tfplan"
           terraform show -no-color infrastructure/environments/${{ inputs.environment }}/tfplan > infrastructure/environments/${{ inputs.environment }}/tfplan.txt
 
       - name: "Comment Plan on PR"
