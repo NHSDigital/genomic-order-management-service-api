@@ -49,6 +49,12 @@ function run-terraform-in-docker() {
   # shellcheck disable=SC2155
   local image=$(name=hashicorp/terraform docker-get-image-version-and-pull)
   # shellcheck disable=SC2086
+  echo docker run --rm --platform linux/amd64 \
+    --volume "$PWD":/workdir \
+    --workdir /workdir \
+    "$image" \
+      $cmd
+  echo $cmd
   docker run --rm --platform linux/amd64 \
     --volume "$PWD":/workdir \
     --workdir /workdir \
