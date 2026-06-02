@@ -116,6 +116,7 @@ jobs:
       - name: "Terraform Init - ${{ inputs.environment }}"
         run: |
           make terraform-init \
+            FORCE_USE_DOCKER=true \
             dir=infrastructure/environments/${{ inputs.environment }}
 
       - name: "Terraform Plan - ${{ inputs.environment }}"
