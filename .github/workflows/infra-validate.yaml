@@ -135,7 +135,7 @@ jobs:
             AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION} \
             FORCE_USE_DOCKER=true \
             dir=infrastructure/environments/${{ inputs.environment }} \
-            'opts="-var-file=../terraform.tfvars -var-file=./terraform.tfvars -no-color -out=tfplan"'
+            opts="-var-file=../terraform.tfvars\ -var-file=./terraform.tfvars\ -no-color\ -out=tfplan"
           terraform show -no-color infrastructure/environments/${{ inputs.environment }}/tfplan > infrastructure/environments/${{ inputs.environment }}/tfplan.txt
 
       - name: "Comment Plan on PR"
