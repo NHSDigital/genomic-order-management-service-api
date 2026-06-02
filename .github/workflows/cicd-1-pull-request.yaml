@@ -79,9 +79,34 @@ jobs:
       terraform_version: "${{ needs.metadata.outputs.terraform_version }}"
       version: "${{ needs.metadata.outputs.version }}"
     secrets: inherit
+  build-matrix:
+    name: Build environment matrix from secrets
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - name: Build matrix JSON
+        id: set-matrix
+        env:
+          AWS_READ_ONLY_ARN_INT: ${{ secrets.AWS_READ_ONLY_ARN_INT }}
+          AWS_READ_ONLY_ARN_PROD: ${{ secrets.AWS_READ_ONLY_ARN_PROD }}
+        run: |
+          set -euo pipefail
+          entries=()
+          [ -n "${AWS_READ_ONLY_ARN_INT:-}" ] && entries+=('{"environment":"int"}')
+          [ -n "${AWS_READ_ONLY_ARN_PROD:-}" ] && entries+=('{"environment":"prod"}')
+
+          if [ "${#entries[@]}" -eq 0 ]; then
+            echo "matrix=[]" >> $GITHUB_OUTPUT
+          else
+            printf -v matrix_json '[%s]' "$(IFS=,; echo "${entries[*]}")"
+            echo "matrix=$matrix_json" >> $GITHUB_OUTPUT
+          fi
   infra-validate-stage:
     name: "Infrastructure validation"
-    needs: [metadata, commit-stage]
+    needs: [metadata, commit-stage, build-matrix]
+    strategy:
+      matrix: ${{ fromJson(needs.build-matrix.outputs.matrix) }}
     uses: ./.github/workflows/infra-validate.yaml
     with:
       build_datetime: "${{ needs.metadata.outputs.build_datetime }}"
@@ -91,6 +116,7 @@ jobs:
       python_version: "${{ needs.metadata.outputs.python_version }}"
       terraform_version: "${{ needs.metadata.outputs.terraform_version }}"
       version: "${{ needs.metadata.outputs.version }}"
+      environment: ${{ matrix.environment }} 
     secrets: inherit
   test-stage: # Recommended maximum execution time is 5 minutes
     name: "Test stage"

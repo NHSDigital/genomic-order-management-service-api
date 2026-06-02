@@ -34,13 +34,10 @@ on:
         description: "Version of the software, set by the CI/CD pipeline workflow"
         required: true
         type: string
-  pull_request:
-    branches:
-      - main
-    paths:
-      - 'infrastructure/environments/**'
-      - 'infrastructure/modules/**'
-      - '.github/workflows/infra-*.yaml'
+      environment:
+        description: "environment"
+        required: true
+        type: string
 
 permissions:
   id-token: write
@@ -82,13 +79,10 @@ jobs:
           make list-variables
 
   terraform-plan:
-    name: "Terraform plan for ${{ matrix.environment }}"
+    name: "Terraform plan for ${{ inputs.environment }}"
     needs: [metadata]
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    strategy:
-      matrix:
-        environment: [int, prod]
     permissions:
       id-token: write
       contents: read
@@ -102,24 +96,32 @@ jobs:
         with:
           terraform_version: ${{ needs.metadata.outputs.terraform_version }}
 
-      - name: "Configure AWS credentials"
+      - name: Configure AWS credentials (prod)
+        if: ${{ inputs.environment == 'prod' }}
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: ${{ secrets.AWS_READONLY_ROLE_ARN }}
+          role-to-assume: ${{ secrets.AWS_READ_ONLY_ARN_PROD }}
           aws-region: eu-west-2
 
-      - name: "Terraform Init - ${{ matrix.environment }}"
+      - name: Configure AWS credentials (non-prod)
+        if: ${{ inputs.environment == 'int' }}
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_READ_ONLY_ARN_INT }}
+          aws-region: eu-west-2
+
+      - name: "Terraform Init - ${{ inputs.environment }}"
         run: |
           make terraform-init \
-            dir=infrastructure/environments/${{ matrix.environment }}
+            dir=infrastructure/environments/${{ inputs.environment }}
 
-      - name: "Terraform Plan - ${{ matrix.environment }}"
+      - name: "Terraform Plan - ${{ inputs.environment }}"
         id: plan
         run: |
           make terraform-plan \
-            dir=infrastructure/environments/${{ matrix.environment }} \
+            dir=infrastructure/environments/${{ inputs.environment }} \
             opts="-var-file=../terraform.tfvars -var-file=terraform.tfvars -var 'AWS_READONLY_ROLE_ARN=${{ secrets.AWS_READONLY_ROLE_ARN }}' -no-color -out=tfplan"
-          terraform show -no-color infrastructure/environments/${{ matrix.environment }}/tfplan > infrastructure/environments/${{ matrix.environment }}/tfplan.txt
+          terraform show -no-color infrastructure/environments/${{ inputs.environment }}/tfplan > infrastructure/environments/${{ inputs.environment }}/tfplan.txt
 
       - name: "Comment Plan on PR"
         uses: actions/github-script@v7
@@ -127,9 +129,9 @@ jobs:
         with:
           script: |
             const fs = require('fs');
-            const plan = fs.readFileSync('infrastructure/environments/${{ matrix.environment }}/tfplan.txt', 'utf8');
+            const plan = fs.readFileSync('infrastructure/environments/${{ inputs.environment }}/tfplan.txt', 'utf8');
 
-            const output = `#### Terraform Plan for \`${{ matrix.environment }}\`
+            const output = `#### Terraform Plan for \`${{ inputs.environment }}\`
 
             \`\`\`
             ${plan.substring(0, 65536)}
@@ -146,8 +148,8 @@ jobs:
       - name: "Upload tfplan artifact"
         uses: actions/upload-artifact@v4
         with:
-          name: tfplan-${{ matrix.environment }}
-          path: infrastructure/environments/${{ matrix.environment }}/tfplan
+          name: tfplan-${{ inputs.environment }}
+          path: infrastructure/environments/${{ inputs.environment }}/tfplan
 
   validation-summary:
     name: "Validation summary"
