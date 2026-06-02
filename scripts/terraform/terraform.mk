@@ -10,10 +10,10 @@ terraform-init: # Initialise Terraform - optional: terraform_dir|dir=[path to a 
 		opts="$(or ${terraform_opts}, ${opts})"
 
 terraform-plan: # Plan Terraform changes - optional: terraform_dir|dir=[path to a directory where the command will be executed, relative to the project's top-level directory, default is one of the module variables or the example directory, if not set], terraform_opts|opts=[options to pass to the Terraform plan command, default is none/empty] @Development
-    @echo "terraform_opts='$(terraform_opts)'"
-    @echo "opts='$(opts)'"
-	@echo "terraform_dir=${terraform_dir}"
-	@echo "dir=${dir}"
+	@echo "terraform_opts='$(terraform_opts)'"
+	@echo "opts='$(opts)'"
+	@echo "dir='$(dir)'"
+	@echo "terraform_dir='$(terraform_dir)'"
 	make _terraform cmd="plan" \
 		dir=$(or ${terraform_dir}, ${dir}) \
 		opts="$(or ${terraform_opts}, ${opts})"
