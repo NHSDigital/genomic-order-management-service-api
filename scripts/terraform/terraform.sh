@@ -35,6 +35,7 @@ function main() {
 function run-terraform-natively() {
 
   # shellcheck disable=SC2086
+  echo $PWD
   terraform $cmd
 }
 

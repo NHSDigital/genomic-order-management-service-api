@@ -123,6 +123,7 @@ jobs:
         run: |
           set -x
           make terraform-plan \
+            FORCE_USE_DOCKER=true \
             dir=infrastructure/environments/${{ inputs.environment }} \
             opts="-var-file=../terraform.tfvars -var-file=./terraform.tfvars -no-color -out=tfplan"
           terraform show -no-color infrastructure/environments/${{ inputs.environment }}/tfplan > infrastructure/environments/${{ inputs.environment }}/tfplan.txt
