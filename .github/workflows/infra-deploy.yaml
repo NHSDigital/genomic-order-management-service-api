@@ -90,11 +90,13 @@ jobs:
       - name: "Terraform Init"
         run: |
           make terraform-init \
+            FORCE_USE_DOCKER=true \
             dir=infrastructure/environments/${{ inputs.environment }}
 
       - name: "Terraform Validate"
         run: |
           make terraform-validate \
+            FORCE_USE_DOCKER=true \
             dir=infrastructure/environments/${{ inputs.environment }}
 
   terraform-plan:
@@ -117,12 +119,14 @@ jobs:
       - name: "Terraform Init"
         run: |
           make terraform-init \
+            FORCE_USE_DOCKER=true \
             dir=infrastructure/environments/${{ inputs.environment }}
 
       - name: "Terraform Plan"
         id: plan
         run: |
           make terraform-plan \
+            FORCE_USE_DOCKER=true \
             dir=infrastructure/environments/${{ inputs.environment }} \
             opts="-var-file=../terraform.tfvars -var-file=./terraform.tfvars -no-color -out=tfplan"
 
@@ -161,11 +165,13 @@ jobs:
       - name: "Terraform Init"
         run: |
           make terraform-init \
+            FORCE_USE_DOCKER=true \
             dir=infrastructure/environments/${{ inputs.environment }}
 
       - name: "Terraform Apply"
         run: |
           make terraform-apply \
+            FORCE_USE_DOCKER=true \
             dir=infrastructure/environments/${{ inputs.environment }} \
             opts="-no-color tfplan"
 
