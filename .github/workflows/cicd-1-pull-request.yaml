@@ -88,13 +88,13 @@ jobs:
       - name: Build matrix JSON
         id: set-matrix
         env:
-          AWS_READONLY_ROLE_ARN_INT: ${{ secrets.AWS_READONLY_ROLE_ARN_INT }}
-          AWS_READONLY_ROLE_ARN_PROD: ${{ secrets.AWS_READONLY_ROLE_ARN_PROD }}
+          AWS_INT_PR_ROLE: ${{ secrets.AWS_INT_PR_ROLE }}
+          AWS_PROD_PR_ROLE: ${{ secrets.AWS_PROD_PR_ROLE }}
         run: |
           set -euo pipefail
           entries=()
-          [ -n "${AWS_READONLY_ROLE_ARN_INT:-}" ] && entries+=('{"environment":"int"}')
-          [ -n "${AWS_READONLY_ROLE_ARN_PROD:-}" ] && entries+=('{"environment":"prod"}')
+          [ -n "${AWS_INT_PR_ROLE:-}" ] && entries+=("{'environment':'int'}")
+          [ -n "${AWS_PROD_PR_ROLE:-}" ] && entries+=("{'environment':'prod'}")
 
           if [ "${#entries[@]}" -eq 0 ]; then
             echo "matrix=[]" >> $GITHUB_OUTPUT

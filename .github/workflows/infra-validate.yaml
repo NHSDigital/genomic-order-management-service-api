@@ -45,7 +45,7 @@ permissions:
   pull-requests: write
 
 env:
-  AWS_READONLY_ROLE_ARN: ${{ inputs.environment == 'prod' && secrets.AWS_READONLY_ROLE_ARN_PROD || secrets.AWS_READONLY_ROLE_ARN_INT }}
+  AWS_PR_ROLE: ${{ inputs.environment == 'prod' && secrets.AWS_PROD_PR_ROLE || secrets.AWS_INT_PR_ROLE }}
 
 jobs:
   metadata:
@@ -101,16 +101,16 @@ jobs:
 
       - name: "Validate AWS role ARN secret"
         run: |
-          if [ -z "${AWS_READONLY_ROLE_ARN:-}" ]; then
+          if [ -z "${AWS_PR_ROLE:-}" ]; then
             echo "ERROR: Missing AWS role ARN secret for environment '${{ inputs.environment }}'." >&2
-            echo "Set '${{ inputs.environment == 'prod' && 'AWS_READONLY_ROLE_ARN_PROD' || 'AWS_READONLY_ROLE_ARN_INT' }}' in repository secrets." >&2
+            echo "Set '${{ inputs.environment == 'prod' && 'AWS_PROD_PR_ROLE' || 'AWS_INT_PR_ROLE' }}' in repository secrets." >&2
             exit 1
           fi
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: ${{ env.AWS_READONLY_ROLE_ARN }}
+          role-to-assume: ${{ env.AWS_PR_ROLE }}
           aws-region: eu-west-2
 
       - name: "Terraform Init - ${{ inputs.environment }}"

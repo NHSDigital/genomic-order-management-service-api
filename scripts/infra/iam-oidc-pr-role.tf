@@ -41,11 +41,16 @@ data "aws_iam_policy_document" "deploy_permissions_readonly" {
 
     actions = [
       "s3:GetBucketVersioning",
+      "s3:PutBucketVersioning",
       "s3:GetBucketEncryption",
+      "s3:PutBucketEncryption",
       "s3:GetBucketPublicAccessBlock",
+      "s3:PutBucketPublicAccessBlock",
       "s3:GetBucketPolicy",
+      "s3:PutBucketPolicy",
       "s3:ListBucket",
       "s3:GetObject",
+      "s3:PutObject"
     ]
 
     resources = [
@@ -59,12 +64,14 @@ data "aws_iam_policy_document" "deploy_permissions_readonly" {
     effect = "Allow"
 
     actions = [
-      "dynamodb:ListTables",
       "dynamodb:DescribeTable",
+      "dynamodb:UpdateTable",
+      "dynamodb:ListTables",
       "dynamodb:GetItem",
-      "dynamodb:Query"
+      "dynamodb:PutItem",
+      "dynamodb:UpdateItem",
+      "dynamodb:DeleteItem",
     ]
-
     resources = ["arn:aws:dynamodb:*:*:table/*"]
   }
 

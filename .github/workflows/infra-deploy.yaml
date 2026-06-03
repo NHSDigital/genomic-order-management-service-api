@@ -15,7 +15,7 @@ permissions:
   contents: read
 
 env:
-  AWS_ROLE_ARN: ${{ inputs.environment == 'prod' && secrets.AWS_ARN_PROD || secrets.AWS_ARN_INT }}
+  AWS_DEPLOY_ROLE: ${{ inputs.environment == 'prod' && secrets.AWS_PROD_PR_ROLE || secrets.AWS_INT_PR_ROLE }}
 
 jobs:
   validate-main-branch:
@@ -84,7 +84,7 @@ jobs:
       - name: "Configure AWS credentials"
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: ${{ env.AWS_ROLE_ARN }}
+          role-to-assume: ${{ env.AWS_DEPLOY_ROLE }}
           aws-region: eu-west-2
 
       - name: "Terraform Init"
@@ -113,7 +113,7 @@ jobs:
       - name: "Configure AWS credentials"
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: ${{ env.AWS_ROLE_ARN }}
+          role-to-assume: ${{ env.AWS_DEPLOY_ROLE }}
           aws-region: eu-west-2
 
       - name: "Terraform Init"
@@ -159,7 +159,7 @@ jobs:
       - name: "Configure AWS credentials"
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: ${{ env.AWS_ROLE_ARN }}
+          role-to-assume: ${{ env.AWS_DEPLOY_ROLE }}
           aws-region: eu-west-2
 
       - name: "Terraform Init"

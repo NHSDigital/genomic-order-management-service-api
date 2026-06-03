@@ -37,13 +37,13 @@ variable "github_branch" {
 variable "role_name" {
   description = "Name of the IAM role created for GitHub Actions."
   type        = string
-  default     = "github-genomics-order-management-oidc-role"
+  default     = "github-genomics-order-management-oidc-deploy-role"
 }
 
 variable "role_name_readonly" {
   description = "Name of the IAM role created for GitHub Actions."
   type        = string
-  default     = "github-genomics-order-management-oidc-role-readonly"
+  default     = "github-genomics-order-management-oidc-pr-role"
 }
 
 variable "oidc_provider" {
