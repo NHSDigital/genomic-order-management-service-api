@@ -12,7 +12,7 @@ terraform {
     bucket         = "genomics-order-management-tfstate-prod"
     key            = "nhs-e/infrastructure/terraform.tfstate"
     region         = "eu-west-2"
-    dynamodb_table = "genomic-order-management-service-api-tfstate-lock-prod"
+    dynamodb_table = "genomic-order-management-service-tfstate-lock-prod"
     encrypt        = true
   }
 }
