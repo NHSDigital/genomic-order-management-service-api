@@ -7,4 +7,5 @@ module "nhs_e_secrets" {
   environment           = var.environment
   intersystems_role_arn = var.intersystems_role_arn
   external_id           = var.external_id
+  tags                  = var.tags
 }
