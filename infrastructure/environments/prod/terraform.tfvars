@@ -16,3 +16,64 @@ tags = {
   BusinessAnalyst    = "Harini Nallapothola​"
 }
 
+secrets = {
+  "DGTS-INT" = {
+    description             = "Digital Genomic Test Service INT"
+    recovery_window_in_days = 7
+    secret_key              = "dgts_int"
+    tags = {
+      environment = "int"
+      owner       = "NHS-E Service Team"
+    }
+  }
+
+  "MNS-INT" = {
+    description             = "Multicast Notification Service INT"
+    recovery_window_in_days = 7
+    secret_key              = "mns_int"
+    tags = {
+      environment = "int"
+      owner       = "NHS-E Service Team"
+    }
+  }
+
+  "PDM-INT" = {
+    description             = "Patient Data Manager INT"
+    recovery_window_in_days = 7
+    secret_key              = "pdm_int"
+    tags = {
+      environment = "int"
+      owner       = "NHS-E Service Team"
+    }
+  }
+
+  "ODS-INT" = {
+    description             = "Order Management Service INT"
+    recovery_window_in_days = 7
+    secret_key              = "ods_int"
+    tags = {
+      environment = "int"
+      owner       = "NHS-E Service Team"
+    }
+  }
+
+  "PDS-INT" = {
+    description             = "Personal Demographic Service INT"
+    recovery_window_in_days = 7
+    secret_key              = "pds_int"
+    tags = {
+      environment = "int"
+      owner       = "NHS-E Service Team"
+    }
+  }
+
+  "GOMS-INT" = {
+    description             = "Genomic Order Management Service INT"
+    recovery_window_in_days = 7
+    secret_key              = "goms_int"
+    tags = {
+      environment = "int"
+      owner       = "NHS-E Service Team"
+    }
+  }
+}

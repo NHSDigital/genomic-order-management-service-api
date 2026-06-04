@@ -8,4 +8,5 @@ module "nhs_e_secrets" {
   intersystems_role_arn = var.intersystems_role_arn
   external_id           = var.external_id
   tags                  = var.tags
+  secrets               = var.secrets
 }
