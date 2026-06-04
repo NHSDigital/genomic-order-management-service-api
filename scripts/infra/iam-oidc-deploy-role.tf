@@ -36,29 +36,115 @@ resource "aws_iam_role" "github_actions" {
 
 data "aws_iam_policy_document" "deploy_permissions" {
   statement {
-    sid    = "S3BucketManagement"
+    sid    = "ManageS3BucketsPoliciesEncryptionAndLifecycle"
     effect = "Allow"
 
     actions = [
       "s3:CreateBucket",
       "s3:DeleteBucket",
-      "s3:GetBucketVersioning",
-      "s3:PutBucketVersioning",
+      "s3:GetBucketAcl",
       "s3:GetBucketEncryption",
-      "s3:PutBucketEncryption",
-      "s3:GetBucketPublicAccessBlock",
-      "s3:PutBucketPublicAccessBlock",
+      "s3:GetBucketLifecycleConfiguration",
+      "s3:GetBucketLocation",
       "s3:GetBucketPolicy",
-      "s3:PutBucketPolicy",
+      "s3:GetBucketPublicAccessBlock",
+      "s3:GetBucketTagging",
+      "s3:GetBucketVersioning",
+      "s3:ListAllMyBuckets",
       "s3:ListBucket",
-      "s3:GetObject",
-      "s3:PutObject",
-      "s3:DeleteObject",
+      "s3:PutBucketEncryption",
+      "s3:PutBucketLifecycleConfiguration",
+      "s3:PutBucketOwnershipControls",
+      "s3:PutBucketPolicy",
+      "s3:PutBucketPublicAccessBlock",
+      "s3:PutBucketTagging",
+      "s3:PutBucketVersioning"
     ]
 
     resources = [
       "arn:aws:s3:::*",
       "arn:aws:s3:::*/*",
+    ]
+  }
+
+  statement {
+    sid = "ManageSecretsManagerSecretsAndResourcePolicies"
+    actions = [
+      "secretsmanager:CreateSecret",
+      "secretsmanager:DeleteSecret",
+      "secretsmanager:DescribeSecret",
+      "secretsmanager:GetResourcePolicy",
+      "secretsmanager:ListSecrets",
+      "secretsmanager:PutResourcePolicy",
+      "secretsmanager:PutSecretValue",
+      "secretsmanager:RestoreSecret",
+      "secretsmanager:TagResource",
+      "secretsmanager:UpdateSecret",
+      "secretsmanager:ValidateResourcePolicy"
+    ]
+    resources = ["arn:aws:secretsmanager:*:*:secret:*"]
+  }
+
+  statement {
+    sid = "ManageKmsKeysAliasesAndPolicies"
+    actions = [
+      "kms:CancelKeyDeletion",
+      "kms:CreateAlias",
+      "kms:CreateKey",
+      "kms:Decrypt",
+      "kms:DescribeKey",
+      "kms:DisableKey",
+      "kms:EnableKey",
+      "kms:EnableKeyRotation",
+      "kms:Encrypt",
+      "kms:GenerateDataKey",
+      "kms:GenerateDataKeyWithoutPlaintext",
+      "kms:GetKeyPolicy",
+      "kms:GetKeyRotationStatus",
+      "kms:ListAliases",
+      "kms:ListResourceTags",
+      "kms:PutKeyPolicy",
+      "kms:ScheduleKeyDeletion",
+      "kms:TagResource",
+      "kms:UpdateAlias"
+    ]
+    resources = ["arn:aws:kms:*:*:key/*"]
+  }
+
+  statement {
+    sid = "ManageIamRolesAndPolicies"
+    actions = [
+      "iam:AttachRolePolicy",
+      "iam:CreatePolicy",
+      "iam:CreatePolicyVersion",
+      "iam:CreateRole",
+      "iam:DeletePolicy",
+      "iam:DeletePolicyVersion",
+      "iam:DeleteRole",
+      "iam:DeleteRolePolicy",
+      "iam:DetachRolePolicy",
+      "iam:GetOpenIDConnectProvider",
+      "iam:GetPolicy",
+      "iam:GetPolicyVersion",
+      "iam:GetRole",
+      "iam:GetRolePolicy",
+      "iam:ListAttachedRolePolicies",
+      "iam:ListEntitiesForPolicy",
+      "iam:ListInstanceProfilesForRole",
+      "iam:ListOpenIDConnectProviders",
+      "iam:ListPolicies",
+      "iam:ListPolicyVersions",
+      "iam:ListRolePolicies",
+      "iam:ListRoles",
+      "iam:PassRole",
+      "iam:PutRolePolicy",
+      "iam:TagPolicy",
+      "iam:TagRole",
+      "iam:UpdateAssumeRolePolicy"
+    ]
+    resources = [
+      "arn:aws:iam::*:policy/*",
+      "arn:aws:iam::*:role/*",
     ]
   }
 
@@ -79,93 +165,6 @@ data "aws_iam_policy_document" "deploy_permissions" {
     ]
 
     resources = ["arn:aws:dynamodb:*:*:table/*"]
-  }
-
-  statement {
-    sid    = "SecretsManagerManagement"
-    effect = "Allow"
-
-    actions = [
-      "secretsmanager:CreateSecret",
-      "secretsmanager:DeleteSecret",
-      "secretsmanager:DescribeSecret",
-      "secretsmanager:GetSecretValue",
-      "secretsmanager:PutSecretValue",
-      "secretsmanager:UpdateSecret",
-      "secretsmanager:ListSecrets",
-    ]
-
-    resources = ["arn:aws:secretsmanager:*:*:secret:*"]
-  }
-
-  statement {
-    sid    = "KMSKeyManagement"
-    effect = "Allow"
-
-    actions = [
-      "kms:CreateKey",
-      "kms:DescribeKey",
-      "kms:ListKeys",
-      "kms:ListAliases",
-      "kms:CreateAlias",
-      "kms:DeleteAlias",
-      "kms:UpdateAlias",
-      "kms:GetKeyPolicy",
-      "kms:PutKeyPolicy",
-      "kms:Decrypt",
-      "kms:Encrypt",
-      "kms:GenerateDataKey",
-      "kms:ScheduleKeyDeletion",
-    ]
-
-    resources = ["arn:aws:kms:*:*:key/*"]
-  }
-
-  statement {
-    sid    = "IAMRoleManagement"
-    effect = "Allow"
-
-    actions = [
-      "iam:CreateRole",
-      "iam:DeleteRole",
-      "iam:GetRole",
-      "iam:ListRoles",
-      "iam:UpdateAssumeRolePolicy",
-      "iam:GetAssumeRolePolicy",
-      "iam:PassRole",
-      "iam:TagRole",
-      "iam:UntagRole",
-    ]
-
-    resources = ["arn:aws:iam::*:role/*"]
-  }
-
-  statement {
-    sid    = "IAMPolicyManagement"
-    effect = "Allow"
-
-    actions = [
-      "iam:CreatePolicy",
-      "iam:DeletePolicy",
-      "iam:GetPolicy",
-      "iam:ListPolicies",
-      "iam:CreatePolicyVersion",
-      "iam:DeletePolicyVersion",
-      "iam:ListPolicyVersions",
-      "iam:GetPolicyVersion",
-      "iam:AttachRolePolicy",
-      "iam:DetachRolePolicy",
-      "iam:ListAttachedRolePolicies",
-      "iam:PutRolePolicy",
-      "iam:GetRolePolicy",
-      "iam:DeleteRolePolicy",
-      "iam:ListRolePolicies",
-    ]
-
-    resources = [
-      "arn:aws:iam::*:policy/*",
-      "arn:aws:iam::*:role/*",
-    ]
   }
 
   statement {

@@ -32,3 +32,9 @@ variable "enable_kms_key_rotation" {
   type        = bool
   default     = false
 }
+
+variable "tags" {
+  description = "Tags applied to resources that support tagging."
+  type        = map(string)
+  default     = {}
+}

@@ -9,11 +9,11 @@ terraform {
   }
 
   backend "s3" {
-    bucket         = "genomics-order-management-tfstate-int"
-    key            = "nhs-e/infrastructure/terraform.tfstate"
-    region         = "eu-west-2"
-    dynamodb_table = "genomics-order-management-tfstate-lock-int"
-    encrypt        = true
+    bucket       = "genomics-order-management-tfstate-int"
+    key          = "nhs-e/infrastructure/terraform.tfstate"
+    region       = "eu-west-2"
+    use_lockfile = true
+    encrypt      = true
   }
 }
 

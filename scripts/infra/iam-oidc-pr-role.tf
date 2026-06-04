@@ -1,8 +1,8 @@
-data "aws_iam_openid_connect_provider" "github_actions_readonly" {
+data "aws_iam_openid_connect_provider" "github_actions_pr" {
   arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:oidc-provider/${var.oidc_provider}"
 }
 
-data "aws_iam_policy_document" "github_actions_assume_role_readonly" {
+data "aws_iam_policy_document" "github_actions_assume_role_pr" {
   statement {
     effect = "Allow"
 
@@ -29,12 +29,12 @@ data "aws_iam_policy_document" "github_actions_assume_role_readonly" {
   }
 }
 
-resource "aws_iam_role" "github_actions_readonly" {
-  name               = var.role_name_readonly
-  assume_role_policy = data.aws_iam_policy_document.github_actions_assume_role_readonly.json
+resource "aws_iam_role" "github_actions_pr" {
+  name               = var.role_name_pr
+  assume_role_policy = data.aws_iam_policy_document.github_actions_assume_role_pr.json
 }
 
-data "aws_iam_policy_document" "deploy_permissions_readonly" {
+data "aws_iam_policy_document" "deploy_permissions_pr" {
   statement {
     sid    = "S3BucketManagement"
     effect = "Allow"
@@ -157,8 +157,8 @@ data "aws_iam_policy_document" "deploy_permissions_readonly" {
   }
 }
 
-resource "aws_iam_role_policy" "deploy_permissions_readonly" {
-  name   = "deploy-permissions-readonly"
-  role   = aws_iam_role.github_actions_readonly.id
-  policy = data.aws_iam_policy_document.deploy_permissions_readonly.json
+resource "aws_iam_role_policy" "deploy_permissions_pr" {
+  name   = "deploy-permissions-pr"
+  role   = aws_iam_role.github_actions_pr.id
+  policy = data.aws_iam_policy_document.deploy_permissions_pr.json
 }
