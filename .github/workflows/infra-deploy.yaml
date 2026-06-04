@@ -130,8 +130,6 @@ jobs:
             dir=infrastructure/environments/${{ inputs.environment }} \
             opts="-var-file=../terraform.tfvars -var-file=./terraform.tfvars -no-color -out=tfplan"
 
-          echo "plan_output=$(terraform show -no-color infrastructure/environments/${{ inputs.environment }}/tfplan | head -100)" >> $GITHUB_OUTPUT
-
       - name: "Save tfplan"
         uses: actions/upload-artifact@v4
         with:
