@@ -1,0 +1,177 @@
+name: "Infrastructure Deploy"
+
+# Deployment workflow for infrastructure changes
+# Called from cicd-3-deploy after merge - deploys to selected environment
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  AWS_DEPLOY_ROLE: ${{ inputs.environment == 'prod' && secrets.AWS_PROD_PR_ROLE || secrets.AWS_INT_PR_ROLE }}
+
+jobs:
+  validate-main-branch:
+    name: "Validate deployment from main branch"
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Check branch"
+        run: |
+          if [ "${{ github.ref }}" != "refs/heads/main" ]; then
+            echo "ERROR: This workflow can only be run from the 'main' branch." >&2
+            echo "Current branch: ${{ github.ref }}" >&2
+            exit 1
+          fi
+  metadata:
+    name: "Set CI/CD metadata"
+    needs: [validate-main-branch]
+    runs-on: ubuntu-latest
+    timeout-minutes: 1
+    outputs:
+      build_datetime: ${{ steps.variables.outputs.build_datetime }}
+      build_timestamp: ${{ steps.variables.outputs.build_timestamp }}
+      build_epoch: ${{ steps.variables.outputs.build_epoch }}
+      terraform_version: ${{ steps.variables.outputs.terraform_version }}
+      version: ${{ steps.variables.outputs.version }}
+    steps:
+      - name: "Checkout code"
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: "Set CI/CD variables"
+        id: variables
+        run: |
+          datetime=$(date -u +'%Y-%m-%dT%H:%M:%S%z')
+          echo "build_datetime=$datetime" >> $GITHUB_OUTPUT
+          echo "build_timestamp=$(date --date=$datetime -u +'%Y%m%d%H%M%S')" >> $GITHUB_OUTPUT
+          echo "build_epoch=$(date --date=$datetime -u +'%s')" >> $GITHUB_OUTPUT
+          echo "terraform_version=$(grep "^terraform" .tool-versions | cut -f2 -d' ')" >> $GITHUB_OUTPUT
+          echo "version=$(head -n 1 .version 2> /dev/null || echo unknown)" >> $GITHUB_OUTPUT
+
+      - name: "List variables"
+        run: |
+          export BUILD_DATETIME="${{ steps.variables.outputs.build_datetime }}"
+          export BUILD_TIMESTAMP="${{ steps.variables.outputs.build_timestamp }}"
+          export BUILD_EPOCH="${{ steps.variables.outputs.build_epoch }}"
+          export TERRAFORM_VERSION="${{ steps.variables.outputs.terraform_version }}"
+          export VERSION="${{ steps.variables.outputs.version }}"
+          make list-variables
+
+  terraform-validate:
+    name: "Terraform validate"
+    needs: [metadata]
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: "Checkout code"
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: "Setup Terraform"
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ needs.metadata.outputs.terraform_version }}
+
+      - name: "Configure AWS credentials"
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ env.AWS_DEPLOY_ROLE }}
+          aws-region: eu-west-2
+
+      - name: "Terraform Init"
+        run: |
+          make terraform-init \
+            FORCE_USE_DOCKER=true \
+            dir=infrastructure/environments/${{ inputs.environment }}
+
+      - name: "Terraform Validate"
+        run: |
+          make terraform-validate \
+            FORCE_USE_DOCKER=true \
+            dir=infrastructure/environments/${{ inputs.environment }}
+
+  terraform-plan:
+    name: "Terraform plan for ${{ inputs.environment }}"
+    needs: [terraform-validate]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: "Setup Terraform"
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ needs.metadata.outputs.terraform_version }}
+
+      - name: "Configure AWS credentials"
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ env.AWS_DEPLOY_ROLE }}
+          aws-region: eu-west-2
+
+      - name: "Terraform Init"
+        run: |
+          make terraform-init \
+            FORCE_USE_DOCKER=true \
+            dir=infrastructure/environments/${{ inputs.environment }}
+
+      - name: "Terraform Plan"
+        id: plan
+        run: |
+          make terraform-plan \
+            FORCE_USE_DOCKER=true \
+            dir=infrastructure/environments/${{ inputs.environment }} \
+            opts="-var-file=../terraform.tfvars -var-file=./terraform.tfvars -no-color -out=tfplan"
+
+      - name: "Save tfplan"
+        uses: actions/upload-artifact@v4
+        with:
+          name: tfplan-${{ inputs.environment }}-${{ github.run_id }}
+          path: infrastructure/environments/${{ inputs.environment }}/tfplan
+          retention-days: 7
+
+  terraform-apply:
+    name: "Terraform apply to ${{ inputs.environment }}"
+    needs: [terraform-plan]
+    runs-on: ubuntu-latest
+    environment:
+      name: ${{ inputs.environment }}
+    steps:
+      - name: "Checkout code"
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: "Setup Terraform"
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ needs.metadata.outputs.terraform_version }}
+
+      - name: "Configure AWS credentials"
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ env.AWS_DEPLOY_ROLE }}
+          aws-region: eu-west-2
+
+      - name: "Terraform Init"
+        run: |
+          make terraform-init \
+            FORCE_USE_DOCKER=true \
+            dir=infrastructure/environments/${{ inputs.environment }}
+
+      - name: "Terraform Apply"
+        run: |
+          make terraform-apply \
+            FORCE_USE_DOCKER=true \
+            dir=infrastructure/environments/${{ inputs.environment }} \
+            opts="-no-color tfplan"
+
+
+
