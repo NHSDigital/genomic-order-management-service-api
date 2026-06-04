@@ -50,7 +50,7 @@ function run-terraform-in-docker() {
   local image=$(name=hashicorp/terraform docker-get-image-version-and-pull)
   # shellcheck disable=SC2086
 
-  docker run --rm --platform linux/amd64 \b 
+  docker run --rm --platform linux/amd64 \
     --volume "$PWD":/workdir \
     --workdir /workdir \
     -e AWS_ACCESS_KEY_ID="${AWS_ACCESS_KEY_ID:-}" \
