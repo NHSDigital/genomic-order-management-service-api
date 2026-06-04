@@ -3,9 +3,8 @@ locals {
   common_tags = merge(
     {
       ManagedBy = "Terraform"
-      Purpose   = "GitHub OIDC bootstrap"
+      module    = "NHS-E Secrets"
     },
     var.tags
   )
-
 }

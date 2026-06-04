@@ -95,7 +95,7 @@ resource "aws_kms_key" "secrets_manager" {
   description         = "KMS key for Secrets Manager"
   enable_key_rotation = true
   policy              = data.aws_iam_policy_document.secrets_manager_kms_key.json
-  tags                = merge(local.common_tags, { Name = "${var.project}" })
+  tags                = merge(local.common_tags, { Name = "${var.project}-key" })
 }
 
 resource "aws_kms_alias" "secrets_manager" {
