@@ -10,9 +10,8 @@ The `scripts/infra` directory contains **one-time bootstrap Terraform configurat
 
 This directory creates the infrastructure **backend** and **deployment prerequisites**:
 
-- **Terraform State Backend (S3 + DynamoDB)**
+- **Terraform State Backend (S3)**
   - S3 bucket for storing Terraform state files (`s3-terraform.tf`)
-  - DynamoDB table for state locking (`dynamodb-terraform.tf`)
   - Enables safe, concurrent Terraform operations
 
 - **GitHub Actions OIDC Integration**
