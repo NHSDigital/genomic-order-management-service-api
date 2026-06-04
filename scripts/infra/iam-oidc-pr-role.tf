@@ -50,29 +50,14 @@ data "aws_iam_policy_document" "deploy_permissions_pr" {
       "s3:PutBucketPolicy",
       "s3:ListBucket",
       "s3:GetObject",
-      "s3:PutObject"
+      "s3:PutObject",
+      "s3:DeleteObject"
     ]
 
     resources = [
       "arn:aws:s3:::*",
       "arn:aws:s3:::*/*",
     ]
-  }
-
-  statement {
-    sid    = "DynamoDBTableManagement"
-    effect = "Allow"
-
-    actions = [
-      "dynamodb:DescribeTable",
-      "dynamodb:UpdateTable",
-      "dynamodb:ListTables",
-      "dynamodb:GetItem",
-      "dynamodb:PutItem",
-      "dynamodb:UpdateItem",
-      "dynamodb:DeleteItem",
-    ]
-    resources = ["arn:aws:dynamodb:*:*:table/*"]
   }
 
   statement {
