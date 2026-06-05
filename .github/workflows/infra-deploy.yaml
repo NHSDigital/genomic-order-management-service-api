@@ -15,7 +15,7 @@ permissions:
   contents: read
 
 env:
-  AWS_DEPLOY_ROLE: ${{ inputs.environment == 'prod' && secrets.AWS_PROD_PR_ROLE || secrets.AWS_INT_PR_ROLE }}
+  AWS_DEPLOY_ROLE: ${{ inputs.environment == 'prod' && secrets.AWS_PROD_DEPLOY_ROLE || secrets.AWS_INT_DEPLOY_ROLE }}
 
 jobs:
   validate-main-branch:
@@ -105,6 +105,11 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
+      - name: "Checkout code"
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
       - name: "Setup Terraform"
         uses: hashicorp/setup-terraform@v3
         with:
