@@ -99,6 +99,6 @@ resource "aws_kms_key" "secrets_manager" {
 }
 
 resource "aws_kms_alias" "secrets_manager" {
-  name          = "alias/${var.project}-key"
+  name          = "alias/${var.project}-${var.environment}-key"
   target_key_id = aws_kms_key.secrets_manager.key_id
 }

@@ -4,7 +4,7 @@ environment = "prod"
 external_id = "ext-9f83hf83hf83hf83"
 
 # InterSystems role ARN - this should be provided via terraform.tfvars override or command line
-# Example: intersystems_role_arn = "arn:aws:iam::038462762332:role/InterSystems-GOM-Role"
+intersystems_role_arn = "arn:aws:iam::038462762345:role/InterSystems-GOM-Role"
 
 tags = {
   Environment        = "prod"
@@ -13,7 +13,7 @@ tags = {
   Owner              = "John Fraser"
   DeliveryLead       = "Cairns-Hockey, Beryl"
   TechnicalArchitect = "Ravi Natarajan"
-  BusinessAnalyst    = "Harini Nallapothola​"
+  BusinessAnalyst    = "Adam Laurent​"
 }
 
 secrets = {
@@ -48,7 +48,7 @@ secrets = {
   }
 
   "ODS-INT" = {
-    description             = "Order Management Service INT"
+    description             = "Organization Data Service INT"
     recovery_window_in_days = 7
     secret_key              = "ods_int"
     tags = {
