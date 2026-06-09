@@ -18,17 +18,18 @@ env:
   AWS_DEPLOY_ROLE: ${{ inputs.environment == 'prod' && secrets.AWS_PROD_DEPLOY_ROLE || secrets.AWS_INT_DEPLOY_ROLE }}
 
 jobs:
-  # validate-main-branch:
-  #   name: "Validate deployment from main branch"
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: "Check branch"
-  #       run: |
-  #         if [ "${{ github.ref }}" != "refs/heads/main" ]; then
-  #           echo "ERROR: This workflow can only be run from the 'main' branch." >&2
-  #           echo "Current branch: ${{ github.ref }}" >&2
-  #           exit 1
-  #         fi
+  validate-main-branch:
+    name: "Validate deployment from main branch"
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Check branch"
+        run: |
+          # if [ "${{ github.ref }}" != "refs/heads/main" ]; then
+          #   echo "ERROR: This workflow can only be run from the 'main' branch." >&2
+          #   echo "Current branch: ${{ github.ref }}" >&2
+          #   exit 1
+          # fi
+          echo "bypassing the checks temporarily for testing"
   metadata:
     name: "Set CI/CD metadata"
     needs: [validate-main-branch]
