@@ -198,6 +198,12 @@ jobs:
             FORCE_USE_DOCKER=true \
             dir=infrastructure/environments/${{ inputs.environment }}
 
+      - name: "Download tfplan"
+        uses: actions/download-artifact@v4
+        with:
+          name: tfplan-${{ inputs.environment }}-${{ github.run_id }}
+          path: infrastructure/environments/${{ inputs.environment }}
+
       - name: "Terraform Apply"
         run: |
           make terraform-apply \
