@@ -4,7 +4,7 @@ environment = "int"
 external_id = "ext-9f83hf83hf83hf83"
 
 # InterSystems role ARN - this should be provided via terraform.tfvars override or command line
-intersystems_role_arn = "arn:aws:iam::038462762332:role/InterSystems-GOM-Role"
+intersystems_role_arn = "arn:aws:iam::038462762342:role/InterSystems-GOM-Role"
 
 tags = {
   Environment        = "int"
