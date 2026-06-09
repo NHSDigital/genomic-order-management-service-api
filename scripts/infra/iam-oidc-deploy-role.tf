@@ -108,6 +108,10 @@ data "aws_iam_policy_document" "deploy_permissions" {
       "secretsmanager:RestoreSecret",
       "secretsmanager:TagResource",
       "secretsmanager:UpdateSecret",
+      "secretsmanager:GetSecretValue",
+      "secretsmanager:ListSecretVersionIds",
+      "secretsmanager:UpdateSecretVersionStage",
+      "secretsmanager:UntagResource",
       "secretsmanager:ValidateResourcePolicy"
     ]
     resources = ["arn:aws:secretsmanager:*:*:secret:*"]
@@ -118,7 +122,6 @@ data "aws_iam_policy_document" "deploy_permissions" {
     actions = [
       "kms:CancelKeyDeletion",
       "kms:CreateAlias",
-      "kms:CreateKey",
       "kms:Decrypt",
       "kms:DescribeKey",
       "kms:DisableKey",
@@ -129,14 +132,31 @@ data "aws_iam_policy_document" "deploy_permissions" {
       "kms:GenerateDataKeyWithoutPlaintext",
       "kms:GetKeyPolicy",
       "kms:GetKeyRotationStatus",
-      "kms:ListAliases",
       "kms:ListResourceTags",
       "kms:PutKeyPolicy",
       "kms:ScheduleKeyDeletion",
       "kms:TagResource",
-      "kms:UpdateAlias"
+      "kms:UntagResource",
+      "kms:UpdateAlias",
+      "kms:DeleteAlias",
+      "kms:CreateGrant",
+      "kms:ListGrants",
+      "kms:RevokeGrant"
     ]
-    resources = ["arn:aws:kms:*:*:key/*"]
+    resources = [
+      "arn:aws:kms:*:*:key/*",
+      "arn:aws:kms:*:*:alias/*"
+    ]
+  }
+
+  statement {
+    sid = "KmsGlobalPermissions"
+    actions = [
+      "kms:CreateKey",
+      "kms:ListKeys",
+      "kms:ListAliases"
+    ]
+    resources = ["*"]
   }
 
   statement {
@@ -211,8 +231,8 @@ data "aws_iam_policy_document" "deploy_permissions" {
   }
 }
 
-resource "aws_iam_role_policy" "deploy_permissions" {
-  name   = "deploy-permissions"
+resource "aws_iam_role_policy" "deploy_permissions_policy" {
+  name   = "infra-deploy-permissions"
   role   = aws_iam_role.github_actions.id
   policy = data.aws_iam_policy_document.deploy_permissions.json
 }

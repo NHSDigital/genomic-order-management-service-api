@@ -31,7 +31,7 @@ data "aws_iam_policy_document" "nhs_e_secrets_access" {
     ]
     principals {
       type        = "AWS"
-      identifiers = [aws_iam_role.nhs_e_secretsreader_role.name]
+      identifiers = [aws_iam_role.nhs_e_secretsreader_role.arn]
     }
     resources = [
       aws_secretsmanager_secret.nhs_e_secrets[each.key].arn
