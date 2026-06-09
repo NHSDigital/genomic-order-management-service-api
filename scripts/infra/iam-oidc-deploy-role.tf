@@ -68,6 +68,34 @@ data "aws_iam_policy_document" "deploy_permissions" {
   }
 
   statement {
+    sid    = "ReadWriteTerraformState"
+    effect = "Allow"
+
+    actions = [
+      "s3:GetObject",
+      "s3:PutObject"
+    ]
+
+    resources = [
+      "${aws_s3_bucket.terraform_state_store.arn}/*.tfstate"
+    ]
+  }
+
+  statement {
+    sid    = "ReadWriteDeleteTerraformLockFile"
+    effect = "Allow"
+
+    actions = [
+      "s3:GetObject",
+      "s3:PutObject",
+      "s3:DeleteObject"
+    ]
+    resources = [
+      "${aws_s3_bucket.terraform_state_store.arn}/*.tfstate.tflock"
+    ]
+  }
+
+  statement {
     sid = "ManageSecretsManagerSecretsAndResourcePolicies"
     actions = [
       "secretsmanager:CreateSecret",
@@ -147,6 +175,7 @@ data "aws_iam_policy_document" "deploy_permissions" {
       "arn:aws:iam::*:role/*",
     ]
   }
+
 
   statement {
     sid    = "DynamoDBTableManagement"

@@ -44,8 +44,6 @@ jobs:
     steps:
       - name: "Checkout code"
         uses: actions/checkout@v4
-        with:
-          ref: main
 
       - name: "Set CI/CD variables"
         id: variables
@@ -168,8 +166,6 @@ jobs:
     steps:
       - name: "Checkout code"
         uses: actions/checkout@v4
-        with:
-          ref: main
 
       - name: "Setup Terraform"
         uses: hashicorp/setup-terraform@v3
