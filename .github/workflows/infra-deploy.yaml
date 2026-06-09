@@ -91,12 +91,22 @@ jobs:
       - name: "Terraform Init"
         run: |
           make terraform-init \
+            AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID} \
+            AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY} \
+            AWS_SESSION_TOKEN=${AWS_SESSION_TOKEN} \
+            AWS_REGION=${AWS_REGION} \
+            AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION} \
             FORCE_USE_DOCKER=true \
             dir=infrastructure/environments/${{ inputs.environment }}
 
       - name: "Terraform Validate"
         run: |
           make terraform-validate \
+            AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID} \
+            AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY} \
+            AWS_SESSION_TOKEN=${AWS_SESSION_TOKEN} \
+            AWS_REGION=${AWS_REGION} \
+            AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION} \
             FORCE_USE_DOCKER=true \
             dir=infrastructure/environments/${{ inputs.environment }}
 
@@ -125,6 +135,11 @@ jobs:
       - name: "Terraform Init"
         run: |
           make terraform-init \
+            AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID} \
+            AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY} \
+            AWS_SESSION_TOKEN=${AWS_SESSION_TOKEN} \
+            AWS_REGION=${AWS_REGION} \
+            AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION} \
             FORCE_USE_DOCKER=true \
             dir=infrastructure/environments/${{ inputs.environment }}
 
@@ -132,9 +147,14 @@ jobs:
         id: plan
         run: |
           make terraform-plan \
+            AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID} \
+            AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY} \
+            AWS_SESSION_TOKEN=${AWS_SESSION_TOKEN} \
+            AWS_REGION=${AWS_REGION} \
+            AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION} \
             FORCE_USE_DOCKER=true \
             dir=infrastructure/environments/${{ inputs.environment }} \
-            opts="-var-file=../terraform.tfvars -var-file=./terraform.tfvars -no-color -out=tfplan"
+            opts="-var-file=../terraform.tfvars\ -var-file=./terraform.tfvars\ -no-color\ -out=tfplan"
 
       - name: "Save tfplan"
         uses: actions/upload-artifact@v4
@@ -169,15 +189,23 @@ jobs:
       - name: "Terraform Init"
         run: |
           make terraform-init \
+            AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID} \
+            AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY} \
+            AWS_SESSION_TOKEN=${AWS_SESSION_TOKEN} \
+            AWS_REGION=${AWS_REGION} \
+            AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION} \
             FORCE_USE_DOCKER=true \
             dir=infrastructure/environments/${{ inputs.environment }}
 
       - name: "Terraform Apply"
         run: |
           make terraform-apply \
+            AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID} \
+            AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY} \
+            AWS_SESSION_TOKEN=${AWS_SESSION_TOKEN} \
+            AWS_REGION=${AWS_REGION} \
+            AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION} \
             FORCE_USE_DOCKER=true \
             dir=infrastructure/environments/${{ inputs.environment }} \
             opts="-no-color tfplan"
-
-
 
