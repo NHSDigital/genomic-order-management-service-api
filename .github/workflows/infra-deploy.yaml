@@ -208,5 +208,5 @@ jobs:
             AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION} \
             FORCE_USE_DOCKER=true \
             dir=infrastructure/environments/${{ inputs.environment }} \
-            opts="-no-color --auto-approve tfplan"
+            opts="-no-color -auto-approve tfplan"
 
