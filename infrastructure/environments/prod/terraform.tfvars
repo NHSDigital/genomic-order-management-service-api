@@ -11,7 +11,7 @@ tags = {
   Project            = "genomics-order-management"
   ManagedBy          = "Terraform"
   Owner              = "John Fraser"
-  DeliveryLead       = "Cairns-Hockey, Beryl"
+  DeliveryLead       = "Cairns-Hockey Beryl"
   TechnicalArchitect = "Ravi Natarajan"
   BusinessAnalyst    = "Adam Laurent"
 }
