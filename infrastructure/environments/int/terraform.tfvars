@@ -13,7 +13,7 @@ tags = {
   Owner              = "John Fraser"
   DeliveryLead       = "Cairns-Hockey, Beryl"
   TechnicalArchitect = "Ravi Natarajan"
-  BusinessAnalyst    = "Adam Laurent​"
+  BusinessAnalyst    = "Adam Laurent"
 }
 
 secrets = {

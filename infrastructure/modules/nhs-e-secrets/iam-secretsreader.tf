@@ -24,7 +24,7 @@ resource "aws_iam_role" "nhs_e_secretsreader_role" {
   #  max_session_duration = var.max_session_duration
   #    permissions_boundary = var.permissions_boundary_arn
 
-  tags = merge(local.common_tags, { Purpose = "Cross-account Secrets Manager reader" })
+  tags = merge(local.common_tags, { Purpose = "Crossaccount Secrets retrieval" })
 }
 
 data "aws_iam_policy_document" "nhs_e_secretsreader_role_policy_document" {
