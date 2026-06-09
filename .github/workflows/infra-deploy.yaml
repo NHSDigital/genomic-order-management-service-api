@@ -129,8 +129,6 @@ jobs:
     name: "Terraform apply to ${{ inputs.environment }}"
     needs: [terraform-plan]
     runs-on: ubuntu-latest
-    environment:
-      name: ${{ inputs.environment }}
     steps:
       - name: "Checkout code"
         uses: actions/checkout@v4
