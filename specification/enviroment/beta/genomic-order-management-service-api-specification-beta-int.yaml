@@ -1818,6 +1818,9 @@ paths:
   /FHIR/R4/ServiceRequest/{id}/$graph:
     get:
       operationId: getservicerequestinformation
+      security:
+        - app-level3: []
+        - nhs-cis2-aal3: []
       summary: Get detailed information around a service request.
       description: >
         This endpoint allows to retrieve all related records of a ServiceRequest
@@ -1871,6 +1874,9 @@ paths:
   /FHIR/R4/RequestGroup/{id}/$graph:
     get:
       operationId: getrequestgroupinformation
+      security:
+        - app-level3: []
+        - nhs-cis2-aal3: []
       summary: Get detailed information around a Request Group.
       description: >
         This endpoint allows to retrieve all related records of a ServiceRequest
@@ -2159,6 +2165,9 @@ paths:
     get:
       summary: Retrieve resource history by its logical id
       operationId: readResourceHistory
+      security:
+        - app-level3: []
+        - nhs-cis2-aal3: []
       description: >
         ## Overview
 
@@ -2203,6 +2212,9 @@ paths:
     get:
       summary: Retrieve Resource version by its logical id
       operationId: readResourceHistoryVersion
+      security:
+        - app-level3: []
+        - nhs-cis2-aal3: []
       description: >
         ## Overview
 
