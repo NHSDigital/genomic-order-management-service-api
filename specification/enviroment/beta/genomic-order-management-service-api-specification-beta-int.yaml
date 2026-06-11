@@ -140,11 +140,11 @@ info:
     (RBAC)](https://digital.nhs.uk/developer/guides-and-documentation/security-and-authorisation/national-rbac-for-developers)
     - RBAC rules are stored in the National RBAC Database (NRD) and are used to
     limit what clinical users can and cannot do.
-  
+
     * [Digital Genomics Test Directory Service
     (DGTS)](https://digital.nhs.uk/developer/api-catalogue/digital-genomics-test-directory-service)
     - Search for Genomic Tests and Test Packages using FHIR
-  
+
     * [Multicast Notification Service
     (MNS)](https://digital.nhs.uk/developer/api-catalogue/multicast-notification-service)
     - Notification service for genomic events
@@ -352,7 +352,7 @@ info:
 
     | Integration
     |`https://int.api.service.nhs.uk/genomic-order-management-service`|
-    
+
     | Production
     |`https://api.service.nhs.uk/genomic-order-management-service`|
 
@@ -2182,8 +2182,8 @@ paths:
         ------------------------------------------------------------------------|
 
         |
-        |                                                                                      
-        |                                                                        
+        |
+        |
         |
       tags:
         - history
@@ -2226,7 +2226,7 @@ paths:
         ------------------------------------------------------------------------|
 
         |
-        |                                                                                      
+        |                                 
         |
         |
       tags:
