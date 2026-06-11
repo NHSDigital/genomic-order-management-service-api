@@ -23,3 +23,6 @@ indent_style = tab
 
 [scripts/infra/README.md]
 ignore = true
+
+[specification/enviroment/beta/genomic-order-management-service-api-specification-beta-int.yaml]
+ignore = true
