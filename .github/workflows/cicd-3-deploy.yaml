@@ -70,7 +70,7 @@ jobs:
           export TAG="${{ steps.variables.outputs.tag }}"
           make list-variables
   infra-deploy:
-    needs: [terraform-validate]
+    needs: [validate-main-branch]
     uses: ./.github/workflows/infra-deploy.yaml
     with:
       environment: ${{ inputs.environment }}

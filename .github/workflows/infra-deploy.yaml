@@ -20,7 +20,6 @@ env:
 jobs:
   metadata:
     name: "Set CI/CD metadata"
-    needs: [validate-main-branch]
     runs-on: ubuntu-latest
     timeout-minutes: 1
     outputs:
@@ -96,6 +95,7 @@ jobs:
 
   terraform-plan:
     name: "Terraform plan for ${{ inputs.environment }}"
+    needs: [terraform-validate]
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
