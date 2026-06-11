@@ -22,13 +22,13 @@ jobs:
     name: "Validate deployment from main branch"
     runs-on: ubuntu-latest
     steps:
-      - name: "Check branch"
+    - name: "Check branch"
         run: |
-          # if [ "${{ github.ref }}" != "refs/heads/main" ]; then
-          #   echo "ERROR: This workflow can only be run from the 'main' branch." >&2
-          #   echo "Current branch: ${{ github.ref }}" >&2
-          #   exit 1
-          # fi
+          if [ "${{ github.ref }}" != "refs/heads/main" ]; then
+            echo "ERROR: This workflow can only be run from the 'main' branch." >&2
+            echo "Current branch: ${{ github.ref }}" >&2
+            exit 1
+          fi
           echo "bypassing the checks temporarily for testing"
   metadata:
     name: "Set CI/CD metadata"
@@ -114,6 +114,8 @@ jobs:
     steps:
       - name: "Checkout code"
         uses: actions/checkout@v4
+        with:
+          ref: main
 
       - name: "Setup Terraform"
         uses: hashicorp/setup-terraform@v3
@@ -147,7 +149,7 @@ jobs:
             AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION} \
             FORCE_USE_DOCKER=true \
             dir=infrastructure/environments/${{ inputs.environment }}
-            
+
       - name: "Terraform Plan"
         id: plan
         run: |
@@ -175,6 +177,8 @@ jobs:
     steps:
       - name: "Checkout code"
         uses: actions/checkout@v4
+        with:
+          ref: main
 
       - name: "Setup Terraform"
         uses: hashicorp/setup-terraform@v3

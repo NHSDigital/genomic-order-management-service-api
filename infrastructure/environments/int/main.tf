@@ -1,7 +1,6 @@
 # Production environment configuration
 module "nhs_e_secrets" {
-  source = "../../modules/nhs-e-secrets"
-
+  source                = "../../modules/nhs-e-secrets"
   project               = var.project
   region                = var.region
   environment           = var.environment

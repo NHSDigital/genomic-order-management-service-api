@@ -1,26 +1,39 @@
+###############################################################
+# GitHub Actions OIDC Provider (existing AWS provider)
+###############################################################
 data "aws_iam_openid_connect_provider" "github_actions" {
+  # Reference the AWS OIDC provider for GitHub Actions
   arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:oidc-provider/${var.oidc_provider}"
 }
 
+###############################################################
+# IAM Trust Policy — GitHub Actions (Main Branch Only)
+###############################################################
 data "aws_iam_policy_document" "github_actions_assume_role" {
   statement {
     effect = "Allow"
 
     principals {
-      type        = "Federated"
+      type = "Federated"
+      # Allow authentication only via GitHub's OIDC provider
       identifiers = [data.aws_iam_openid_connect_provider.github_actions.arn]
     }
 
+    # Required for GitHub OIDC → AWS IAM role assumption
     actions = ["sts:AssumeRoleWithWebIdentity"]
 
+    # Enforce that ONLY the main branch can assume this role
+    # GitHub OIDC token 'sub' claim looks like:
+    #   repo:<org>/<repo>:ref:refs/heads/main
     condition {
       test     = "StringLike"
       variable = "token.actions.githubusercontent.com:sub"
       values = [
-        "repo:${var.github_org}/${var.github_repo}:ref:refs/heads/*",
+        "repo:${var.github_org}/${var.github_repo}:ref:refs/heads/main",
       ]
     }
 
+    # Ensure the token is intended for AWS STS (mandatory for GitHub OIDC)
     condition {
       test     = "StringEquals"
       variable = "token.actions.githubusercontent.com:aud"
@@ -29,12 +42,24 @@ data "aws_iam_policy_document" "github_actions_assume_role" {
   }
 }
 
+###############################################################
+# IAM Role — Deployment Role (Main Branch Only)
+###############################################################
 resource "aws_iam_role" "github_actions" {
-  name               = var.role_name
+  name = var.role_name
+  # Attach the trust policy above
   assume_role_policy = data.aws_iam_policy_document.github_actions_assume_role.json
 }
 
+###############################################################
+# IAM Permissions — Deployment Role (Full Infra Access)
+###############################################################
 data "aws_iam_policy_document" "deploy_permissions" {
+
+  ###############################################################
+  # S3 Bucket + Lifecycle + Encryption Management
+  # Required for Terraform-managed infrastructure buckets
+  ###############################################################
   statement {
     sid    = "ManageS3BucketsPoliciesEncryptionAndLifecycle"
     effect = "Allow"
@@ -61,12 +86,16 @@ data "aws_iam_policy_document" "deploy_permissions" {
       "s3:PutBucketVersioning"
     ]
 
+    # Broad S3 access — required for infra provisioning
     resources = [
       "arn:aws:s3:::*",
       "arn:aws:s3:::*/*",
     ]
   }
 
+  ###############################################################
+  # Terraform State (.tfstate) Read/Write
+  ###############################################################
   statement {
     sid    = "ReadWriteTerraformState"
     effect = "Allow"
@@ -81,6 +110,9 @@ data "aws_iam_policy_document" "deploy_permissions" {
     ]
   }
 
+  ###############################################################
+  # Terraform Lock File Management
+  ###############################################################
   statement {
     sid    = "ReadWriteDeleteTerraformLockFile"
     effect = "Allow"
@@ -95,6 +127,9 @@ data "aws_iam_policy_document" "deploy_permissions" {
     ]
   }
 
+  ###############################################################
+  # Secrets Manager — Full Secret Lifecycle
+  ###############################################################
   statement {
     sid = "ManageSecretsManagerSecretsAndResourcePolicies"
     actions = [
@@ -117,6 +152,9 @@ data "aws_iam_policy_document" "deploy_permissions" {
     resources = ["arn:aws:secretsmanager:*:*:secret:*"]
   }
 
+  ###############################################################
+  # KMS — Key + Alias + Grant Management
+  ###############################################################
   statement {
     sid = "ManageKmsKeysAliasesAndPolicies"
     actions = [
@@ -149,6 +187,9 @@ data "aws_iam_policy_document" "deploy_permissions" {
     ]
   }
 
+  ###############################################################
+  # KMS Global Permissions (Key Creation)
+  ###############################################################
   statement {
     sid = "KmsGlobalPermissions"
     actions = [
@@ -159,6 +200,9 @@ data "aws_iam_policy_document" "deploy_permissions" {
     resources = ["*"]
   }
 
+  ###############################################################
+  # IAM Role + Policy Management
+  ###############################################################
   statement {
     sid = "ManageIamRolesAndPolicies"
     actions = [
@@ -196,7 +240,9 @@ data "aws_iam_policy_document" "deploy_permissions" {
     ]
   }
 
-
+  ###############################################################
+  # DynamoDB — Table + Item Management
+  ###############################################################
   statement {
     sid    = "DynamoDBTableManagement"
     effect = "Allow"
@@ -216,6 +262,9 @@ data "aws_iam_policy_document" "deploy_permissions" {
     resources = ["arn:aws:dynamodb:*:*:table/*"]
   }
 
+  ###############################################################
+  # CloudWatch Logs — Log Group Management
+  ###############################################################
   statement {
     sid    = "CloudWatchLogs"
     effect = "Allow"
@@ -231,6 +280,9 @@ data "aws_iam_policy_document" "deploy_permissions" {
   }
 }
 
+###############################################################
+# Attach Permissions to Deployment Role
+###############################################################
 resource "aws_iam_role_policy" "deploy_permissions_policy" {
   name   = "infra-deploy-permissions"
   role   = aws_iam_role.github_actions.id
