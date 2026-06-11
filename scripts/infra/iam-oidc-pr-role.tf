@@ -114,9 +114,10 @@ data "aws_iam_policy_document" "deploy_permissions_pr" {
     actions = [
       "secretsmanager:DescribeSecret",
       "secretsmanager:GetSecretValue",
-      "secretsmanager:ListSecrets",
+      "secretsmanager:GetResourcePolicy",
+      "secretsmanager:ListSecretVersionIds",
+      "secretsmanager:ListSecrets"
     ]
-
     resources = ["arn:aws:secretsmanager:*:*:secret:*"]
   }
 
@@ -130,14 +131,28 @@ data "aws_iam_policy_document" "deploy_permissions_pr" {
 
     actions = [
       "kms:DescribeKey",
-      "kms:ListKeys",
-      "kms:ListAliases",
       "kms:GetKeyPolicy",
       "kms:Encrypt",
+      "kms:Decrypt",
+      "kms:GetKeyRotationStatus",
+      "kms:ListResourceTags",
+      "kms:ListGrants",
+      "kms:GenerateDataKeyWithoutPlaintext",
       "kms:GenerateDataKey"
     ]
-
     resources = ["arn:aws:kms:*:*:key/*"]
+  }
+
+  ###############################################################
+  # KMS Global Permissions (Key Creation)
+  ###############################################################
+  statement {
+    sid = "KmsGlobalPermissions"
+    actions = [
+      "kms:ListKeys",
+      "kms:ListAliases"
+    ]
+    resources = ["*"]
   }
 
   ###############################################
