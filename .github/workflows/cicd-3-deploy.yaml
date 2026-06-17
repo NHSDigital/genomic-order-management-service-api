@@ -4,14 +4,34 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: "This is the tag that is oging to be deployed"
+        description: "This is the tag that is going to be deployed"
         required: true
         default: "latest"
+      environment:
+        description: "Select environment"
+        required: true
+        type: choice
+        options:
+          - int
+          - prod
 
 jobs:
+  validate-main-branch:
+    name: "Validate deployment from main branch"
+    runs-on: ubuntu-latest
+    steps:
+    - name: "Check branch"
+      run: |
+        if [ "${{ github.ref }}" != "refs/heads/main" ]; then
+          echo "ERROR: This workflow can only be run from the 'main' branch." >&2
+          echo "Current branch: ${{ github.ref }}" >&2
+          exit 1
+        fi
+        echo "bypassing the checks temporarily for testing"
   metadata:
     name: "Set CI/CD metadata"
     runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
     timeout-minutes: 1
     outputs:
       build_datetime: ${{ steps.variables.outputs.build_datetime }}
@@ -49,14 +69,13 @@ jobs:
           export VERSION="${{ steps.variables.outputs.version }}"
           export TAG="${{ steps.variables.outputs.tag }}"
           make list-variables
-  deploy:
-    name: "Deploy to an environment"
-    runs-on: ubuntu-latest
-    needs: [metadata]
-    timeout-minutes: 10
-    steps:
-      - name: "Checkout code"
-        uses: actions/checkout@v4
+  infra-deploy:
+    needs: [validate-main-branch]
+    uses: ./.github/workflows/infra-deploy.yaml
+    with:
+      environment: ${{ inputs.environment }}
+    secrets: inherit
+
   # TODO: More jobs or/and steps here
   # success:
   #   name: "Success notification"

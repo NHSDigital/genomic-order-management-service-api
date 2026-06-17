@@ -1,0 +1,178 @@
+name: "Infrastructure Validate"
+
+# Validation workflow for infrastructure changes
+# Runs on pull requests to validate Terraform code without deploying
+
+on:
+  workflow_call:
+    inputs:
+      build_datetime:
+        description: "Build datetime, set by the CI/CD pipeline workflow"
+        required: true
+        type: string
+      build_timestamp:
+        description: "Build timestamp, set by the CI/CD pipeline workflow"
+        required: true
+        type: string
+      build_epoch:
+        description: "Build epoch, set by the CI/CD pipeline workflow"
+        required: true
+        type: string
+      nodejs_version:
+        description: "Node.js version, set by the CI/CD pipeline workflow"
+        required: true
+        type: string
+      python_version:
+        description: "Python version, set by the CI/CD pipeline workflow"
+        required: true
+        type: string
+      terraform_version:
+        description: "Terraform version, set by the CI/CD pipeline workflow"
+        required: true
+        type: string
+      version:
+        description: "Version of the software, set by the CI/CD pipeline workflow"
+        required: true
+        type: string
+      environment:
+        description: "environment"
+        required: true
+        type: string
+
+permissions:
+  id-token: write
+  contents: read
+  pull-requests: write
+
+env:
+  AWS_PR_ROLE: ${{ inputs.environment == 'prod' && secrets.AWS_PROD_PR_ROLE || secrets.AWS_INT_PR_ROLE }}
+
+jobs:
+  metadata:
+    name: "Set CI/CD metadata"
+    runs-on: ubuntu-latest
+    timeout-minutes: 1
+    outputs:
+      build_datetime: ${{ steps.variables.outputs.build_datetime }}
+      build_timestamp: ${{ steps.variables.outputs.build_timestamp }}
+      build_epoch: ${{ steps.variables.outputs.build_epoch }}
+      terraform_version: ${{ steps.variables.outputs.terraform_version }}
+      version: ${{ steps.variables.outputs.version }}
+    steps:
+      - name: "Checkout code"
+        uses: actions/checkout@v4
+
+      - name: "Set CI/CD variables"
+        id: variables
+        run: |
+          datetime=$(date -u +'%Y-%m-%dT%H:%M:%S%z')
+          echo "build_datetime=$datetime" >> $GITHUB_OUTPUT
+          echo "build_timestamp=$(date --date=$datetime -u +'%Y%m%d%H%M%S')" >> $GITHUB_OUTPUT
+          echo "build_epoch=$(date --date=$datetime -u +'%s')" >> $GITHUB_OUTPUT
+          echo "terraform_version=$(grep "^terraform" .tool-versions | cut -f2 -d' ')" >> $GITHUB_OUTPUT
+          echo "version=$(head -n 1 .version 2> /dev/null || echo unknown)" >> $GITHUB_OUTPUT
+
+      - name: "List variables"
+        run: |
+          export BUILD_DATETIME="${{ steps.variables.outputs.build_datetime }}"
+          export BUILD_TIMESTAMP="${{ steps.variables.outputs.build_timestamp }}"
+          export BUILD_EPOCH="${{ steps.variables.outputs.build_epoch }}"
+          export TERRAFORM_VERSION="${{ steps.variables.outputs.terraform_version }}"
+          export VERSION="${{ steps.variables.outputs.version }}"
+          make list-variables
+
+  terraform-plan:
+    name: "Terraform plan for ${{ inputs.environment }}"
+    needs: [metadata]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      id-token: write
+      contents: read
+      pull-requests: write
+    steps:
+      - name: "Checkout code"
+        uses: actions/checkout@v4
+
+      - name: "Setup Terraform"
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ needs.metadata.outputs.terraform_version }}
+
+      - name: "Validate AWS role ARN secret"
+        run: |
+          if [ -z "${AWS_PR_ROLE:-}" ]; then
+            echo "ERROR: Missing AWS role ARN secret for environment '${{ inputs.environment }}'." >&2
+            echo "Set '${{ inputs.environment == 'prod' && 'AWS_PROD_PR_ROLE' || 'AWS_INT_PR_ROLE' }}' in repository secrets." >&2
+            exit 1
+          fi
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ env.AWS_PR_ROLE }}
+          aws-region: eu-west-2
+
+      - name: "Terraform Init - ${{ inputs.environment }}"
+        run: |
+          make terraform-init \
+            AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID} \
+            AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY} \
+            AWS_SESSION_TOKEN=${AWS_SESSION_TOKEN} \
+            AWS_REGION=${AWS_REGION} \
+            AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION} \
+            FORCE_USE_DOCKER=true \
+            dir=infrastructure/environments/${{ inputs.environment }}
+
+      - name: "Terraform Plan - ${{ inputs.environment }}"
+        id: plan
+        run: |
+          make terraform-plan \
+            AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID} \
+            AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY} \
+            AWS_SESSION_TOKEN=${AWS_SESSION_TOKEN} \
+            AWS_REGION=${AWS_REGION} \
+            AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION} \
+            FORCE_USE_DOCKER=true \
+            dir=infrastructure/environments/${{ inputs.environment }} \
+            opts="-var-file=../terraform.tfvars\ -var-file=./terraform.tfvars\ -no-color\ -out=tfplan"
+
+      - name: "Comment Plan on PR"
+        uses: actions/github-script@v7
+        if: github.event_name == 'pull_request'
+        with:
+          script: |
+            const fs = require('fs');
+            const plan = fs.readFileSync('infrastructure/environments/${{ inputs.environment }}/tfplan.txt', 'utf8');
+            const output = `#### Terraform Plan for \`${{ inputs.environment }}\`
+            \`\`\`
+            ${plan.substring(0, 65536)}
+            \`\`\`
+            `;
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: output
+            });
+
+      - name: "Upload tfplan artifact"
+        uses: actions/upload-artifact@v4
+        with:
+          name: tfplan-${{ inputs.environment }}
+          path: infrastructure/environments/${{ inputs.environment }}/tfplan
+
+  validation-summary:
+    name: "Validation summary"
+    needs: [terraform-plan]
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: "Check validation status"
+        run: |
+          if [ "${{ needs.terraform-plan.result }}" == "failure" ]; then
+            echo "Infrastructure validation failed"
+            exit 1
+          else
+            echo "Infrastructure validation passed"
+          fi
