@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: Genomic Order Management Service (FHIR) API
-  version: v0.5.2 Beta
+  version: v0.5.3 Beta
   description: >
 
     ## Overview
@@ -140,11 +140,11 @@ info:
     (RBAC)](https://digital.nhs.uk/developer/guides-and-documentation/security-and-authorisation/national-rbac-for-developers)
     - RBAC rules are stored in the National RBAC Database (NRD) and are used to
     limit what clinical users can and cannot do.
-    
+
     * [Digital Genomics Test Directory Service
     (DGTS)](https://digital.nhs.uk/developer/api-catalogue/digital-genomics-test-directory-service)
     - Search for Genomic Tests and Test Packages using FHIR
-    
+
     * [Multicast Notification Service
     (MNS)](https://digital.nhs.uk/developer/api-catalogue/multicast-notification-service)
     - Notification service for genomic events
@@ -352,7 +352,7 @@ info:
 
     | Integration
     |`https://int.api.service.nhs.uk/genomic-order-management-service`|
-    
+
     | Production
     |`https://api.service.nhs.uk/genomic-order-management-service`|
 
@@ -469,7 +469,7 @@ paths:
       description: |
         ## Overview
         [FHIR Restful](https://hl7.org/fhir/R4/http.html) endpoint to
-         register a **new test or update tests or add reports etc**. This end point uses FHIR [bundle](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Bundle) of type **transaction** and the list of resources that forms the payload are listed [here](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/Build/Resource-Linkage).
+        register a **new test or update tests or add reports etc**. This end point uses FHIR [bundle](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/Bundle) of type **transaction** and the list of resources that forms the payload are listed [here](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/Build/Resource-Linkage).
       tags:
         - process
       parameters:
@@ -1919,7 +1919,7 @@ paths:
 
         This endpoint allows you to retrieve the records of DiagnosticReport
         using various query parameters. Refer [search](https://simplifier.net/guide/FHIR-Genomics-Implementation-Guide/Home/Build/Supported-CRUD-capability#Read) for more details.
-        
+
         ## UGR - Search for patient test reports.
       tags:
         - report
@@ -2133,7 +2133,7 @@ paths:
 
 
         | Scenario                                |
-        Request                                                                                                                                                    
+        Request
         |
         Response
         |
@@ -2143,8 +2143,8 @@ paths:
         ------------------------------------------------------------------------|
 
         |
-        |                                                                                      
-        |                                                                        
+        |
+        |
         |
       tags:
         - history
@@ -2177,7 +2177,7 @@ paths:
 
 
         | Scenario                                |
-        Request                                                                                    
+        Request
         |
         Response
         |
@@ -2187,7 +2187,7 @@ paths:
         ------------------------------------------------------------------------|
 
         |
-        |                                                                                      
+        |
         |
         |
       tags:
@@ -3533,7 +3533,7 @@ components:
               - type
               - entry
             description: >-
-              A Bundle containing [FHIR ServiceRequest](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/UKCore-ServiceRequest) 
+              A Bundle containing [FHIR ServiceRequest](https://simplifier.net/guide/fhir-genomics-implementation-guide/Home/FHIRAssets/Profiles/All-Profiles/UKCore-ServiceRequest)
               history
           examples:
             multiple-items:
