@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: Genomic Order Management Service (FHIR) API
-  version: v0.5.3 Beta
+  version: v2.0
   description: >
 
     ## Overview
@@ -469,8 +469,6 @@ paths:
       operationId: processgenomicrequests
       security:
         - app-level0: []
-        - app-level3: []
-        - nhs-cis2-aal3: []
       summary: Process genomic test request
       description: |
         ## Overview
@@ -1760,8 +1758,6 @@ paths:
       operationId: getSearchPages
       security:
         - app-level0: []
-        - app-level3: []
-        - nhs-cis2-aal3: []
       summary: Get results pages
       description: >
         ## Overview
@@ -1786,8 +1782,6 @@ paths:
       operationId: getServiceRequests
       security:
         - app-level0: []
-        - app-level3: []
-        - nhs-cis2-aal3: []
       summary: Search for ServiceRequests
       description: >
         ## Overview
@@ -1825,8 +1819,6 @@ paths:
       operationId: getservicerequestinformation
       security:
         - app-level0: []
-        - app-level3: []
-        - nhs-cis2-aal3: []
       summary: Get detailed information around a service request.
       description: >
         This endpoint allows to retrieve all related records of a ServiceRequest
@@ -1853,8 +1845,6 @@ paths:
       operationId: getRequestGroup
       security:
         - app-level0: []
-        - app-level3: []
-        - nhs-cis2-aal3: []
       summary: Search for RequestGroup
       description: >
         ## Overview
@@ -1883,8 +1873,6 @@ paths:
       operationId: getrequestgroupinformation
       security:
         - app-level0: []
-        - app-level3: []
-        - nhs-cis2-aal3: []
       summary: Get detailed information around a Request Group.
       description: >
         This endpoint allows to retrieve all related records of a ServiceRequest
@@ -1911,8 +1899,6 @@ paths:
       operationId: getTasks
       security:
         - app-level0: []
-        - app-level3: []
-        - nhs-cis2-aal3: []
       summary: Search for Tasks
       description: >
         ## Overview
@@ -1945,8 +1931,6 @@ paths:
       operationId: getDiagnosticReports
       security:
         - app-level0: []
-        - app-level3: []
-        - nhs-cis2-aal3: []
       summary: Search for DiagnosticReports
       description: >
         ## Overview
@@ -1981,8 +1965,6 @@ paths:
       operationId: getdiagnosticreportinformation
       security:
         - app-level0: []
-        - app-level3: []
-        - nhs-cis2-aal3: []
       summary: Get detailed information around a diagnostic report.
       description: >
         This endpoint allows to retrieve all related records of a DiagnosticReport
@@ -2009,8 +1991,6 @@ paths:
       operationId: getSpecimens
       security:
         - app-level0: []
-        - app-level3: []
-        - nhs-cis2-aal3: []
       summary: Search for Specimens
       description: >
         ## Overview
@@ -2043,8 +2023,6 @@ paths:
       operationId: getPatient
       security:
         - app-level0: []
-        - app-level3: []
-        - nhs-cis2-aal3: []
       summary: Search for Patient
       description: >
         ## Overview
@@ -2071,8 +2049,6 @@ paths:
       operationId: getRelatedPerson
       security:
         - app-level0: []
-        - app-level3: []
-        - nhs-cis2-aal3: []
       summary: Search for RelatedPerson
       description: >
         ## Overview
@@ -2100,8 +2076,6 @@ paths:
       operationId: getPractitionerRole
       security:
         - app-level0: []
-        - app-level3: []
-        - nhs-cis2-aal3: []
       summary: Search for PractitionerRole
       description: >
         ## Overview
@@ -2129,8 +2103,6 @@ paths:
       operationId: validategenomicrequests
       security:
         - app-level0: []
-        - app-level3: []
-        - nhs-cis2-aal3: []
       summary: Validate genomic test requests resource without processing them for storage
       description: >
         ## Overview
@@ -2155,8 +2127,6 @@ paths:
       operationId: readResource
       security:
         - app-level0: []
-        - app-level3: []
-        - nhs-cis2-aal3: []
       summary: Search for resource by its logical id
       description: >
         ## Overview
@@ -2184,8 +2154,6 @@ paths:
       operationId: readResourceHistory
       security:
         - app-level0: []
-        - app-level3: []
-        - nhs-cis2-aal3: []
       description: >
         ## Overview
 
@@ -2232,8 +2200,6 @@ paths:
       operationId: readResourceHistoryVersion
       security:
         - app-level0: []
-        - app-level3: []
-        - nhs-cis2-aal3: []
       description: >
         ## Overview
 
@@ -2280,8 +2246,6 @@ paths:
       operationId: readMetadata
       security:
         - app-level0: []
-        - app-level3: []
-        - nhs-cis2-aal3: []
       summary: Get the capability statement from server
       description: >
         ## Overview
@@ -2299,12 +2263,6 @@ components:
     app-level0:
       $ref: >-
        https://proxygen.prod.api.platform.nhs.uk/components/securitySchemes/app-level0
-    app-level3:
-      $ref: >-
-       https://proxygen.prod.api.platform.nhs.uk/components/securitySchemes/app-level3
-    nhs-cis2-aal3:
-      $ref: >-
-       https://proxygen.ptl.api.platform.nhs.uk/components/securitySchemes/nhs-cis2-aal3
   responses:
     4XX-goms-error:
       description: >
@@ -4775,19 +4733,15 @@ x-nhsd-apim:
   target:
     type: external
     healthcheck: /_status
-    url: https://glu-api.aireinnovate.com/genomics-stag
+    url: https://api.i5byono12ujz.workload-prod-hcc.isccloud.io:9443/genomics-gomtst
     security:
       type: apikey
-      header: X-Api-Key
+      header: apikey
       secret: order-management-service-dev-api-key
   access:
     - title: Application Restricted
       grants:
         app-level0: []
-        app-level3: []
-    - title: User Restricted
-      grants:
-        nhs-cis2-aal3: []
   ratelimiting:
     proxy:
       limit: 100
